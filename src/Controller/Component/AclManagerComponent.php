@@ -156,7 +156,7 @@ class AclManagerComponent extends Component {
             ];
         } else {
             $conditions = [
-                'parent_id IS NULL',
+                'parent_id' => null,
                 'foreign_key' => $aro->foreign_key,
                 'model' => $aro->model
             ];
