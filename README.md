@@ -8,7 +8,30 @@
 
 This plugin provides a comprehensive web interface for managing Access Control Lists (ACL) in CakePHP 5.x applications. It's been completely refactored following Clean Code principles and modern PHP standards.
 
-> **Note**: This is a fork of the original [CakePHP AclManager](https://github.com/ivanamat/cakephp-aclmanager) by Iván Amat, updated and maintained by Marcos Gómez Buceta.
+## 🍴 About This Fork
+
+> **This is a fork and continuation** of the original [CakePHP AclManager](https://github.com/ivanamat/cakephp-aclmanager) by **Iván Amat**.
+
+### What's New in This Fork
+
+This fork, maintained by **Marcos Gómez Buceta**, includes the following enhancements:
+
+- ✨ **Complete CakePHP 5.x upgrade** - Full migration to CakePHP 5.x framework
+- 🏗️ **Modern PHP 8.1+ architecture** - Strict typing, typed properties, and modern PHP features
+- 🎯 **Service layer implementation** - Clean separation of concerns with dedicated service classes:
+  - `AclPermissionService` for permission evaluation
+  - `AclSynchronizationService` for ACO/ARO synchronization
+- 📁 **Updated template structure** - Migrated from `src/Template/` to modern `templates/` directory
+- 🎨 **Enhanced UI** - Bootstrap 5 integration with accessibility improvements
+- 🛣️ **Modern routing** - Closure-based routing with kebab-case URLs (`/acl-manager`)
+- 📚 **Comprehensive documentation** - Updated guides and developer documentation
+- 🧹 **Code quality improvements** - PSR-12 compliance, Clean Code principles, and better error handling
+
+### Original Work Attribution
+
+The original CakePHP 4.x Acl Manager was created by **Iván Amat** ([@ivanamat](https://github.com/ivanamat)), which itself was based on the CakePHP 2.x [AclManager](https://github.com/FMCorz/AclManager) by **Frédéric Massart (FMCorz)**.
+
+---
 
 ## Key Features
 
