@@ -52,25 +52,10 @@ For CakePHP 3.x/4.x versions, visit: https://github.com/ivanamat/cakephp3-aclman
 
 ## Installation
 
-### Using Composer from GitHub
-
-Add the repository to your `composer.json`:
-
-```json
-{
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/mgomezbuceta/cakephp-aclmanager"
-        }
-    ]
-}
-```
-
-Then install the package:
+### Using Composer (Recommended)
 
 ```bash
-composer require mgomezbuceta/cakephp-aclmanager:dev-master
+composer require mgomezbuceta/cakephp-aclmanager
 ```
 
 ### Dependencies
