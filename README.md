@@ -337,5 +337,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## Acknowledgments
 
 This project is a fork and continuation of the excellent work done by:
-- **Iván Amat** ([@ivanamat](https://github.com/ivanamat)) - Original CakePHP 5.x refactor
+- **Iván Amat** ([@ivanamat](https://github.com/ivanamat)) - Original [CakePHP 4.x Acl Manager](https://github.com/ivanamat/cakephp-aclmanager)
 - **Frédéric Massart (FMCorz)** ([@FMCorz](https://github.com/FMCorz)) - Original [AclManager](https://github.com/FMCorz/AclManager) for CakePHP 2.x
