@@ -79,7 +79,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated README.md with CakePHP 5.x examples
   - Modern installation and configuration instructions
   - Enhanced troubleshooting section
-- **Migration Guide**: Created MIGRATION.md for upgrading from previous versions
 - **Developer Guide**: Enhanced CLAUDE.md with modern architecture details
 
 ### 🔧 Internal Changes

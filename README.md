@@ -1,12 +1,14 @@
 # CakePHP 5.x ACL Manager
 
-[![Latest Stable Version](https://img.shields.io/packagist/v/ivanamat/cakephp5-aclmanager.svg)](https://packagist.org/packages/ivanamat/cakephp5-aclmanager)
-[![PHP Version Require](https://img.shields.io/packagist/php-v/ivanamat/cakephp5-aclmanager.svg)](https://packagist.org/packages/ivanamat/cakephp5-aclmanager)
-[![License](https://img.shields.io/packagist/l/ivanamat/cakephp5-aclmanager.svg)](https://github.com/ivanamat/cakephp-aclmanager/blob/main/LICENSE.md)
+[![Latest Stable Version](https://img.shields.io/packagist/v/mgomezbuceta/cakephp-aclmanager.svg)](https://packagist.org/packages/mgomezbuceta/cakephp-aclmanager)
+[![PHP Version Require](https://img.shields.io/packagist/php-v/mgomezbuceta/cakephp-aclmanager.svg)](https://packagist.org/packages/mgomezbuceta/cakephp-aclmanager)
+[![License](https://img.shields.io/packagist/l/mgomezbuceta/cakephp-aclmanager.svg)](https://github.com/mgomezbuceta/cakephp-aclmanager/blob/main/LICENSE.md)
 
 **Enhanced ACL permissions management system for CakePHP 5.x applications**
 
 This plugin provides a comprehensive web interface for managing Access Control Lists (ACL) in CakePHP 5.x applications. It's been completely refactored following Clean Code principles and modern PHP standards.
+
+> **Note**: This is a fork of the original [CakePHP AclManager](https://github.com/ivanamat/cakephp-aclmanager) by Iván Amat, updated and maintained by Marcos Gómez Buceta.
 
 ## Key Features
 
@@ -30,7 +32,7 @@ For CakePHP 3.x/4.x versions, visit: https://github.com/ivanamat/cakephp3-aclman
 ### Using Composer (Recommended)
 
 ```bash
-composer require ivanamat/cakephp5-aclmanager
+composer require mgomezbuceta/cakephp-aclmanager
 ```
 
 ### Dependencies
@@ -314,10 +316,6 @@ Configure::write('debug', true);
 Configure::write('AclManager.debug', true);
 ```
 
-## Migration from Previous Versions
-
-See [MIGRATION.md](MIGRATION.md) for detailed upgrade instructions from CakePHP 3.x/4.x versions.
-
 ## Contributing
 
 1. Fork the repository
@@ -332,10 +330,12 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Author
 
-**Iván Amat**
-- GitHub: [@ivanamat](https://github.com/ivanamat)
-- Website: [www.ivanamat.es](http://www.ivanamat.es/)
+**Marcos Gómez Buceta**
+- GitHub: [@mgomezbuceta](https://github.com/mgomezbuceta)
+- Email: [mgomezbuceta@gmail.com](mailto:mgomezbuceta@gmail.com)
 
 ## Acknowledgments
 
-Based on the original [AclManager](https://github.com/FMCorz/AclManager) by [Frédéric Massart (FMCorz)](https://github.com/FMCorz) for CakePHP 2.x.
+This project is a fork and continuation of the excellent work done by:
+- **Iván Amat** ([@ivanamat](https://github.com/ivanamat)) - Original CakePHP 5.x refactor
+- **Frédéric Massart (FMCorz)** ([@FMCorz](https://github.com/FMCorz)) - Original [AclManager](https://github.com/FMCorz/AclManager) for CakePHP 2.x

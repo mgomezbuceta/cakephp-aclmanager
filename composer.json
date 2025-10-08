@@ -1,15 +1,21 @@
 {
-    "name": "ivanamat/cakephp5-aclmanager",
+    "name": "mgomezbuceta/cakephp-aclmanager",
     "description": "AclManager plugin for CakePHP 5.x - Enhanced ACL permissions management system",
     "keywords": ["cakephp", "cakephp5", "cake5", "plugin", "acl", "manager", "permissions", "authorization"],
-    "homepage": "https://github.com/ivanamat/cakephp-aclmanager",
+    "homepage": "https://github.com/mgomezbuceta/cakephp-aclmanager",
     "type": "cakephp-plugin",
     "license": "MIT",
     "authors": [
         {
+            "name": "Marcos Gómez Buceta",
+            "email": "mgomezbuceta@gmail.com",
+            "homepage": "https://github.com/mgomezbuceta",
+            "role": "Maintainer"
+        },
+        {
             "name": "Ivan Amat",
             "homepage": "http://www.ivanamat.es",
-            "role": "Author"
+            "role": "Original Author"
         }
     ],
     "require": {
