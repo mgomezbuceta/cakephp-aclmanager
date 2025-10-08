@@ -38,3 +38,8 @@ nbproject/*
 .vscode
 # Sass preprocessor
 .sass-cache/
+
+# Project specific files #
+##########################
+CLAUDE.md
+README.cp3.md
