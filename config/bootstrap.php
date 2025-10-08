@@ -1,94 +1,94 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * CakePHP 3.x - Acl Manager
- * 
- * PHP version 5
+ * CakePHP 5.x - ACL Manager Bootstrap
+ *
+ * Enhanced bootstrap configuration for CakePHP 5.x
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @category CakePHP3
- * 
- * @author   Ivan Amat <dev@ivanamat.es>
- * @copyright     Copyright 2016, Iván Amat
- * @license  MIT http://opensource.org/licenses/MIT
- * @link     https://github.com/ivanamat/cakephp3-aclmanager
- *
- * @author        Frédéric Massart - FMCorz.net
- * @copyright     Copyright 2011, Frédéric Massart
- * @link          http://github.com/FMCorz/AclManager
- * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
+ * @author Ivan Amat <dev@ivanamat.es>
+ * @copyright Copyright 2024, Iván Amat
+ * @license MIT http://opensource.org/licenses/MIT
+ * @link https://github.com/ivanamat/cakephp-aclmanager
  */
 
 use Cake\Core\Configure;
 
 /**
- * List of AROs (Class aliases)
- * Order is important! Parent to Children
+ * Plugin version
  */
-// Configure::write('AclManager.aros', array('Groups', 'Roles', 'Users'));
+Configure::write('AclManager.version', '2.0.0');
 
 /**
- * Limit used to paginate AROs
- * Replace {alias} with ARO alias
- * Configure::write('AclManager.{alias}.limit', 3)
+ * Default configuration values
  */
-// Configure::write('AclManager.Role.limit', 3);
+$defaultConfig = [
+    // List of ARO models (hierarchy: parent to children)
+    'aros' => ['Groups', 'Roles', 'Users'],
 
-/**
- * Routing Prefix
- * Set the prefix you would like to restrict the plugin to
- * @see Configure::read('Routing.prefixes')
- */
-// Configure::write('AclManager.prefix', 'admin');
+    // Enable admin prefix routing
+    'admin' => false,
 
-/**
- * Ugly identation?
- * Turn off when using CSS
- */
-Configure::write('AclManager.uglyIdent', true);
+    // Hide denied permissions in ACL lists
+    'hideDenied' => true,
 
-/**
- * Hide denied on ACL list
- * Format: boolean ( true/false)
- */
-if(!Configure::check('AclManager.hideDenied')) {
-    Configure::write('AclManager.hideDenied', true);
-}
+    // Use ugly indentation (for non-CSS styling)
+    'uglyIdent' => true,
 
-/**
- * Actions to ignore when looking for new ACOs
- * Format: 'action', 'Controller/action' or 'Plugin.Controller/action'
- */
-if(!Configure::check('AclManager.ignoreActions')) {
-    Configure::write('AclManager.ignoreActions', array(
+    // Actions to ignore during ACO synchronization
+    'ignoreActions' => [
         'isAuthorized',
+        'beforeFilter',
+        'afterFilter',
+        'initialize',
         'Acl.*',
-        'Error/*'
-    ));
+        'Error/*',
+        'DebugKit.*'
+    ],
+
+    // Default pagination limits per ARO model
+    'paginationLimits' => [
+        'Groups' => 10,
+        'Roles' => 15,
+        'Users' => 20
+    ]
+];
+
+// Apply default configuration if not already set
+foreach ($defaultConfig as $key => $value) {
+    if (!Configure::check("AclManager.{$key}")) {
+        Configure::write("AclManager.{$key}", $value);
+    }
 }
 
-/**
- * List of ARO models to load
- * Use only if AclManager.aros aliases are different than model name
- */
-// Configure::write('AclManager.models', array('Group', 'Customer'));
-
-/**
- * END OF USER SETTINGS
- */
-
-/**
- * AclManager settings
- */
-Configure::write("AclManager.version", "1.3");
-if (!is_array(Configure::read('AclManager.aros'))) {
-	Configure::write('AclManager.aros', array(Configure::read('AclManager.aros')));
+// Ensure AROs configuration is an array
+$aros = Configure::read('AclManager.aros');
+if (!is_array($aros)) {
+    Configure::write('AclManager.aros', [$aros]);
 }
-if (!is_array(Configure::read('AclManager.ignoreActions'))) {
-	Configure::write('AclManager.ignoreActions', array(Configure::read('AclManager.ignoreActions')));
+
+// Ensure ignoreActions configuration is an array
+$ignoreActions = Configure::read('AclManager.ignoreActions');
+if (!is_array($ignoreActions)) {
+    Configure::write('AclManager.ignoreActions', [$ignoreActions]);
 }
+
+// Set models configuration if not specified
 if (!Configure::read('AclManager.models')) {
-	Configure::write('AclManager.models', Configure::read('AclManager.aros'));
+    Configure::write('AclManager.models', Configure::read('AclManager.aros'));
+}
+
+// Set individual pagination limits if specified
+$aros = Configure::read('AclManager.aros', []);
+$defaultLimits = Configure::read('AclManager.paginationLimits', []);
+
+foreach ($aros as $aro) {
+    if (!Configure::check("AclManager.{$aro}.limit")) {
+        $limit = $defaultLimits[$aro] ?? 10;
+        Configure::write("AclManager.{$aro}.limit", $limit);
+    }
 }

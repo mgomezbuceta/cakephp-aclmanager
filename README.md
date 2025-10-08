@@ -1,304 +1,341 @@
-# CakePHP 4.x Acl Manager
-**WARNING!:** This project should not be used yet with CakePHP 4.x
+# CakePHP 5.x ACL Manager
 
-Currently this project is under development and does't have any stable version. The code comes from CakePHP 3.x and should be refactorized
+[![Latest Stable Version](https://img.shields.io/packagist/v/ivanamat/cakephp5-aclmanager.svg)](https://packagist.org/packages/ivanamat/cakephp5-aclmanager)
+[![PHP Version Require](https://img.shields.io/packagist/php-v/ivanamat/cakephp5-aclmanager.svg)](https://packagist.org/packages/ivanamat/cakephp5-aclmanager)
+[![License](https://img.shields.io/packagist/l/ivanamat/cakephp5-aclmanager.svg)](https://github.com/ivanamat/cakephp-aclmanager/blob/main/LICENSE.md)
 
-If you need CakePHP 3.x AclManager version visit https://github.com/ivanamat/cakephp3-aclmanager.
+**Enhanced ACL permissions management system for CakePHP 5.x applications**
 
-Come back soon!
+This plugin provides a comprehensive web interface for managing Access Control Lists (ACL) in CakePHP 5.x applications. It's been completely refactored following Clean Code principles and modern PHP standards.
+
+## Key Features
+
+- 🔐 **Comprehensive ACL Management**: Complete web interface for managing permissions
+- 🎯 **Hierarchical ARO Support**: Supports complex role hierarchies (Groups → Roles → Users)
+- 🔄 **Automatic Synchronization**: Auto-sync ACOs and AROs with your application structure
+- 🎨 **Modern UI**: Bootstrap-based responsive interface with accessibility features
+- 🚀 **CakePHP 5.x Native**: Built specifically for CakePHP 5.x with modern PHP 8.1+ features
+- 🧹 **Clean Architecture**: Service layer separation and SOLID principles implementation
+
+For CakePHP 3.x/4.x versions, visit: https://github.com/ivanamat/cakephp3-aclmanager
+
+## Requirements
+
+- PHP 8.1 or higher
+- CakePHP 5.0 or higher
+- CakePHP ACL Plugin 2.0 or higher
 
 ## Installation
 
-### Composer
+### Using Composer (Recommended)
 
-You can install this plugin into your CakePHP application using [composer](http://getcomposer.org).
-
-The recommended way to install composer packages is:
-
-```
-composer require ivanamat/cakephp3-aclmanager
+```bash
+composer require ivanamat/cakephp5-aclmanager
 ```
 
+### Dependencies
 
-### Git submodule
+First, install the CakePHP ACL plugin:
+
+```bash
+composer require cakephp/acl
 ```
-git submodule add git@github.com:ivanamat/cakephp3-aclmanager.git plugins/AclManager
-git submodule init
-git submodule update
-```
-
-### Manual installation
-
-Download the .zip or .tar.gz file, unzip and rename the plugin folder "cakephp3-aclmanager" to "AclManager" then copy the folder to your plugins folder.
-
-[Download release](https://github.com/ivanamat/cakephp3-aclmanager/releases)
 
 
-## Getting started
+## Quick Start
 
-* Install the CakePHP ACL plugin by running *composer require cakephp/acl*. [Read Acl plugin documentation](https://github.com/cakephp/acl).
-* Set AclManager configuration. ***AclManager.aros***. Must be specified before load plugin.
-* Load the Acl and AclManager plugins in *app/config/bootstrap.php*.
+### 1. Configure ACL Models
+
+In your `config/app_local.php` or `config/bootstrap.php`, configure your ARO hierarchy:
 
 ```php
-# Example configuration for an schema based on Groups, Roles and Users
-Configure::write('AclManager.aros', array('Groups', 'Roles', 'Users'));
+use Cake\Core\Configure;
 
-Plugin::load('Acl', ['bootstrap' => true]);
-Plugin::load('AclManager', ['bootstrap' => true, 'routes' => true]);
-```
+// Configure ARO hierarchy (parent to children)
+Configure::write('AclManager.aros', ['Groups', 'Roles', 'Users']);
 
-**Warning:** It is not recommended to use Plugin::loadAll();. if you use Plugin::loadAll(); make sure it will not load any plugin several times with Plugin::load('PluginName').
+// Optional: Configure admin prefix
+Configure::write('AclManager.admin', false);
 
-### Configuration parameters
-
-Must be specified before load plugin.
-
-* **AclManager.aros** Required. Sets the AROs to be used. The value of this parameter must be an array with the names of the AROs to be used.
-```php
-# Example configuration for an schema based on Groups, Roles and Users
-Configure::write('AclManager.aros', array('Groups', 'Roles', 'Users'));
-```
-* **AclManager.admin** Optional. Set 'admin' prefix. The value of this parameter must be boolean.
-```php
-# Set prefix admin ( http://www.domain.com/admin/AclManager )
-Configure::write('AclManager.admin', true);
-```
-* ***AclManager.hideDenied*** Hide plugins, controllers and actions denied in ACLs lists.
-```php
+// Optional: Hide denied permissions in lists
 Configure::write('AclManager.hideDenied', true);
 ```
-* ***AclManager.ignoreActions*** Ignore all plugins, controllers and actions you don't want to add to your ACLs. The value of this parameter must be an array.
-```php
-    # Ecample:
-    Configure::write('AclManager.ignoreActions', array(
-        'actionName', // ignore action
-        'Plugin.*', // Ignore the plugin
-        'Plugin.Controller/*', // Ignore the plugin controller
-        'Plugin.Controller/Action', // Ignore specific action from the plugin.
-        'Error/*' // Ignore the controller
-        'Error/Action' // Ignore specifc action from controller
-    ));
-```
 
-## Creating ACL tables
+### 2. Load the Plugins
 
-To create ACL related tables, run the following Migrations command.
-
-    bin/cake migrations migrate -p Acl
-
-
-## Example schema
-
-An example schema based on Groups, Roles and Users.
-
-```sql
-    CREATE TABLE `groups` (
-        `id` int(11) NOT NULL AUTO_INCREMENT,
-        `name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-        `created` datetime DEFAULT NULL,
-        `modified` datetime DEFAULT NULL,
-        PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-    CREATE TABLE `roles` (
-        `id` int(11) NOT NULL AUTO_INCREMENT,
-        `group_id` int(11) DEFAULT NULL,
-        `name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-        `created` datetime DEFAULT NULL,
-        `modified` datetime DEFAULT NULL,
-        PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-    CREATE TABLE `users` (
-        `id` int(11) NOT NULL AUTO_INCREMENT,
-        `group_id` int(11) NOT NULL,
-        `role_id` int(11) NOT NULL,
-        `username` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-        `password` char(255) COLLATE utf8_unicode_ci NOT NULL,
-        `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-        `created` datetime DEFAULT NULL,
-        `modified` datetime DEFAULT NULL,
-        PRIMARY KEY (`id`),
-        UNIQUE KEY `username` (`username`),
-        UNIQUE KEY `email` (`email`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-```
-
-## Auth
-
-Include and configure the *AuthComponent* and the *AclComponent* in the *AppController*.
+Add to your `config/bootstrap.php`:
 
 ```php
-    public $components = [
-        'Acl' => [
-            'className' => 'Acl.Acl'
-        ]
-    ];
-    
-    $this->loadComponent('Auth', [
-        'authorize' => [
-            'Acl.Actions' => ['actionPath' => 'controllers/']
-        ],
-        'loginAction' => [
-            'plugin' => false,
-            'controller' => 'Users',
-            'action' => 'login'
-        ],
-        'loginRedirect' => [
-            'plugin' => false,
-            'controller' => 'Posts',
-            'action' => 'index'
-        ],
-        'logoutRedirect' => [
-            'plugin' => false,
-            'controller' => 'Pages',
-            'action' => 'display'
-        ],
-        'unauthorizedRedirect' => [
-            'plugin' => false,
-            'controller' => 'Users',
-            'action' => 'login',
-            'prefix' => false
-        ],
-        'authError' => 'You are not authorized to access that location.',
-        'flash' => [
-            'element' => 'error'
-        ]
-    ]);
+// Load required plugins
+$this->addPlugin('Acl', ['bootstrap' => true]);
+$this->addPlugin('AclManager', ['bootstrap' => true, 'routes' => true]);
+```
+
+### 3. Create Database Tables
+
+Run the ACL migrations:
+
+```bash
+bin/cake migrations migrate -p Acl
+```
+
+## Configuration Options
+
+All configuration options should be set in your `config/bootstrap.php` before loading the plugin:
+
+### Required Configuration
+
+```php
+// Define your ARO hierarchy (parent to children relationship)
+Configure::write('AclManager.aros', ['Groups', 'Roles', 'Users']);
+```
+
+### Optional Configuration
+
+```php
+// Enable admin prefix routing (default: false)
+Configure::write('AclManager.admin', true);
+
+// Hide denied permissions in ACL lists (default: true)
+Configure::write('AclManager.hideDenied', true);
+
+// Actions to ignore during ACO synchronization
+Configure::write('AclManager.ignoreActions', [
+    'isAuthorized',
+    'beforeFilter',
+    'afterFilter',
+    'initialize',
+    'Acl.*',           // Ignore entire ACL plugin
+    'Error/*',         // Ignore Error controller
+    'DebugKit.*',      // Ignore DebugKit plugin
+    'Plugin.Controller/action'  // Ignore specific plugin action
+]);
+
+// Custom pagination limits per ARO model
+Configure::write('AclManager.Groups.limit', 10);
+Configure::write('AclManager.Roles.limit', 15);
+Configure::write('AclManager.Users.limit', 20);
 ```
 
 ## Model Setup
 
-### Acting as a requester
+### 1. Add ACL Behavior to Tables
 
-Add $this->addBehavior('Acl.Acl', ['type' => 'requester']); to the initialize function in the files src/Model/Table/GroupsTable.php, src/Model/Table/RolesTable.php and src/Model/Table/UsersTable.php.
-
-```php
-    public function initialize(array $config) {
-        parent::initialize($config);
-
-        $this->addBehavior('Acl.Acl', ['type' => 'requester']);
-    }
-```
-
-### Implement parentNode function in Group entity
-
-Add the following implementation of parentNode to the file src/Model/Entity/Group.php.
+Add the ACL behavior to your ARO table classes:
 
 ```php
-    public function parentNode()
-    {
-        return null;
-    }
-```
+// src/Model/Table/GroupsTable.php
+public function initialize(array $config): void
+{
+    parent::initialize($config);
+    $this->addBehavior('Acl.Acl', ['type' => 'requester']);
+}
 
-### Implement parentNode function in Role entity
+// src/Model/Table/RolesTable.php
+public function initialize(array $config): void
+{
+    parent::initialize($config);
+    $this->addBehavior('Acl.Acl', ['type' => 'requester']);
+}
 
-Add the following implementation of parentNode to the file src/Model/Entity/Role.php.
-
-```php
-    public function parentNode() {
-        if (!$this->id) {
-            return null;
-        }
-        if (isset($this->group_id)) {
-            $groupId = $this->group_id;
-        } else {
-            $Users = TableRegistry::get('Users');
-            $user = $Users->find('all', ['fields' => ['group_id']])->where(['id' => $this->id])->first();
-            $groupId = $user->group_id;
-        }
-        if (!$groupId) {
-            return null;
-        }
-        return ['Groups' => ['id' => $groupId]];
-    }
-```
-
-### Implement parentNode function in User entity
-
-Add the following implementation of parentNode to the file src/Model/Entity/User.php.
-
-```php
-    public function parentNode() {
-        if (!$this->id) {
-            return null;
-        }
-        if (isset($this->role_id)) {
-            $roleId = $this->role_id;
-        } else {
-            $Users = TableRegistry::get('Users');
-            $user = $Users->find('all', ['fields' => ['role_id']])->where(['id' => $this->id])->first();
-            $roleId = $user->role_id;
-        }
-        if (!$roleId) {
-            return null;
-        }
-        return ['Roles' => ['id' => $roleId]];
-    }
-```
-
-## Create a group, role, and user.
-
-Allow all. Add in AppController.php.
-```php
-public function initialize() {
-	parent::initialize();
-	
-	...
-	$this->Auth->allow();
+// src/Model/Table/UsersTable.php
+public function initialize(array $config): void
+{
+    parent::initialize($config);
+    $this->addBehavior('Acl.Acl', ['type' => 'requester']);
 }
 ```
-Now create a group, role, and user.
 
-## Access the plugin
+### 2. Implement parentNode in Entities
 
-Now navigate to http://www.domain.com/AclManager ( or http://www.domain.com/admin/AclManager If AclManager.admin is set to true ), just click *"Update ACOs and AROs and set default values"*, after update ACOs and AROs, remove *$this->Auth->allow()* from *AppController.php* and enjoy!
-
-
-## Known issues
-
-* Not known.
-
-
-## Changelog
-
-### v1.3
-
-#### Added
-
-* ***AclManager.hideDenied*** Hide plugins, controllers and actions denied in ACLs lists.
-
-#### Changed
-
-* ***AclManager.ignoreActions*** Ignore all plugins, controllers and actions you don't want to add to your ACLs.
+#### Group Entity (Root level)
 ```php
-    Configure::write('AclManager.ignoreActions', array(
-        'actionName', // ignore action
-        'Plugin.*', // Ignore the plugin
-        'Plugin.Controller/*', // Ignore the plugin controller
-        'Plugin.Controller/Action', // Ignore specific action from the plugin.
-        'Error/*' // Ignore the controller
-        'Error/Action' // Ignore specifc action from controller
-    ));
+// src/Model/Entity/Group.php
+public function parentNode(): ?array
+{
+    return null; // Root level has no parent
+}
 ```
-* Updated indexctp and permissioins.ctp: Show or hide ACLs that do not have permissions in the ACL list. Show flash messages below the actions panel.
-* Fixed acoUpdate syncronization.
 
-## About CakePHP 3.x Acl Manager
+#### Role Entity
+```php
+// src/Model/Entity/Role.php
+use Cake\ORM\Locator\LocatorAwareTrait;
 
-CakePHP 3.x - AclManager is a single plugin for manage CakePHP 3.x ACLs, based on the [original idea](https://github.com/FMCorz/AclManager) of [Frédéric Massart (FMCorz)](https://github.com/FMCorz) for CakePHP 2.x.
+public function parentNode(): ?array
+{
+    if (!$this->id || !$this->group_id) {
+        return null;
+    }
 
-This project will be deprecated in favor of CakePHP 4.x - AclManager.
+    return ['Groups' => ['id' => $this->group_id]];
+}
+```
 
-All code will be moved to the repository https://github.com/ivanamat/cakephp-aclmanager in order to continue future versions.
+#### User Entity
+```php
+// src/Model/Entity/User.php
+use Cake\ORM\Locator\LocatorAwareTrait;
+
+public function parentNode(): ?array
+{
+    if (!$this->id || !$this->role_id) {
+        return null;
+    }
+
+    return ['Roles' => ['id' => $this->role_id]];
+}
+```
+
+## Authentication Setup
+
+### Using CakePHP 5.x Authentication Plugin
+
+```php
+// src/Controller/AppController.php
+public function initialize(): void
+{
+    parent::initialize();
+
+    $this->loadComponent('Authentication.Authentication');
+    $this->loadComponent('Authorization.Authorization');
+    $this->loadComponent('Acl', ['className' => 'Acl.Acl']);
+}
+```
+
+### Configure Authorization
+
+```php
+// src/Application.php
+public function getAuthorizationService(ServerRequestInterface $request): AuthorizationServiceInterface
+{
+    $resolver = new OrmResolver();
+
+    return new AuthorizationService($resolver);
+}
+```
+
+## Usage
+
+### 1. Access the Management Interface
+
+Navigate to:
+- Standard: `http://yourdomain.com/acl-manager`
+- Admin mode: `http://yourdomain.com/admin/acl-manager` (if admin prefix enabled)
+
+### 2. Initialize ACL Structure
+
+1. Click **"Reset to defaults"** to initialize the complete ACL structure
+2. This will:
+   - Create ACOs for all controllers and actions
+   - Build AROs from your configured models
+   - Set default permissions for the first user
+
+### 3. Manage Permissions
+
+- Use the **"Manage [Model]"** links to set permissions for each ARO type
+- **Update ACOs/AROs** to synchronize with code changes
+- **Revoke permissions** to reset all permissions to defaults
+
+## Example Database Schema
+
+Here's an example schema for the Groups → Roles → Users hierarchy:
+
+```sql
+CREATE TABLE groups (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    created DATETIME,
+    modified DATETIME
+);
+
+CREATE TABLE roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    group_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    created DATETIME,
+    modified DATETIME,
+    FOREIGN KEY (group_id) REFERENCES groups(id)
+);
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    role_id INT NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created DATETIME,
+    modified DATETIME,
+    FOREIGN KEY (role_id) REFERENCES roles(id)
+);
+```
+
+## Advanced Features
+
+### Service Layer Architecture
+
+The plugin uses a modern service layer for better code organization:
+
+- **AclPermissionService**: Handles permission evaluation and matrix building
+- **AclSynchronizationService**: Manages ACO/ARO synchronization and database operations
+
+### Custom Integration
+
+```php
+// Inject services in your controllers
+use AclManager\Service\AclPermissionService;
+use AclManager\Service\AclSynchronizationService;
+
+public function initialize(): void
+{
+    parent::initialize();
+
+    $this->permissionService = new AclPermissionService($this->Acl);
+    $this->syncService = new AclSynchronizationService($this->Acl, $this->AclManager);
+}
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Missing permissions**: Run ACO/ARO synchronization after adding new controllers or actions
+2. **Access denied**: Ensure your user hierarchy is properly configured with parentNode() methods
+3. **Performance issues**: Consider enabling permission caching in production
+
+### Debug Mode
+
+Enable debug mode to see detailed ACL information:
+
+```php
+Configure::write('debug', true);
+Configure::write('AclManager.debug', true);
+```
+
+## Migration from Previous Versions
+
+See [MIGRATION.md](MIGRATION.md) for detailed upgrade instructions from CakePHP 3.x/4.x versions.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Follow PSR-12 coding standards
+4. Add tests for new functionality
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
 ## Author
 
-Iván Amat [on GitHub](https://github.com/ivanamat)  
-[www.ivanamat.es](http://www.ivanamat.es/)
+**Iván Amat**
+- GitHub: [@ivanamat](https://github.com/ivanamat)
+- Website: [www.ivanamat.es](http://www.ivanamat.es/)
 
-## Licensed
+## Acknowledgments
 
-[MIT License](https://opensource.org/licenses/MIT)
+Based on the original [AclManager](https://github.com/FMCorz/AclManager) by [Frédéric Massart (FMCorz)](https://github.com/FMCorz) for CakePHP 2.x.

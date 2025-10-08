@@ -1,171 +1,196 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * CakePHP 3.x - Acl Manager
- * 
- * PHP version 5
- * 
- * Class AclManagerComponent
+ * CakePHP 5.x - ACL Manager Component
+ *
+ * Enhanced ACL Manager component for CakePHP 5.x with improved architecture
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @category CakePHP3
- * 
- * @package AclManager\Controller\Component
- * 
  * @author Ivan Amat <dev@ivanamat.es>
- * @copyright Copyright 2016, Iván Amat
+ * @copyright Copyright 2024, Iván Amat
  * @license MIT http://opensource.org/licenses/MIT
- * @link https://github.com/ivanamat/cakephp3-aclmanager
- * 
- * @author Jc Pires <djyss@live.fr>
- * @license MIT http://opensource.org/licenses/MIT
- * @link https://github.com/JcPires/CakePhp3-AclManager
+ * @link https://github.com/ivanamat/cakephp-aclmanager
  */
 
 namespace AclManager\Controller\Component;
 
 use Acl\Controller\Component\AclComponent;
+use Acl\Model\Entity\Aco;
 use Acl\Model\Entity\Aro;
 use Cake\Controller\Component;
-use Cake\Controller\ComponentRegistry;
 use Cake\Core\Configure;
-use Cake\ORM\TableRegistry;
+use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\ORM\Table;
 use Cake\Utility\Inflector;
 
-class AclManagerComponent extends Component {
-    
+class AclManagerComponent extends Component
+{
+    use LocatorAwareTrait;
+
+    private AclComponent $acl;
+    private Table $acoTable;
+    private Table $aroTable;
+
     /**
-     * Basic Api actions
-     *
-     * @var array
+     * Initialize component
      */
-    protected $config = [];
-    
-    /**
-     * Initialize all properties we need
-     *
-     * @param array $config initialize cake method need $config
-     *
-     * @return null
-     */
-    public function initialize(array $config) {
-        $this->config = $config;
-        $this->controller = $this->_registry->getController();
-        $registry = new ComponentRegistry();
-        $this->Acl = new AclComponent($registry, Configure::read('Acl'));
-        $this->Aco = $this->Acl->Aco;
-        $this->Aro = $this->Acl->Aro;
-        return null;
+    public function initialize(array $config): void
+    {
+        parent::initialize($config);
+
+        $this->initializeAclComponent();
     }
 
     /**
-     * Create aros
-     * 
-     * @return bool return true if all aros saved
+     * Initialize ACL component and related tables
      */
-    public function arosBuilder() {
-        
-        $newAros = array();
-        $counter = 0;        
-        $parent = null;
-        
-        $models = Configure::read('AclManager.aros');
-        // foreach ($models as $model) {
-        for($i = 0; $i < count($models); $i++) {
-            $model = $models[$i];
-            $this->{$model} = TableRegistry::get($model);
+    private function initializeAclComponent(): void
+    {
+        $this->acl = $this->getController()->loadComponent('Acl', [
+            'className' => 'Acl.Acl'
+        ]);
 
-            // Build the roles.
-            $items = $this->{$model}->find('all');
-            foreach($items as $item) {
-                if($i > 0 && isset($models[$i-1])) {
-                    $pk = strtolower(Inflector::singularize($models[$i-1])).'_id';
-                    $parent = $this->Aro->find('all',
-                        ['conditions' => [
-                            'model' => $models[$i-1],
-                            'foreign_key' => $item->{$pk}
-                        ]])->first();
-                }
-                
-                // Prepare alias
-                $alias = null;
-                if(isset($item->name)) {
-                    $alias = $item->name;
-                }
-                
-                if(isset($item->username)) {
-                    $alias = $item->username;
-                }
-                
-                // Create aro
-                $aro = new Aro([
-                    'alias' => $alias,
-                    'foreign_key' => $item->id,
-                    'model' => $model,
-                    'parent_id' => (isset($parent->id)) ? $parent->id : Null
-                ]);
+        $this->acoTable = $this->acl->Aco;
+        $this->aroTable = $this->acl->Aro;
+    }
 
-                if($this->__findAro($aro) == 0 && $this->Acl->Aro->save($aro)) {  
-                    $counter++;
-                }
-            }
+    /**
+     * Build AROs from configured models
+     */
+    public function arosBuilder(): int
+    {
+        $models = Configure::read('AclManager.aros', []);
+        $counter = 0;
+
+        foreach ($models as $index => $modelName) {
+            $counter += $this->buildArosForModel($modelName, $index, $models);
         }
-        
+
         return $counter;
     }
 
     /**
-     * Check if the aco exist and store it if empty
-     *
-     * @param string $path     the path like App/Admin/Admin/home
-     * @param string $alias    the name of the alias like home
-     * @param null   $parentId the parent id
-     *
-     * @return object
+     * Build AROs for a specific model
      */
-    public function checkNodeOrSave($path, $alias, $parentId = null) {
-        $node = $this->Aco->node($path);
+    private function buildArosForModel(string $modelName, int $index, array $models): int
+    {
+        $table = $this->fetchTable($modelName);
+        $entities = $table->find('all');
+        $counter = 0;
+
+        foreach ($entities as $entity) {
+            $parentAro = $this->findParentAro($entity, $index, $models);
+            $alias = $this->determineAroAlias($entity);
+
+            $aroData = [
+                'alias' => $alias,
+                'foreign_key' => $entity->id,
+                'model' => $modelName,
+                'parent_id' => $parentAro?->id
+            ];
+
+            if ($this->createAroIfNotExists($aroData)) {
+                $counter++;
+            }
+        }
+
+        return $counter;
+    }
+
+    /**
+     * Find parent ARO for hierarchical structure
+     */
+    private function findParentAro($entity, int $modelIndex, array $models): ?Aro
+    {
+        if ($modelIndex === 0 || !isset($models[$modelIndex - 1])) {
+            return null;
+        }
+
+        $parentModel = $models[$modelIndex - 1];
+        $foreignKey = strtolower(Inflector::singularize($parentModel)) . '_id';
+
+        if (!property_exists($entity, $foreignKey) || !$entity->{$foreignKey}) {
+            return null;
+        }
+
+        return $this->aroTable->find('all')
+            ->where([
+                'model' => $parentModel,
+                'foreign_key' => $entity->{$foreignKey}
+            ])
+            ->first();
+    }
+
+    /**
+     * Determine ARO alias from entity properties
+     */
+    private function determineAroAlias($entity): ?string
+    {
+        $aliasFields = ['name', 'username', 'title', 'alias'];
+
+        foreach ($aliasFields as $field) {
+            if (property_exists($entity, $field) && !empty($entity->{$field})) {
+                return (string)$entity->{$field};
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Create ARO if it doesn't exist
+     */
+    private function createAroIfNotExists(array $aroData): bool
+    {
+        if ($this->aroExists($aroData)) {
+            return false;
+        }
+
+        $aro = $this->aroTable->newEntity($aroData);
+        return (bool)$this->aroTable->save($aro);
+    }
+
+    /**
+     * Check if ARO already exists
+     */
+    private function aroExists(array $aroData): bool
+    {
+        $conditions = [
+            'foreign_key' => $aroData['foreign_key'],
+            'model' => $aroData['model']
+        ];
+
+        if (isset($aroData['parent_id'])) {
+            $conditions['parent_id'] = $aroData['parent_id'];
+        } else {
+            $conditions['parent_id IS'] = null;
+        }
+
+        return $this->aroTable->exists($conditions);
+    }
+
+    /**
+     * Check if ACO exists and create it if not
+     */
+    public function checkNodeOrSave(string $path, string $alias, ?int $parentId = null): ?Aco
+    {
+        $node = $this->acoTable->node($path);
+
         if ($node === false) {
-            $data = [
+            $acoData = [
                 'parent_id' => $parentId,
                 'model' => null,
                 'alias' => $alias,
             ];
-            $entity = $this->Aco->newEntity($data);
-            $node = $this->Aco->save($entity);
-            return $node;
+
+            $aco = $this->acoTable->newEntity($acoData);
+            return $this->acoTable->save($aco) ?: null;
         }
+
         return $node->first();
     }
-    
-    /**
-     * Find aro in database and returns the number of matches
-     * 
-     * @param object $aro
-     **/
-    private function __findAro($aro) {
-        
-        
-        if(isset($aro->parent_id)) {
-            $conditions = [
-                'parent_id' => $aro->parent_id,
-                'foreign_key' => $aro->foreign_key,
-                'model' => $aro->model
-            ];
-        } else {
-            $conditions = [
-                'parent_id' => null,
-                'foreign_key' => $aro->foreign_key,
-                'model' => $aro->model
-            ];
-        }
-
-        return $this->Acl->Aro->find('all', [
-            'conditions' => $conditions,
-            'recursive' => -1
-        ])->count();
-    }
-
 }
