@@ -27,10 +27,6 @@ class PermissionsController extends AppController
 
         $this->permissionService = new PermissionService();
         $this->scannerService = new ResourceScannerService();
-
-        $this->loadModel('AclManager.Roles');
-        $this->loadModel('AclManager.Permissions');
-        $this->loadModel('AclManager.Resources');
     }
 
     /**
@@ -41,7 +37,7 @@ class PermissionsController extends AppController
     public function index(): \Cake\Http\Response|null
     {
         $roles = $this->permissionService->getRolesWithPermissionCount();
-        $resourceCount = $this->Resources->find()->where(['active' => true])->count();
+        $resourceCount = $this->fetchTable('AclManager.Resources')->find()->where(['active' => true])->count();
 
         $this->set(compact('roles', 'resourceCount'));
     }
@@ -59,7 +55,7 @@ class PermissionsController extends AppController
             return $this->redirect(['action' => 'index']);
         }
 
-        $role = $this->Roles->get($roleId);
+        $role = $this->fetchTable('AclManager.Roles')->get($roleId);
         $resources = $this->scannerService->getGroupedResources();
         $permissions = $this->permissionService->getPermissionMatrix($roleId);
 
@@ -147,7 +143,7 @@ class PermissionsController extends AppController
      */
     public function roles(): \Cake\Http\Response|null
     {
-        $roles = $this->Roles->find()
+        $roles = $this->fetchTable('AclManager.Roles')->find()
             ->order(['priority' => 'DESC'])
             ->all();
 
@@ -161,12 +157,13 @@ class PermissionsController extends AppController
      */
     public function addRole(): \Cake\Http\Response|null
     {
-        $role = $this->Roles->newEmptyEntity();
+        $rolesTable = $this->fetchTable('AclManager.Roles');
+        $role = $rolesTable->newEmptyEntity();
 
         if ($this->request->is('post')) {
-            $role = $this->Roles->patchEntity($role, $this->request->getData());
+            $role = $rolesTable->patchEntity($role, $this->request->getData());
 
-            if ($this->Roles->save($role)) {
+            if ($rolesTable->save($role)) {
                 $this->Flash->success(__('Role created successfully.'));
                 return $this->redirect(['action' => 'roles']);
             }
@@ -185,12 +182,13 @@ class PermissionsController extends AppController
      */
     public function editRole(?int $id = null): \Cake\Http\Response|null
     {
-        $role = $this->Roles->get($id);
+        $rolesTable = $this->fetchTable('AclManager.Roles');
+        $role = $rolesTable->get($id);
 
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $role = $this->Roles->patchEntity($role, $this->request->getData());
+            $role = $rolesTable->patchEntity($role, $this->request->getData());
 
-            if ($this->Roles->save($role)) {
+            if ($rolesTable->save($role)) {
                 $this->Flash->success(__('Role updated successfully.'));
                 return $this->redirect(['action' => 'roles']);
             }
@@ -212,9 +210,10 @@ class PermissionsController extends AppController
     {
         $this->request->allowMethod(['post', 'delete']);
 
-        $role = $this->Roles->get($id);
+        $rolesTable = $this->fetchTable('AclManager.Roles');
+        $role = $rolesTable->get($id);
 
-        if ($this->Roles->delete($role)) {
+        if ($rolesTable->delete($role)) {
             $this->Flash->success(__('Role deleted successfully.'));
         } else {
             $this->Flash->error(__('Unable to delete role. Please try again.'));
@@ -240,8 +239,9 @@ class PermissionsController extends AppController
         }
 
         try {
-            $sourceRole = $this->Roles->get($sourceId);
-            $targetRole = $this->Roles->get($targetId);
+            $rolesTable = $this->fetchTable('AclManager.Roles');
+            $sourceRole = $rolesTable->get($sourceId);
+            $targetRole = $rolesTable->get($targetId);
 
             if ($this->permissionService->copyPermissions($sourceId, $targetId)) {
                 $this->Flash->success(__(
@@ -275,7 +275,7 @@ class PermissionsController extends AppController
         }
 
         try {
-            $role = $this->Roles->get($roleId);
+            $role = $this->fetchTable('AclManager.Roles')->get($roleId);
             $count = $this->permissionService->revokeAll($roleId);
 
             $this->Flash->success(__(
