@@ -1,7 +1,7 @@
 {
     "name": "mgomezbuceta/cakephp-aclmanager",
-    "description": "AclManager plugin for CakePHP 5.x - Enhanced ACL permissions management system",
-    "keywords": ["cakephp", "cakephp5", "cake5", "plugin", "acl", "manager", "permissions", "authorization"],
+    "description": "Modern Authorization Manager for CakePHP 5.x - Role-based permission management system",
+    "keywords": ["cakephp", "cakephp5", "cake5", "plugin", "authorization", "manager", "permissions", "rbac", "roles"],
     "homepage": "https://github.com/mgomezbuceta/cakephp-aclmanager",
     "type": "cakephp-plugin",
     "license": "MIT",
@@ -21,7 +21,7 @@
     "require": {
         "php": ">=8.1",
         "cakephp/cakephp": "^5.0",
-        "cakephp/acl": "^2.0"
+        "cakephp/authorization": "^3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.0",

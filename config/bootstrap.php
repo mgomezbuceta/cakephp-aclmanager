@@ -1,19 +1,17 @@
 <?php
-
 declare(strict_types=1);
 
 /**
- * CakePHP 5.x - ACL Manager Bootstrap
+ * Authorization Manager Bootstrap
  *
- * Enhanced bootstrap configuration for CakePHP 5.x
+ * Modern bootstrap configuration for CakePHP 5.x Authorization Manager
  *
  * Licensed under The MIT License
- * Redistributions of files must retain the above copyright notice.
  *
- * @author Ivan Amat <dev@ivanamat.es>
- * @copyright Copyright 2024, Iván Amat
+ * @author Marcos Gómez Buceta <mgomezbuceta@gmail.com>
+ * @copyright Copyright 2025, Marcos Gómez Buceta
  * @license MIT http://opensource.org/licenses/MIT
- * @link https://github.com/ivanamat/cakephp-aclmanager
+ * @link https://github.com/mgomezbuceta/cakephp-aclmanager
  */
 
 use Cake\Core\Configure;
@@ -21,40 +19,48 @@ use Cake\Core\Configure;
 /**
  * Plugin version
  */
-Configure::write('AclManager.version', '2.0.0');
+Configure::write('AclManager.version', '3.0.0');
 
 /**
  * Default configuration values
  */
 $defaultConfig = [
-    // List of ARO models (hierarchy: parent to children)
-    'aros' => ['Groups', 'Roles', 'Users'],
-
     // Enable admin prefix routing
     'admin' => false,
 
-    // Hide denied permissions in ACL lists
-    'hideDenied' => true,
-
-    // Use ugly indentation (for non-CSS styling)
-    'uglyIdent' => true,
-
-    // Actions to ignore during ACO synchronization
+    // Actions to ignore during resource synchronization
     'ignoreActions' => [
         'isAuthorized',
         'beforeFilter',
         'afterFilter',
         'initialize',
-        'Acl.*',
+        'beforeRender',
+        'AclManager.*',
+        'Authorization.*',
+        'Authentication.*',
         'Error/*',
-        'DebugKit.*'
+        'DebugKit.*',
+        'Bake.*',
+        'Migrations.*'
     ],
 
-    // Default pagination limits per ARO model
+    // Default role for new users (optional)
+    'defaultRoleId' => null,
+
+    // Cache permissions for better performance
+    'cachePermissions' => true,
+    'cacheDuration' => '+1 hour',
+
+    // Permission checking mode: 'strict' or 'permissive'
+    // strict: deny if permission not found
+    // permissive: allow if permission not found
+    'permissionMode' => 'strict',
+
+    // Default pagination limits
     'paginationLimits' => [
-        'Groups' => 10,
-        'Roles' => 15,
-        'Users' => 20
+        'roles' => 20,
+        'permissions' => 50,
+        'resources' => 100
     ]
 ];
 
@@ -65,30 +71,17 @@ foreach ($defaultConfig as $key => $value) {
     }
 }
 
-// Ensure AROs configuration is an array
-$aros = Configure::read('AclManager.aros');
-if (!is_array($aros)) {
-    Configure::write('AclManager.aros', [$aros]);
-}
-
 // Ensure ignoreActions configuration is an array
 $ignoreActions = Configure::read('AclManager.ignoreActions');
 if (!is_array($ignoreActions)) {
     Configure::write('AclManager.ignoreActions', [$ignoreActions]);
 }
 
-// Set models configuration if not specified
-if (!Configure::read('AclManager.models')) {
-    Configure::write('AclManager.models', Configure::read('AclManager.aros'));
-}
-
-// Set individual pagination limits if specified
-$aros = Configure::read('AclManager.aros', []);
+// Set individual pagination limits
 $defaultLimits = Configure::read('AclManager.paginationLimits', []);
-
-foreach ($aros as $aro) {
-    if (!Configure::check("AclManager.{$aro}.limit")) {
-        $limit = $defaultLimits[$aro] ?? 10;
-        Configure::write("AclManager.{$aro}.limit", $limit);
+foreach (['roles', 'permissions', 'resources'] as $entity) {
+    if (!Configure::check("AclManager.{$entity}.limit")) {
+        $limit = $defaultLimits[$entity] ?? 20;
+        Configure::write("AclManager.{$entity}.limit", $limit);
     }
 }
