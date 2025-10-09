@@ -36,9 +36,9 @@ class PermissionsController extends AppController
     /**
      * Index method - Dashboard
      *
-     * @return \Cake\Http\Response|null|void
+     * @return \Cake\Http\Response|null
      */
-    public function index(): \Cake\Http\Response|null|void
+    public function index(): \Cake\Http\Response|null
     {
         $roles = $this->permissionService->getRolesWithPermissionCount();
         $resourceCount = $this->Resources->find()->where(['active' => true])->count();
@@ -50,9 +50,9 @@ class PermissionsController extends AppController
      * Manage permissions for a specific role
      *
      * @param int|null $roleId Role ID
-     * @return \Cake\Http\Response|null|void
+     * @return \Cake\Http\Response|null
      */
-    public function manage(?int $roleId = null): \Cake\Http\Response|null|void
+    public function manage(?int $roleId = null): \Cake\Http\Response|null
     {
         if (!$roleId) {
             $this->Flash->error(__('Please select a role.'));
@@ -143,9 +143,9 @@ class PermissionsController extends AppController
     /**
      * View and manage roles
      *
-     * @return \Cake\Http\Response|null|void
+     * @return \Cake\Http\Response|null
      */
-    public function roles(): \Cake\Http\Response|null|void
+    public function roles(): \Cake\Http\Response|null
     {
         $roles = $this->Roles->find()
             ->order(['priority' => 'DESC'])
@@ -157,9 +157,9 @@ class PermissionsController extends AppController
     /**
      * Add a new role
      *
-     * @return \Cake\Http\Response|null|void
+     * @return \Cake\Http\Response|null
      */
-    public function addRole(): \Cake\Http\Response|null|void
+    public function addRole(): \Cake\Http\Response|null
     {
         $role = $this->Roles->newEmptyEntity();
 
@@ -181,9 +181,9 @@ class PermissionsController extends AppController
      * Edit a role
      *
      * @param int|null $id Role ID
-     * @return \Cake\Http\Response|null|void
+     * @return \Cake\Http\Response|null
      */
-    public function editRole(?int $id = null): \Cake\Http\Response|null|void
+    public function editRole(?int $id = null): \Cake\Http\Response|null
     {
         $role = $this->Roles->get($id);
 
