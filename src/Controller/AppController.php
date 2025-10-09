@@ -54,5 +54,9 @@ class AppController extends Controller
     public function beforeFilter(EventInterface $event): void
     {
         parent::beforeFilter($event);
+
+        // Skip authorization for Authorization Manager plugin
+        // This plugin manages authorization itself, so it shouldn't be subject to authorization checks
+        $this->Authorization->skipAuthorization();
     }
 }
