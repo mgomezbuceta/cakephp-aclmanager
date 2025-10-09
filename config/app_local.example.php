@@ -2,10 +2,14 @@
 /**
  * Authorization Manager Configuration Example
  *
- * Copy this file to your application's config/app_local.php or config/app.php
- * and customize the settings according to your needs.
+ * Add this configuration to your application's config/app.php file
+ * (merge with existing configuration array).
+ *
+ * DO NOT copy this entire file - just add the AclManager section
+ * to your existing config/app.php return array.
  */
 
+// Example configuration - add to your config/app.php:
 return [
     'AclManager' => [
         /**

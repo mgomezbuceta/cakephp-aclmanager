@@ -167,10 +167,13 @@ The plugin checks if the user is an admin using multiple methods (in order):
 3. **is_admin**: Checks if `is_admin` flag is true
 4. **email**: Checks against a whitelist of admin emails
 
-**To customize admin access**, add to your `config/app_local.php`:
+**To customize admin access**, add to your `config/app.php` in the return array:
 
 ```php
+// In config/app.php, add to the return array:
 return [
+    // ... existing configuration ...
+
     'AclManager' => [
         'adminAccess' => [
             // Which role IDs can access the Authorization Manager

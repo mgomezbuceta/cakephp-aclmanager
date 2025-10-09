@@ -75,18 +75,19 @@ class AppController extends Controller
 
         if (!$identity) {
             // No authenticated user - redirect to login
+            $loginUrl = \Cake\Core\Configure::read('AclManager.redirects.login', ['plugin' => false, 'controller' => 'Users', 'action' => 'login']);
             $this->Flash->error(__('You must be logged in to access the Authorization Manager.'));
-            $this->redirect(['plugin' => false, 'controller' => 'Users', 'action' => 'login']);
+            $this->redirect($loginUrl);
             return;
         }
 
         // Check if user is admin
-        // Customize this based on your application's structure
         $isAdmin = $this->isUserAdmin($identity);
 
         if (!$isAdmin) {
+            $unauthorizedUrl = \Cake\Core\Configure::read('AclManager.redirects.unauthorized', ['plugin' => false, 'controller' => 'Pages', 'action' => 'display', 'home']);
             $this->Flash->error(__('You do not have permission to access the Authorization Manager.'));
-            $this->redirect(['plugin' => false, 'controller' => 'Pages', 'action' => 'display', 'home']);
+            $this->redirect($unauthorizedUrl);
             return;
         }
     }
@@ -101,16 +102,25 @@ class AppController extends Controller
      */
     protected function isUserAdmin($identity): bool
     {
+        // Load configuration from config/app.php
+        $adminRoleIds = \Cake\Core\Configure::read('AclManager.adminAccess.adminRoleIds', [1]);
+        $adminRoleNames = \Cake\Core\Configure::read('AclManager.adminAccess.adminRoleNames', ['admin', 'administrator', 'superadmin']);
+        $adminEmails = \Cake\Core\Configure::read('AclManager.adminAccess.adminEmails', []);
+        $customCheck = \Cake\Core\Configure::read('AclManager.adminAccess.customCheck');
+
+        // Custom callback function (highest priority)
+        if (is_callable($customCheck)) {
+            return $customCheck($identity);
+        }
+
         // Method 1: Check by role name (if you have a role_name field)
         if (isset($identity->role_name)) {
-            return in_array(strtolower($identity->role_name), ['admin', 'administrator', 'superadmin']);
+            return in_array(strtolower($identity->role_name), array_map('strtolower', $adminRoleNames));
         }
 
         // Method 2: Check by role_id (common pattern)
         if (isset($identity->role_id)) {
-            // Role ID 1 is typically admin
-            // Adjust this based on your application's role structure
-            return $identity->role_id == 1;
+            return in_array($identity->role_id, $adminRoleIds);
         }
 
         // Method 3: Check by is_admin flag
@@ -118,13 +128,8 @@ class AppController extends Controller
             return (bool)$identity->is_admin;
         }
 
-        // Method 4: Check by email domain (for initial setup)
-        if (isset($identity->email)) {
-            // Allow access for specific admin emails during setup
-            // Remove or comment this in production
-            $adminEmails = [
-                // 'admin@example.com',
-            ];
+        // Method 4: Check by email (useful for initial setup)
+        if (isset($identity->email) && !empty($adminEmails)) {
             return in_array($identity->email, $adminEmails);
         }
 
