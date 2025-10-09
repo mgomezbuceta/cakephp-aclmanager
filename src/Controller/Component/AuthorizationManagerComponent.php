@@ -144,7 +144,7 @@ class AuthorizationManagerComponent extends Component
      *
      * @return array|string
      */
-    public function getUnauthorizedRedirect()
+    public function getUnauthorizedRedirect(): array|string
     {
         return $this->getConfig('unauthorizedRedirect');
     }

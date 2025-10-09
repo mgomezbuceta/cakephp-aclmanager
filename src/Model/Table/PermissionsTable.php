@@ -122,7 +122,7 @@ class PermissionsTable extends Table
      * @param int $roleId Role ID
      * @return \Cake\ORM\Query
      */
-    public function findByRole(int $roleId)
+    public function findByRole(int $roleId): \Cake\ORM\Query
     {
         return $this->find()
             ->where(['role_id' => $roleId])

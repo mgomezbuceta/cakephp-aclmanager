@@ -38,7 +38,7 @@ class PermissionsController extends AppController
      *
      * @return \Cake\Http\Response|null|void
      */
-    public function index()
+    public function index(): \Cake\Http\Response|null|void
     {
         $roles = $this->permissionService->getRolesWithPermissionCount();
         $resourceCount = $this->Resources->find()->where(['active' => true])->count();
@@ -52,7 +52,7 @@ class PermissionsController extends AppController
      * @param int|null $roleId Role ID
      * @return \Cake\Http\Response|null|void
      */
-    public function manage(?int $roleId = null)
+    public function manage(?int $roleId = null): \Cake\Http\Response|null|void
     {
         if (!$roleId) {
             $this->Flash->error(__('Please select a role.'));
@@ -76,7 +76,7 @@ class PermissionsController extends AppController
      * @param int $roleId Role ID
      * @return \Cake\Http\Response
      */
-    protected function savePermissions(int $roleId)
+    protected function savePermissions(int $roleId): \Cake\Http\Response
     {
         $data = $this->request->getData();
 
@@ -119,7 +119,7 @@ class PermissionsController extends AppController
      *
      * @return \Cake\Http\Response
      */
-    public function syncResources()
+    public function syncResources(): \Cake\Http\Response
     {
         try {
             $stats = $this->scannerService->scanAndSync();
@@ -145,7 +145,7 @@ class PermissionsController extends AppController
      *
      * @return \Cake\Http\Response|null|void
      */
-    public function roles()
+    public function roles(): \Cake\Http\Response|null|void
     {
         $roles = $this->Roles->find()
             ->order(['priority' => 'DESC'])
@@ -159,7 +159,7 @@ class PermissionsController extends AppController
      *
      * @return \Cake\Http\Response|null|void
      */
-    public function addRole()
+    public function addRole(): \Cake\Http\Response|null|void
     {
         $role = $this->Roles->newEmptyEntity();
 
@@ -183,7 +183,7 @@ class PermissionsController extends AppController
      * @param int|null $id Role ID
      * @return \Cake\Http\Response|null|void
      */
-    public function editRole(?int $id = null)
+    public function editRole(?int $id = null): \Cake\Http\Response|null|void
     {
         $role = $this->Roles->get($id);
 
@@ -208,7 +208,7 @@ class PermissionsController extends AppController
      * @param int|null $id Role ID
      * @return \Cake\Http\Response
      */
-    public function deleteRole(?int $id = null)
+    public function deleteRole(?int $id = null): \Cake\Http\Response
     {
         $this->request->allowMethod(['post', 'delete']);
 
@@ -230,7 +230,7 @@ class PermissionsController extends AppController
      * @param int|null $targetId Target role ID
      * @return \Cake\Http\Response
      */
-    public function copyPermissions(?int $sourceId = null, ?int $targetId = null)
+    public function copyPermissions(?int $sourceId = null, ?int $targetId = null): \Cake\Http\Response
     {
         $this->request->allowMethod(['post']);
 
@@ -265,7 +265,7 @@ class PermissionsController extends AppController
      * @param int|null $roleId Role ID
      * @return \Cake\Http\Response
      */
-    public function clearPermissions(?int $roleId = null)
+    public function clearPermissions(?int $roleId = null): \Cake\Http\Response
     {
         $this->request->allowMethod(['post']);
 

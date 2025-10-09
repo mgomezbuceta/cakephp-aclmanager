@@ -1,23 +1,24 @@
 <?php
+declare(strict_types=1);
 
 /**
- * CakePHP 3.x - Acl Manager
- * 
- * PHP version 5
- * 
- * Class AclHelper
+ * CakePHP 5.x - Authorization Manager
+ *
+ * PHP version 8.1
+ *
+ * Class AclManagerHelper
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @category CakePHP3
- * 
  * @package  AclManager\View\Helper
- * 
+ *
+ * @author Marcos Gómez Buceta <mgomezbuceta@gmail.com>
  * @author Ivan Amat <dev@ivanamat.es>
+ * @copyright Copyright 2025, Marcos Gómez Buceta
  * @copyright Copyright 2016, Iván Amat
  * @license MIT http://opensource.org/licenses/MIT
- * @link https://github.com/ivanamat/cakephp3-aclmanager
+ * @link https://github.com/mgomezbuceta/cakephp-aclmanager
  */
 
 namespace AclManager\View\Helper;
@@ -29,23 +30,35 @@ use Cake\ORM\TableRegistry;
 use Cake\View\Helper;
 use Cake\View\View;
 
-class AclManagerHelper extends Helper {
-    
+/**
+ * AclManagerHelper
+ *
+ * Helper for ACL-related functionality in views
+ */
+class AclManagerHelper extends Helper
+{
     /**
      * Helpers used.
      *
-     * @var array
+     * @var array<string>
      */
-    public $helpers = ['Html'];
-    
+    protected array $helpers = ['Html'];
+
     /**
      * Acl Instance.
      *
-     * @var object
+     * @var \Acl\Controller\Component\AclComponent
      */
-    public $Acl;
+    protected AclComponent $Acl;
 
-    public function __construct(View $View , $config = array()) {
+    /**
+     * Constructor
+     *
+     * @param \Cake\View\View $View The View this helper is being attached to
+     * @param array $config Configuration settings for the helper
+     */
+    public function __construct(View $View, array $config = [])
+    {
         parent::__construct($View, $config);
 
         $collection = new ComponentRegistry();
@@ -53,46 +66,61 @@ class AclManagerHelper extends Helper {
     }
 
     /**
-     *  Check if the User have access to the aco
+     * Check if the User have access to the aco
      *
-     * @param \App\Model\Entity\User $aro The Aro of the user you want to check
-     * @param string                  $aco The path of the Aco like App/Blog/add
-     *
+     * @param mixed $aro The Aro of the user you want to check
+     * @param string $aco The path of the Aco like App/Blog/add
      * @return bool
      */
-    public function check($aro, $aco) {
+    public function check(mixed $aro, string $aco): bool
+    {
         if (empty($aro) || empty($aco)) {
             return false;
         }
-        
+
         return $this->Acl->check($aro, $aco);
     }
 
-    public function getName($aro, $id) {
+    /**
+     * Get name for ARO by ID
+     *
+     * @param string $aro The ARO model name
+     * @param int $id The ARO ID
+     * @return mixed
+     */
+    public function getName(string $aro, int $id): mixed
+    {
         return $this->__getName($aro, $id);
     }
 
     /**
      * Return value from permissions input
-     * 
-     * @param string $value
-     * @return boolean
+     *
+     * @param mixed $value The value to check
+     * @return mixed
      */
-    public function value($value = NULL) {
-        if($value == NULL) {
+    public function value(mixed $value = null): mixed
+    {
+        if ($value === null) {
             return false;
         }
-        
-        $o = explode('.',$value);
-        $data = $this->request->data;
-        return $data[$o[0]][$o[1]][$o[2]];
+
+        $o = explode('.', $value);
+        $data = $this->getView()->getRequest()->getData();
+        return $data[$o[0]][$o[1]][$o[2]] ?? false;
     }
 
-    protected function __getName($aro, $id) {
-        $model = TableRegistry::get($aro);
-        $data = $model->get($id, array(
-            'recursive' => -1
-        ));
+    /**
+     * Get name for ARO by ID (internal method)
+     *
+     * @param string $aro The ARO model name
+     * @param int $id The ARO ID
+     * @return mixed
+     */
+    protected function __getName(string $aro, int $id): mixed
+    {
+        $model = TableRegistry::getTableLocator()->get($aro);
+        $data = $model->get($id);
 
         return $data;
     }
