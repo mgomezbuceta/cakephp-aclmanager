@@ -23,6 +23,7 @@ namespace AclManager\Controller;
 
 use Cake\Controller\Controller;
 use Cake\Event\EventInterface;
+use Cake\ORM\Locator\LocatorAwareTrait;
 
 /**
  * AppController
@@ -31,6 +32,7 @@ use Cake\Event\EventInterface;
  */
 class AppController extends Controller
 {
+    use LocatorAwareTrait;
     /**
      * Initialization hook method.
      *
