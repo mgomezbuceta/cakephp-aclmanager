@@ -156,13 +156,48 @@ ALTER TABLE users ADD FOREIGN KEY (role_id) REFERENCES roles(id);
 <details>
 <summary><b>🔧 Configuration Options</b></summary>
 
+### Admin Access Control
+
+**IMPORTANT**: By default, only administrators can access the Authorization Manager.
+
+The plugin checks if the user is an admin using multiple methods (in order):
+
+1. **role_name**: Checks if `role_name` is 'admin', 'administrator', or 'superadmin'
+2. **role_id**: Checks if `role_id == 1` (typically admin role)
+3. **is_admin**: Checks if `is_admin` flag is true
+4. **email**: Checks against a whitelist of admin emails
+
+**To customize admin access**, add to your `config/app_local.php`:
+
+```php
+return [
+    'AclManager' => [
+        'adminAccess' => [
+            // Which role IDs can access the Authorization Manager
+            'adminRoleIds' => [1, 2],  // Allow role IDs 1 and 2
+
+            // Which role names can access
+            'adminRoleNames' => ['admin', 'superuser'],
+
+            // Specific emails (useful for initial setup)
+            'adminEmails' => [
+                'admin@example.com',
+            ],
+        ],
+        'redirects' => [
+            'login' => ['controller' => 'Users', 'action' => 'login'],
+            'unauthorized' => ['controller' => 'Dashboard', 'action' => 'index'],
+        ],
+    ],
+];
+```
+
+### Other Configuration Options
+
 In your `config/bootstrap.php`:
 
 ```php
 use Cake\Core\Configure;
-
-// Enable admin prefix
-Configure::write('AclManager.admin', true);
 
 // Actions to ignore during resource scan
 Configure::write('AclManager.ignoreActions', [
