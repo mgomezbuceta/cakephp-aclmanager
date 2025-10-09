@@ -21,7 +21,7 @@ declare(strict_types=1);
 
 namespace AclManager\Controller;
 
-use App\Controller\AppController as BaseController;
+use Cake\Controller\Controller;
 use Cake\Event\EventInterface;
 
 /**
@@ -29,8 +29,21 @@ use Cake\Event\EventInterface;
  *
  * Base controller for all Authorization Manager controllers
  */
-class AppController extends BaseController
+class AppController extends Controller
 {
+    /**
+     * Initialization hook method.
+     *
+     * @return void
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+
+        $this->loadComponent('RequestHandler');
+        $this->loadComponent('Flash');
+    }
+
     /**
      * Before filter callback
      *
