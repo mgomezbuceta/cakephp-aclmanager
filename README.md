@@ -1,17 +1,17 @@
 <div align="center">
 
-# 🔐 CakePHP ACL Manager
+# 🔐 CakePHP Authorization Manager
 
-### Modern Access Control List Management for CakePHP 5.x
+### Modern Role-Based Permission Management for CakePHP 5.x
 
 [![Latest Version](https://img.shields.io/packagist/v/mgomezbuceta/cakephp-aclmanager.svg?style=flat-square)](https://packagist.org/packages/mgomezbuceta/cakephp-aclmanager)
 [![PHP Version](https://img.shields.io/packagist/php-v/mgomezbuceta/cakephp-aclmanager.svg?style=flat-square)](https://packagist.org/packages/mgomezbuceta/cakephp-aclmanager)
 [![License](https://img.shields.io/packagist/l/mgomezbuceta/cakephp-aclmanager.svg?style=flat-square)](LICENSE.md)
 [![Downloads](https://img.shields.io/packagist/dt/mgomezbuceta/cakephp-aclmanager.svg?style=flat-square)](https://packagist.org/packages/mgomezbuceta/cakephp-aclmanager)
 
-**A powerful, modern, and intuitive web interface for managing Access Control Lists in CakePHP 5.x applications.**
+**A powerful, modern web interface for managing role-based permissions using CakePHP's Authorization plugin.**
 
-[Features](#-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Contributing](#-contributing)
+[Features](#-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Migration](#-migration-from-v2x)
 
 ---
 
@@ -23,26 +23,26 @@
 <tr>
 <td width="50%">
 
-### 🎯 **Smart Permission Management**
-Intuitive web interface with visual permission matrices for managing complex ACL structures with ease.
+### 🎯 **Role-Based Access Control**
+Simple yet powerful RBAC system with role priorities and hierarchical permission management.
 
-### 🏗️ **Modern Architecture**
-Built with PHP 8.1+ strict typing, service layer pattern, and SOLID principles for maintainable code.
+### 🔄 **Auto-Discovery**
+Automatically scans your application for controllers and actions—no manual configuration needed.
 
-### 🔄 **Auto-Sync**
-Automatically synchronize your ACOs and AROs with your application structure—no manual updates needed.
+### 🎨 **Modern UI**
+Beautiful Bootstrap 5 interface with intuitive permission matrices and visual role management.
 
 </td>
 <td width="50%">
 
-### 🎨 **Beautiful UI**
-Responsive Bootstrap 5 interface with accessibility features and modern design patterns.
+### ⚡ **High Performance**
+Built on CakePHP's Authorization plugin with permission caching for optimal performance.
 
-### 🚀 **High Performance**
-Optimized queries, efficient caching strategies, and clean architecture for production environments.
+### 🛡️ **Secure by Default**
+Strict permission checking mode with comprehensive authorization middleware integration.
 
-### 📊 **Hierarchical Support**
-Full support for complex role hierarchies (Groups → Roles → Users) with inheritance.
+### 🚀 **CakePHP 5.x Native**
+Fully compatible with CakePHP 5.x using modern Authorization instead of deprecated ACL.
 
 </td>
 </tr>
@@ -50,15 +50,15 @@ Full support for complex role hierarchies (Groups → Roles → Users) with inhe
 
 ---
 
-## 💡 Why This Plugin?
+## 💡 Why Authorization Manager?
 
-Managing permissions in CakePHP applications can be complex and time-consuming. **CakePHP ACL Manager** simplifies this process by providing:
+Traditional ACL systems (acos/aros) are **deprecated in CakePHP 5.x**. This plugin provides:
 
-- ✅ **Visual Interface** - No more command-line ACL management
-- ✅ **Real-time Updates** - See permission changes immediately
-- ✅ **Error Prevention** - Built-in validation and safety checks
-- ✅ **Developer Friendly** - Clean API and comprehensive documentation
-- ✅ **Production Ready** - Battle-tested code with modern PHP standards
+- ✅ **Modern Authorization** - Uses CakePHP's official Authorization plugin
+- ✅ **Simplified Structure** - No more complex ACO/ARO trees
+- ✅ **Visual Management** - Web interface for managing permissions
+- ✅ **Role-Based** - Industry-standard RBAC pattern
+- ✅ **Easy Integration** - Drop-in authorization solution
 
 ---
 
@@ -68,7 +68,7 @@ Managing permissions in CakePHP applications can be complex and time-consuming. 
 |------------|---------|
 | PHP | ≥ 8.1 |
 | CakePHP | ≥ 5.0 |
-| CakePHP ACL Plugin | ≥ 2.0 |
+| CakePHP Authorization | ≥ 3.0 |
 
 ---
 
@@ -78,154 +78,191 @@ Managing permissions in CakePHP applications can be complex and time-consuming. 
 
 ```bash
 composer require mgomezbuceta/cakephp-aclmanager
-composer require cakephp/acl
+composer require cakephp/authorization
 ```
 
-### Step 2: Load the Plugins
+### Step 2: Load the Plugin
 
-Add to your `config/bootstrap.php`:
+Add to your `src/Application.php`:
 
 ```php
-$this->addPlugin('Acl', ['bootstrap' => true]);
-$this->addPlugin('AclManager', ['bootstrap' => true, 'routes' => true]);
+public function bootstrap(): void
+{
+    parent::bootstrap();
+
+    $this->addPlugin('AclManager', ['bootstrap' => true, 'routes' => true]);
+}
 ```
 
-### Step 3: Create Database Tables
+### Step 3: Run Migrations
 
 ```bash
-bin/cake migrations migrate -p Acl
+bin/cake migrations migrate -p AclManager
 ```
 
-**That's it!** 🎉 Access your ACL manager at `/acl-manager`
+### Step 4: Sync Resources
+
+Visit `/authorization-manager` and click **"Sync Resources"** to discover all your controllers and actions.
+
+**That's it!** 🎉
 
 ---
 
 ## ⚡ Quick Start
 
-### Basic Configuration
+### Basic Setup
 
-Add this to your `config/bootstrap.php`:
+1. **Create Roles**
+   - Visit `/authorization-manager/roles`
+   - Click "New Role"
+   - Create roles like: Administrator, Editor, Viewer
 
-```php
-use Cake\Core\Configure;
+2. **Assign Permissions**
+   - Click "Manage Permissions" for a role
+   - Check/uncheck permissions for each controller/action
+   - Click "Save Permissions"
 
-// Define your ARO hierarchy (required)
-Configure::write('AclManager.aros', ['Groups', 'Roles', 'Users']);
-
-// Optional: Enable admin prefix
-Configure::write('AclManager.admin', false);
-
-// Optional: Hide denied permissions
-Configure::write('AclManager.hideDenied', true);
-```
-
-### Set Up Your Models
-
-#### 1️⃣ Add ACL Behavior to Tables
+3. **Integrate with Your Auth**
 
 ```php
-// src/Model/Table/UsersTable.php
-public function initialize(array $config): void
+// In your AppController or specific controller
+public function initialize(): void
 {
-    parent::initialize($config);
-    $this->addBehavior('Acl.Acl', ['type' => 'requester']);
+    parent::initialize();
+
+    $this->loadComponent('AclManager.AuthorizationManager', [
+        'userModel' => 'Users',
+        'roleField' => 'role_id'
+    ]);
+}
+
+public function isAuthorized($user = null): bool
+{
+    return $this->AuthorizationManager->isAuthorized($user);
 }
 ```
 
-#### 2️⃣ Implement parentNode in Entities
+### Add role_id to Your Users Table
 
-```php
-// src/Model/Entity/User.php
-public function parentNode(): ?array
-{
-    if (!$this->id || !$this->role_id) {
-        return null;
-    }
-    return ['Roles' => ['id' => $this->role_id]];
-}
+```sql
+ALTER TABLE users ADD COLUMN role_id INT NOT NULL;
+ALTER TABLE users ADD FOREIGN KEY (role_id) REFERENCES roles(id);
 ```
-
-### Initialize Your ACL
-
-1. Navigate to `/acl-manager`
-2. Click **"Reset to defaults"**
-3. Start managing permissions! ✨
 
 ---
 
 ## 📚 Documentation
 
 <details>
-<summary><b>🔧 Advanced Configuration</b></summary>
+<summary><b>🔧 Configuration Options</b></summary>
+
+In your `config/bootstrap.php`:
 
 ```php
-// Ignore specific actions during ACO sync
+use Cake\Core\Configure;
+
+// Enable admin prefix
+Configure::write('AclManager.admin', true);
+
+// Actions to ignore during resource scan
 Configure::write('AclManager.ignoreActions', [
     'isAuthorized',
     'beforeFilter',
-    'Acl.*',        // Ignore entire plugin
-    'Error/*',      // Ignore controller
-    'DebugKit.*'    // Ignore DebugKit
+    'initialize',
+    'AclManager.*',      // Ignore plugin
+    'DebugKit.*'         // Ignore DebugKit
 ]);
 
-// Custom pagination limits
-Configure::write('AclManager.Groups.limit', 10);
-Configure::write('AclManager.Roles.limit', 15);
-Configure::write('AclManager.Users.limit', 20);
+// Permission checking mode
+Configure::write('AclManager.permissionMode', 'strict'); // or 'permissive'
+
+// Enable permission caching
+Configure::write('AclManager.cachePermissions', true);
+Configure::write('AclManager.cacheDuration', '+1 hour');
+
+// Default role for new users
+Configure::write('AclManager.defaultRoleId', 2);
 ```
 
 </details>
 
 <details>
-<summary><b>🗄️ Database Schema Example</b></summary>
+<summary><b>🗄️ Database Schema</b></summary>
 
+The plugin creates three tables:
+
+**roles** - User roles
 ```sql
-CREATE TABLE groups (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-    created DATETIME,
-    modified DATETIME
-);
+id, name, description, priority, active, created, modified
+```
 
-CREATE TABLE roles (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    group_id INT NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    created DATETIME,
-    modified DATETIME,
-    FOREIGN KEY (group_id) REFERENCES groups(id)
-);
+**permissions** - Role permissions
+```sql
+id, role_id, controller, action, plugin, allowed, created, modified
+```
 
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    role_id INT NOT NULL,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    created DATETIME,
-    modified DATETIME,
-    FOREIGN KEY (role_id) REFERENCES roles(id)
-);
+**resources** - Available resources (auto-discovered)
+```sql
+id, controller, action, plugin, description, active, created, modified
 ```
 
 </details>
 
 <details>
-<summary><b>🔌 Service Layer Usage</b></summary>
+<summary><b>🔌 Component Usage</b></summary>
 
 ```php
-use AclManager\Service\AclPermissionService;
-use AclManager\Service\AclSynchronizationService;
+// Load the component
+$this->loadComponent('AclManager.AuthorizationManager');
 
-// In your controller
-public function initialize(): void
-{
-    parent::initialize();
+// Check if user is authorized
+$allowed = $this->AuthorizationManager->isAuthorized($user);
 
-    $this->permissionService = new AclPermissionService($this->Acl);
-    $this->syncService = new AclSynchronizationService($this->Acl, $this->AclManager);
-}
+// Check specific permission
+$allowed = $this->AuthorizationManager->checkPermission(
+    $roleId,
+    'Articles',
+    'edit',
+    'Blog' // plugin name (optional)
+);
+
+// Clear permission cache
+$this->AuthorizationManager->clearCache();
+
+// Handle unauthorized access
+return $this->AuthorizationManager->handleUnauthorized();
+```
+
+</details>
+
+<details>
+<summary><b>🎯 Service Layer</b></summary>
+
+```php
+use AclManager\Service\PermissionService;
+use AclManager\Service\ResourceScannerService;
+
+// Permission management
+$permissionService = new PermissionService();
+
+// Grant permission
+$permissionService->grant($roleId, 'Articles', 'edit');
+
+// Deny permission
+$permissionService->deny($roleId, 'Articles', 'delete');
+
+// Get permission matrix
+$matrix = $permissionService->getPermissionMatrix($roleId);
+
+// Copy permissions between roles
+$permissionService->copyPermissions($sourceRoleId, $targetRoleId);
+
+// Resource scanning
+$scannerService = new ResourceScannerService();
+$stats = $scannerService->scanAndSync();
+
+// Get grouped resources
+$resources = $scannerService->getGroupedResources();
 ```
 
 </details>
@@ -233,60 +270,107 @@ public function initialize(): void
 <details>
 <summary><b>🐛 Troubleshooting</b></summary>
 
-**Missing Permissions?**
+**No resources showing?**
 ```bash
-# Re-sync ACOs after adding new controllers
-Navigate to /acl-manager → Click "Update ACOs"
+Visit /authorization-manager and click "Sync Resources"
 ```
 
-**Access Denied?**
+**Permission changes not taking effect?**
 ```php
-// Verify parentNode() implementation in your entities
-// Check ARO hierarchy in configuration
+// Clear cache
+Configure::write('AclManager.cachePermissions', false);
+// Or clear specific cache
+$this->AuthorizationManager->clearCache();
 ```
 
-**Debug Mode**
-```php
-Configure::write('debug', true);
-Configure::write('AclManager.debug', true);
+**Getting "access denied" after setup?**
+```
+1. Make sure your User has a role_id assigned
+2. Verify permissions are granted for that role
+3. Check isAuthorized() is properly implemented
 ```
 
 </details>
 
 ---
 
-## 🏗️ Architecture Highlights
+## 🔄 Migration from v2.x
 
-### Service Layer Pattern
+> **⚠️ BREAKING CHANGE**: Version 3.0 uses Authorization plugin instead of deprecated ACL.
+
+### Migration Steps:
+
+1. **Backup your data**
+```sql
+CREATE TABLE backup_aros_acos AS SELECT * FROM aros_acos;
+```
+
+2. **Update composer.json**
+```bash
+composer remove cakephp/acl
+composer require cakephp/authorization
+composer update mgomezbuceta/cakephp-aclmanager
+```
+
+3. **Run new migrations**
+```bash
+bin/cake migrations migrate -p AclManager
+```
+
+4. **Update routes**
+   - Old: `/acl-manager`
+   - New: `/authorization-manager`
+
+5. **Update component**
+```php
+// Old
+$this->loadComponent('AclManager.AclManager');
+
+// New
+$this->loadComponent('AclManager.AuthorizationManager');
+```
+
+6. **Rebuild permissions**
+   - Create new roles matching your old ARO structure
+   - Use "Sync Resources" to discover controllers
+   - Manually assign permissions (old ACL data cannot be migrated)
+
+---
+
+## 🏗️ Architecture
 
 ```
 ┌─────────────────────────────────────────┐
-│         AclController                    │
-│         (Presentation Layer)             │
+│      PermissionsController               │
+│      (Web Interface)                     │
 └──────────────┬──────────────────────────┘
                │
       ┌────────┴────────┐
       │                 │
 ┌─────▼──────────┐ ┌───▼──────────────────┐
-│ Permission     │ │ Synchronization      │
+│ Permission     │ │ ResourceScanner      │
 │ Service        │ │ Service              │
 │                │ │                      │
-│ • Evaluate     │ │ • ACO/ARO Sync       │
-│ • Build Matrix │ │ • DB Operations      │
+│ • Check Auth   │ │ • Scan Controllers   │
+│ • Grant/Deny   │ │ • Sync Resources     │
+│ • Copy Perms   │ │ • Auto-Discovery     │
 └────────────────┘ └──────────────────────┘
+        │                     │
+        └──────────┬──────────┘
+                   │
+      ┌────────────▼─────────────┐
+      │  Database Tables          │
+      │  • roles                  │
+      │  • permissions            │
+      │  • resources              │
+      └───────────────────────────┘
 ```
-
-**Benefits:**
-- 🎯 Single Responsibility
-- 🧪 Easy to Test
-- 🔄 Reusable Logic
-- 📦 Clean Dependencies
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how you can help:
+Contributions are welcome!
 
 1. 🍴 Fork the repository
 2. 🌿 Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -324,21 +408,21 @@ Copyright (c) 2016 Iván Amat
 
 ## 🙏 Acknowledgments
 
-This project builds upon the excellent foundation laid by:
+This project evolved from the excellent ACL Manager foundation:
 
 - **[Iván Amat](https://github.com/ivanamat)** - Original CakePHP 4.x Acl Manager
 - **[Frédéric Massart (FMCorz)](https://github.com/FMCorz)** - Original CakePHP 2.x AclManager
 
-Special thanks to the CakePHP community for their continuous support and contributions.
+Special thanks to the CakePHP community for their continuous support.
 
 ---
 
 <div align="center">
 
-**⭐ If you find this plugin useful, please consider giving it a star! ⭐**
+**⭐ If you find this plugin useful, please give it a star! ⭐**
 
 Made with ❤️ for the CakePHP community
 
-[Report Bug](https://github.com/mgomezbuceta/cakephp-aclmanager/issues) • [Request Feature](https://github.com/mgomezbuceta/cakephp-aclmanager/issues) • [View Documentation](https://github.com/mgomezbuceta/cakephp-aclmanager/wiki)
+[Report Bug](https://github.com/mgomezbuceta/cakephp-aclmanager/issues) • [Request Feature](https://github.com/mgomezbuceta/cakephp-aclmanager/issues)
 
 </div>

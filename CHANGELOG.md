@@ -5,6 +5,94 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2025-01-10
+
+### ⚡ BREAKING CHANGES
+
+**Complete architectural rewrite - Migration from deprecated ACL to modern Authorization system**
+
+This is a major breaking change that requires migration from the old ACL system to the new Authorization-based system.
+
+#### What Changed
+- **Replaced**: `cakephp/acl` (deprecated) → `cakephp/authorization` (official CakePHP 5.x plugin)
+- **Database**: New simplified schema (`roles`, `permissions`, `resources`) replaces old ACL tables (`acos`, `aros`, `aros_acos`)
+- **Routes**: Changed from `/acl-manager` to `/authorization-manager`
+- **Component**: `AclManagerComponent` → `AuthorizationManagerComponent`
+- **Architecture**: Moved to modern RBAC (Role-Based Access Control) pattern
+
+### 🚀 Added
+
+#### New Architecture
+- **PermissionService**: Modern service for permission evaluation and management
+- **ResourceScannerService**: Automatic controller/action discovery system
+- **AuthorizationManagerComponent**: New component for authorization checking
+- **PermissionsController**: Complete web interface for managing permissions
+
+#### New Models
+- **RolesTable & Role Entity**: User role management
+- **PermissionsTable & Permission Entity**: Controller/action permissions per role
+- **ResourcesTable & Resource Entity**: Application resource catalog
+
+#### New Features
+- **Role-Based Permissions**: Industry-standard RBAC pattern
+- **Auto-Discovery**: Automatic scanning of controllers and actions
+- **Permission Caching**: Built-in caching for performance
+- **Role Priorities**: Hierarchical role system with priorities
+- **Modern UI**: Bootstrap 5 interface with intuitive permission matrices
+- **Bulk Operations**: Copy permissions between roles, clear all permissions
+
+#### New Configuration
+- Simplified configuration options
+- Permission checking modes (strict/permissive)
+- Configurable caching settings
+- Default role assignment for new users
+
+### 🔄 Changed
+
+- **Plugin Name**: Remains `AclManager` for backward compatibility, but internally uses Authorization
+- **Version**: Bumped to 3.0.0 to reflect breaking changes
+- **Routes**: New modern routing system with `/authorization-manager` base path
+- **Templates**: Completely redesigned with modern Bootstrap 5 UI
+- **Documentation**: Complete rewrite focusing on Authorization system
+
+### 🗑️ Removed
+
+- **Deprecated ACL System**:
+  - Removed `AclController`
+  - Removed `AclManagerComponent` (old)
+  - Removed `AclExtras`
+  - Removed ACL-specific services
+  - Removed old templates
+
+- **Database Tables**: No longer uses:
+  - `acos` (Access Control Objects)
+  - `aros` (Access Request Objects)
+  - `aros_acos` (Junction table)
+
+### 📚 Documentation
+
+- **README.md**: Complete rewrite with Authorization-focused documentation
+- **Migration Guide**: Detailed v2.x to v3.0 migration instructions
+- **Configuration Examples**: Updated for new system
+- **Architecture Diagrams**: New service layer documentation
+
+### 🔧 Migration Required
+
+> **⚠️ WARNING**: This is a BREAKING CHANGE. Migration from v2.x required.
+
+**Migration Steps:**
+
+1. Backup your ACL data
+2. Update composer dependencies
+3. Run new migrations
+4. Update routes in your application
+5. Update component usage
+6. Rebuild permissions in new system
+
+See README.md for detailed migration instructions.
+
+---
+
 ## [2.0.0] - 2024-12-19
 
 ### ⚡ BREAKING CHANGES
@@ -30,14 +118,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Bootstrap 5-based responsive interface
   - Accessibility features (ARIA labels, semantic HTML5)
   - Modern card-based layout design
-- **Improved Configuration**:
-  - Default configuration values with automatic fallbacks
-  - Enhanced pagination settings per ARO model
-  - Better default ignore actions list
-- **Development Tools**:
-  - PHPUnit integration for testing
-  - CakePHP CodeSniffer for code style
-  - Comprehensive CLAUDE.md for AI assistance
+- **Developer Guide**: Enhanced CLAUDE.md with modern architecture details
 
 ### 🔄 Changed
 
@@ -49,10 +130,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `AclManagerComponent`: Rewritten with typed properties
   - Better separation of concerns
   - Modern PHP patterns and practices
-- **Configuration Updates**:
-  - Enhanced bootstrap configuration with defaults
-  - Modern route definitions with proper parameter passing
-  - Improved plugin loading mechanism
 - **Template Improvements**:
   - Modern HTML5 semantic elements
   - Better accessibility and responsive design
@@ -64,33 +141,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Single Responsibility Principle adherence
   - Descriptive method and variable names
   - Elimination of code duplication
-- **Architecture**:
-  - Clear separation between controllers, services, and components
-  - Better dependency management
-  - Improved testability
 - **Security**:
   - Enhanced input validation
   - Better error handling
   - Type safety improvements
-
-### 📚 Documentation
-
-- **Complete Documentation Rewrite**:
-  - Updated README.md with CakePHP 5.x examples
-  - Modern installation and configuration instructions
-  - Enhanced troubleshooting section
-- **Developer Guide**: Enhanced CLAUDE.md with modern architecture details
-
-### 🔧 Internal Changes
-
-- **Composer Updates**:
-  - Package name changed to `ivanamat/cakephp5-aclmanager`
-  - Updated dependencies for CakePHP 5.x
-  - Added development dependencies
-- **Code Quality**:
-  - PSR-12 compliance
-  - Strict typing throughout codebase
-  - Modern exception handling
 
 ---
 
