@@ -40,6 +40,8 @@ class PermissionsController extends AppController
         $resourceCount = $this->fetchTable('AclManager.Resources')->find()->where(['active' => true])->count();
 
         $this->set(compact('roles', 'resourceCount'));
+
+        return null;
     }
 
     /**
@@ -64,6 +66,8 @@ class PermissionsController extends AppController
         }
 
         $this->set(compact('role', 'resources', 'permissions'));
+
+        return null;
     }
 
     /**
@@ -148,6 +152,8 @@ class PermissionsController extends AppController
             ->all();
 
         $this->set(compact('roles'));
+
+        return null;
     }
 
     /**
@@ -172,6 +178,8 @@ class PermissionsController extends AppController
         }
 
         $this->set(compact('role'));
+
+        return null;
     }
 
     /**
@@ -198,6 +206,8 @@ class PermissionsController extends AppController
 
         $this->set(compact('role'));
         $this->render('add_role');
+
+        return null;
     }
 
     /**
