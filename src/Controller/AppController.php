@@ -43,6 +43,20 @@ class AppController extends Controller
         parent::initialize();
 
         $this->loadComponent('Flash');
+
+        // Try to load Authorization component if available
+        try {
+            $this->loadComponent('Authorization.Authorization');
+        } catch (\Exception $e) {
+            // Authorization component not available, continue without it
+        }
+
+        // Try to load Authentication component if available
+        try {
+            $this->loadComponent('Authentication.Authentication');
+        } catch (\Exception $e) {
+            // Authentication component not available, continue without it
+        }
     }
 
     /**
@@ -55,8 +69,10 @@ class AppController extends Controller
     {
         parent::beforeFilter($event);
 
-        // Skip authorization checks (plugin manages authorization)
-        $this->Authorization->skipAuthorization();
+        // Skip authorization checks if Authorization component is loaded
+        if ($this->components()->has('Authorization')) {
+            $this->Authorization->skipAuthorization();
+        }
 
         // Restrict access to administrators only
         $this->checkAdminAccess();
@@ -70,6 +86,11 @@ class AppController extends Controller
      */
     protected function checkAdminAccess(): void
     {
+        // If Authentication component is not loaded, allow access (backward compatibility)
+        if (!$this->components()->has('Authentication')) {
+            return;
+        }
+
         // Get the current authenticated user
         $identity = $this->Authentication->getIdentity();
 
