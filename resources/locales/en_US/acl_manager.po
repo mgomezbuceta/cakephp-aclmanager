@@ -1,0 +1,258 @@
+# LANGUAGE translation of CakePHP Authorization Manager
+# Copyright YEAR Marcos Gómez Buceta
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CakePHP Authorization Manager\n"
+"POT-Creation-Date: 2025-01-10 10:00+0000\n"
+"PO-Revision-Date: 2025-01-10 10:00+0000\n"
+"Last-Translator: Marcos Gómez Buceta <mgomezbuceta@gmail.com>\n"
+"Language-Team: English\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# General
+msgid "Authorization Manager"
+msgstr "Authorization Manager"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Roles"
+msgstr "Roles"
+
+msgid "Sync Resources"
+msgstr "Sync Resources"
+
+msgid "Back to App"
+msgstr "Back to App"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Active"
+msgstr "Active"
+
+msgid "Inactive"
+msgstr "Inactive"
+
+msgid "Created"
+msgstr "Created"
+
+msgid "Modified"
+msgstr "Modified"
+
+# Dashboard
+msgid "Manage Roles & Permissions"
+msgstr "Manage Roles & Permissions"
+
+msgid "Overview of all roles and their permissions"
+msgstr "Overview of all roles and their permissions"
+
+msgid "Role"
+msgstr "Role"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Priority"
+msgstr "Priority"
+
+msgid "Permissions"
+msgstr "Permissions"
+
+msgid "Manage Permissions"
+msgstr "Manage Permissions"
+
+msgid "Edit"
+msgstr "Edit"
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "New Role"
+msgstr "New Role"
+
+msgid "Total Resources"
+msgstr "Total Resources"
+
+msgid "No roles found"
+msgstr "No roles found"
+
+msgid "Get started by creating your first role."
+msgstr "Get started by creating your first role."
+
+msgid "Create First Role"
+msgstr "Create First Role"
+
+# Role Form
+msgid "Add Role"
+msgstr "Add Role"
+
+msgid "Edit Role"
+msgstr "Edit Role"
+
+msgid "Create a new role for your application"
+msgstr "Create a new role for your application"
+
+msgid "Update role information"
+msgstr "Update role information"
+
+msgid "Role Information"
+msgstr "Role Information"
+
+msgid "e.g., Administrator, Editor, Viewer"
+msgstr "e.g., Administrator, Editor, Viewer"
+
+msgid "Brief description of this role and its purpose"
+msgstr "Brief description of this role and its purpose"
+
+msgid "Higher priority roles have precedence. Range: 0-100"
+msgstr "Higher priority roles have precedence. Range: 0-100"
+
+msgid "Save Role"
+msgstr "Save Role"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Quick Actions"
+msgstr "Quick Actions"
+
+msgid "Clear All Permissions"
+msgstr "Clear All Permissions"
+
+msgid "Are you sure you want to clear all permissions for this role?"
+msgstr "Are you sure you want to clear all permissions for this role?"
+
+msgid "Role created successfully."
+msgstr "Role created successfully."
+
+msgid "Unable to create role. Please try again."
+msgstr "Unable to create role. Please try again."
+
+msgid "Role updated successfully."
+msgstr "Role updated successfully."
+
+msgid "Unable to update role. Please try again."
+msgstr "Unable to update role. Please try again."
+
+msgid "Role deleted successfully."
+msgstr "Role deleted successfully."
+
+msgid "Unable to delete role. Please try again."
+msgstr "Unable to delete role. Please try again."
+
+msgid "Are you sure you want to delete {0}?"
+msgstr "Are you sure you want to delete {0}?"
+
+# Permissions Management
+msgid "Manage Permissions for {0}"
+msgstr "Manage Permissions for {0}"
+
+msgid "Role: {0}"
+msgstr "Role: {0}"
+
+msgid "Back"
+msgstr "Back"
+
+msgid "Save Permissions"
+msgstr "Save Permissions"
+
+msgid "Clear All"
+msgstr "Clear All"
+
+msgid "Action"
+msgstr "Action"
+
+msgid "Permission"
+msgstr "Permission"
+
+msgid "Allow"
+msgstr "Allow"
+
+msgid "Please select a role."
+msgstr "Please select a role."
+
+msgid "Permissions saved successfully. {0} permissions granted."
+msgstr "Permissions saved successfully. {0} permissions granted."
+
+msgid "Error saving permissions: {0}"
+msgstr "Error saving permissions: {0}"
+
+msgid "No resources found. Please run \"Sync Resources\" first."
+msgstr "No resources found. Please run \"Sync Resources\" first."
+
+msgid "All permissions cleared for role \"{0}\". {1} permissions removed."
+msgstr "All permissions cleared for role \"{0}\". {1} permissions removed."
+
+msgid "Error: {0}"
+msgstr "Error: {0}"
+
+# Sync Resources
+msgid "Resources synchronized. Found: {0}, Created: {1}, Updated: {2}, Deactivated: {3}"
+msgstr "Resources synchronized. Found: {0}, Created: {1}, Updated: {2}, Deactivated: {3}"
+
+msgid "Error synchronizing resources: {0}"
+msgstr "Error synchronizing resources: {0}"
+
+# Copy Permissions
+msgid "Invalid roles specified."
+msgstr "Invalid roles specified."
+
+msgid "Permissions copied successfully from \"{0}\" to \"{1}\"."
+msgstr "Permissions copied successfully from \"{0}\" to \"{1}\"."
+
+msgid "Error copying permissions."
+msgstr "Error copying permissions."
+
+msgid "Invalid role specified."
+msgstr "Invalid role specified."
+
+# Access Control
+msgid "You must be logged in to access the Authorization Manager."
+msgstr "You must be logged in to access the Authorization Manager."
+
+msgid "You do not have permission to access the Authorization Manager."
+msgstr "You do not have permission to access the Authorization Manager."
+
+# Misc
+msgid "ID"
+msgstr "ID"
+
+msgid "Controller"
+msgstr "Controller"
+
+msgid "Plugin"
+msgstr "Plugin"
+
+msgid "Select All"
+msgstr "Select All"
+
+msgid "Deselect All"
+msgstr "Deselect All"
+
+# Additional strings
+msgid "Total Roles"
+msgstr "Total Roles"
+
+msgid "Total Permissions"
+msgstr "Total Permissions"
+
+msgid "Manage Roles"
+msgstr "Manage Roles"
+
+msgid "Create and manage user roles"
+msgstr "Create and manage user roles"
+
+msgid "Back to Dashboard"
+msgstr "Back to Dashboard"
