@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2025-01-10
+
+### 🌍 Added
+
+#### Internationalization (i18n) Support
+- **Full i18n implementation** using `acl_manager` translation domain
+- **Spanish (es_ES) translation**: Complete translation file with 80+ strings
+- **Galician (gl_ES) translation**: Complete translation file with 80+ strings
+- **CakePHP i18n integration**: All strings extractable via `bin/cake i18n extract`
+- Spanish set as default locale in bootstrap configuration
+
+#### UI Improvements
+- **Brand color integration**: All templates updated with `#1db58c` primary color
+- **Consistent theming**: CSS variables for easy color customization
+- **Modern design**: Sober and professional interface with Bootstrap 5
+
+### 🔄 Changed
+
+- **All template files**: Updated to use `__d('acl_manager', ...)` for translations
+  - `templates/Permissions/index.php`
+  - `templates/Permissions/roles.php`
+  - `templates/Permissions/add_role.php`
+  - `templates/Permissions/manage.php`
+  - `templates/layout/default.php`
+- **Controller messages**: All flash messages now use translation domain
+  - `src/Controller/PermissionsController.php`
+  - `src/Controller/AppController.php`
+- **Color scheme**: Changed from blue/gray to brand green (#1db58c)
+
+### 🐛 Fixed
+
+- **Configure class import**: Fixed "Class Configure not found" error in layout template
+- **Component loading**: Added graceful fallback when Authorization/Authentication components not available
+- **Version number**: Updated to 3.2.0 to reflect i18n features
+
+### 📚 Documentation
+
+- **README.md**: Added i18n configuration section
+- **Translation files**: Complete Spanish and Galician .po files
+- **Locale structure**: Proper directory structure in `resources/locales/`
+
+---
+
 ## [3.0.0] - 2025-01-10
 
 ### ⚡ BREAKING CHANGES

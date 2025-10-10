@@ -32,6 +32,9 @@ Automatically scans your application for controllers and actions—no manual con
 ### 🎨 **Modern UI**
 Beautiful Bootstrap 5 interface with intuitive permission matrices and visual role management.
 
+### 🌍 **Multilingual Support**
+Built-in i18n support with Spanish and Galician translations ready to use.
+
 </td>
 <td width="50%">
 
@@ -59,6 +62,7 @@ Traditional ACL systems (acos/aros) are **deprecated in CakePHP 5.x**. This plug
 - ✅ **Visual Management** - Web interface for managing permissions
 - ✅ **Role-Based** - Industry-standard RBAC pattern
 - ✅ **Easy Integration** - Drop-in authorization solution
+- ✅ **Multilingual** - Spanish and Galician translations included
 
 ---
 
@@ -194,6 +198,32 @@ return [
     ],
 ];
 ```
+
+### Internationalization (i18n)
+
+The plugin comes with **Spanish (es_ES)** and **Galician (gl_ES)** translations out of the box.
+
+**To change the language**, add to your `config/bootstrap.php`:
+
+```php
+use Cake\I18n\I18n;
+
+// Set Spanish (default)
+I18n::setLocale('es_ES');
+
+// Or Galician
+I18n::setLocale('gl_ES');
+
+// Or English
+I18n::setLocale('en_US');
+```
+
+**To add your own translation:**
+
+1. Create `resources/locales/{locale}/acl_manager.po` in your app
+2. Copy entries from `vendor/mgomezbuceta/cakephp-aclmanager/resources/locales/es_ES/acl_manager.po`
+3. Translate the `msgstr` values
+4. Run `bin/cake i18n extract --plugin AclManager` to update
 
 ### Other Configuration Options
 
