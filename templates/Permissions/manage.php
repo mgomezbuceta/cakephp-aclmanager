@@ -5,7 +5,7 @@
  * @var array $resources
  * @var array $permissions
  */
-$this->assign('title', __('Manage Permissions for {0}', $role->name));
+$this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->name));
 ?>
 
 <div class="permissions-manage">
@@ -13,12 +13,12 @@ $this->assign('title', __('Manage Permissions for {0}', $role->name));
         <div class="col-md-12">
             <div class="page-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h1><?= __('Manage Permissions') ?></h1>
-                    <p class="lead"><?= __('Role: {0}', h($role->name)) ?></p>
+                    <h1><?= __d('acl_manager', 'Manage Permissions') ?></h1>
+                    <p class="lead"><?= __d('acl_manager', 'Role: {0}', h($role->name)) ?></p>
                 </div>
                 <div>
                     <?= $this->Html->link(
-                        '<i class="fas fa-arrow-left"></i> ' . __('Back'),
+                        '<i class="fas fa-arrow-left"></i> ' . __d('acl_manager', 'Back'),
                         ['action' => 'index'],
                         ['class' => 'btn btn-secondary', 'escape' => false]
                     ) ?>
@@ -32,13 +32,13 @@ $this->assign('title', __('Manage Permissions for {0}', $role->name));
     <div class="row mb-3">
         <div class="col-md-12">
             <button type="submit" class="btn btn-primary btn-lg">
-                <i class="fas fa-save"></i> <?= __('Save Permissions') ?>
+                <i class="fas fa-save"></i> <?= __d('acl_manager', 'Save Permissions') ?>
             </button>
             <?= $this->Form->postLink(
-                '<i class="fas fa-times-circle"></i> ' . __('Clear All'),
+                '<i class="fas fa-times-circle"></i> ' . __d('acl_manager', 'Clear All'),
                 ['action' => 'clearPermissions', $role->id],
                 [
-                    'confirm' => __('Are you sure you want to clear all permissions for this role?'),
+                    'confirm' => __d('acl_manager', 'Are you sure you want to clear all permissions for this role?'),
                     'class' => 'btn btn-danger btn-lg',
                     'escape' => false
                 ]
@@ -63,8 +63,8 @@ $this->assign('title', __('Manage Permissions for {0}', $role->name));
                             <table class="table table-sm table-bordered">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th style="width: 40%"><?= __('Action') ?></th>
-                                        <th style="width: 60%"><?= __('Permission') ?></th>
+                                        <th style="width: 40%"><?= __d('acl_manager', 'Action') ?></th>
+                                        <th style="width: 60%"><?= __d('acl_manager', 'Permission') ?></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -90,7 +90,7 @@ $this->assign('title', __('Manage Permissions for {0}', $role->name));
                                                         'id' => "permission-{$fieldIndex}"
                                                     ]) ?>
                                                     <label class="form-check-label" for="permission-<?= $fieldIndex ?>">
-                                                        <?= __('Allow') ?>
+                                                        <?= __d('acl_manager', 'Allow') ?>
                                                     </label>
                                                 </div>
                                             </td>
@@ -108,17 +108,17 @@ $this->assign('title', __('Manage Permissions for {0}', $role->name));
     <?php if (empty($resources)): ?>
         <div class="alert alert-warning">
             <i class="fas fa-exclamation-triangle"></i>
-            <?= __('No resources found. Please run "Sync Resources" first.') ?>
+            <?= __d('acl_manager', 'No resources found. Please run "Sync Resources" first.') ?>
         </div>
     <?php endif; ?>
 
     <div class="row">
         <div class="col-md-12">
             <button type="submit" class="btn btn-primary btn-lg">
-                <i class="fas fa-save"></i> <?= __('Save Permissions') ?>
+                <i class="fas fa-save"></i> <?= __d('acl_manager', 'Save Permissions') ?>
             </button>
             <?= $this->Html->link(
-                __('Cancel'),
+                __d('acl_manager', 'Cancel'),
                 ['action' => 'index'],
                 ['class' => 'btn btn-secondary btn-lg']
             ) ?>
@@ -130,7 +130,7 @@ $this->assign('title', __('Manage Permissions for {0}', $role->name));
 
 <style>
 .permissions-manage .controller-section {
-    border-left: 3px solid #007bff;
+    border-left: 3px solid var(--primary-color);
     padding-left: 15px;
 }
 
@@ -152,7 +152,7 @@ $this->assign('title', __('Manage Permissions for {0}', $role->name));
 }
 
 .permissions-manage .card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-color: var(--primary-color);
     color: white;
 }
 </style>
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectAllBtn = document.createElement('button');
         selectAllBtn.type = 'button';
         selectAllBtn.className = 'btn btn-sm btn-outline-primary ml-2';
-        selectAllBtn.innerHTML = '<i class="fas fa-check-square"></i> Select All';
+        selectAllBtn.innerHTML = '<i class="fas fa-check-square"></i> <?= __d('acl_manager', 'Select All') ?>';
         selectAllBtn.onclick = function() {
             checkboxes.forEach(cb => cb.checked = true);
         };
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const deselectAllBtn = document.createElement('button');
         deselectAllBtn.type = 'button';
         deselectAllBtn.className = 'btn btn-sm btn-outline-secondary ml-2';
-        deselectAllBtn.innerHTML = '<i class="fas fa-square"></i> Deselect All';
+        deselectAllBtn.innerHTML = '<i class="fas fa-square"></i> <?= __d('acl_manager', 'Deselect All') ?>';
         deselectAllBtn.onclick = function() {
             checkboxes.forEach(cb => cb.checked = false);
         };

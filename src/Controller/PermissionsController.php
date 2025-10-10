@@ -53,7 +53,7 @@ class PermissionsController extends AppController
     public function manage(?int $roleId = null): \Cake\Http\Response|null
     {
         if (!$roleId) {
-            $this->Flash->error(__('Please select a role.'));
+            $this->Flash->error(__d('acl_manager', 'Please select a role.'));
             return $this->redirect(['action' => 'index']);
         }
 
@@ -106,9 +106,9 @@ class PermissionsController extends AppController
                 }
             }
 
-            $this->Flash->success(__('Permissions saved successfully. {0} permissions granted.', $saved));
+            $this->Flash->success(__d('acl_manager', 'Permissions saved successfully. {0} permissions granted.', $saved));
         } catch (\Exception $e) {
-            $this->Flash->error(__('Error saving permissions: {0}', $e->getMessage()));
+            $this->Flash->error(__d('acl_manager', 'Error saving permissions: {0}', $e->getMessage()));
         }
 
         return $this->redirect(['action' => 'manage', $roleId]);
@@ -124,7 +124,8 @@ class PermissionsController extends AppController
         try {
             $stats = $this->scannerService->scanAndSync();
 
-            $message = __(
+            $message = __d(
+                'acl_manager',
                 'Resources synchronized. Found: {0}, Created: {1}, Updated: {2}, Deactivated: {3}',
                 $stats['found'],
                 $stats['created'],
@@ -134,7 +135,7 @@ class PermissionsController extends AppController
 
             $this->Flash->success($message);
         } catch (\Exception $e) {
-            $this->Flash->error(__('Error synchronizing resources: {0}', $e->getMessage()));
+            $this->Flash->error(__d('acl_manager', 'Error synchronizing resources: {0}', $e->getMessage()));
         }
 
         return $this->redirect(['action' => 'index']);
@@ -170,11 +171,11 @@ class PermissionsController extends AppController
             $role = $rolesTable->patchEntity($role, $this->request->getData());
 
             if ($rolesTable->save($role)) {
-                $this->Flash->success(__('Role created successfully.'));
+                $this->Flash->success(__d('acl_manager', 'Role created successfully.'));
                 return $this->redirect(['action' => 'roles']);
             }
 
-            $this->Flash->error(__('Unable to create role. Please try again.'));
+            $this->Flash->error(__d('acl_manager', 'Unable to create role. Please try again.'));
         }
 
         $this->set(compact('role'));
@@ -197,11 +198,11 @@ class PermissionsController extends AppController
             $role = $rolesTable->patchEntity($role, $this->request->getData());
 
             if ($rolesTable->save($role)) {
-                $this->Flash->success(__('Role updated successfully.'));
+                $this->Flash->success(__d('acl_manager', 'Role updated successfully.'));
                 return $this->redirect(['action' => 'roles']);
             }
 
-            $this->Flash->error(__('Unable to update role. Please try again.'));
+            $this->Flash->error(__d('acl_manager', 'Unable to update role. Please try again.'));
         }
 
         $this->set(compact('role'));
@@ -224,9 +225,9 @@ class PermissionsController extends AppController
         $role = $rolesTable->get($id);
 
         if ($rolesTable->delete($role)) {
-            $this->Flash->success(__('Role deleted successfully.'));
+            $this->Flash->success(__d('acl_manager', 'Role deleted successfully.'));
         } else {
-            $this->Flash->error(__('Unable to delete role. Please try again.'));
+            $this->Flash->error(__d('acl_manager', 'Unable to delete role. Please try again.'));
         }
 
         return $this->redirect(['action' => 'roles']);
@@ -244,7 +245,7 @@ class PermissionsController extends AppController
         $this->request->allowMethod(['post']);
 
         if (!$sourceId || !$targetId) {
-            $this->Flash->error(__('Invalid roles specified.'));
+            $this->Flash->error(__d('acl_manager', 'Invalid roles specified.'));
             return $this->redirect(['action' => 'index']);
         }
 
@@ -254,16 +255,17 @@ class PermissionsController extends AppController
             $targetRole = $rolesTable->get($targetId);
 
             if ($this->permissionService->copyPermissions($sourceId, $targetId)) {
-                $this->Flash->success(__(
+                $this->Flash->success(__d(
+                    'acl_manager',
                     'Permissions copied successfully from "{0}" to "{1}".',
                     $sourceRole->name,
                     $targetRole->name
                 ));
             } else {
-                $this->Flash->error(__('Error copying permissions.'));
+                $this->Flash->error(__d('acl_manager', 'Error copying permissions.'));
             }
         } catch (\Exception $e) {
-            $this->Flash->error(__('Error: {0}', $e->getMessage()));
+            $this->Flash->error(__d('acl_manager', 'Error: {0}', $e->getMessage()));
         }
 
         return $this->redirect(['action' => 'index']);
@@ -280,7 +282,7 @@ class PermissionsController extends AppController
         $this->request->allowMethod(['post']);
 
         if (!$roleId) {
-            $this->Flash->error(__('Invalid role specified.'));
+            $this->Flash->error(__d('acl_manager', 'Invalid role specified.'));
             return $this->redirect(['action' => 'index']);
         }
 
@@ -288,13 +290,14 @@ class PermissionsController extends AppController
             $role = $this->fetchTable('AclManager.Roles')->get($roleId);
             $count = $this->permissionService->revokeAll($roleId);
 
-            $this->Flash->success(__(
+            $this->Flash->success(__d(
+                'acl_manager',
                 'All permissions cleared for role "{0}". {1} permissions removed.',
                 $role->name,
                 $count
             ));
         } catch (\Exception $e) {
-            $this->Flash->error(__('Error: {0}', $e->getMessage()));
+            $this->Flash->error(__d('acl_manager', 'Error: {0}', $e->getMessage()));
         }
 
         return $this->redirect(['action' => 'manage', $roleId]);

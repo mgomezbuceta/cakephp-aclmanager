@@ -97,7 +97,7 @@ class AppController extends Controller
         if (!$identity) {
             // No authenticated user - redirect to login
             $loginUrl = \Cake\Core\Configure::read('AclManager.redirects.login', ['plugin' => false, 'controller' => 'Users', 'action' => 'login']);
-            $this->Flash->error(__('You must be logged in to access the Authorization Manager.'));
+            $this->Flash->error(__d('acl_manager', 'You must be logged in to access the Authorization Manager.'));
             $this->redirect($loginUrl);
             return;
         }
@@ -107,7 +107,7 @@ class AppController extends Controller
 
         if (!$isAdmin) {
             $unauthorizedUrl = \Cake\Core\Configure::read('AclManager.redirects.unauthorized', ['plugin' => false, 'controller' => 'Pages', 'action' => 'display', 'home']);
-            $this->Flash->error(__('You do not have permission to access the Authorization Manager.'));
+            $this->Flash->error(__d('acl_manager', 'You do not have permission to access the Authorization Manager.'));
             $this->redirect($unauthorizedUrl);
             return;
         }

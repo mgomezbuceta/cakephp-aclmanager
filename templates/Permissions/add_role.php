@@ -4,16 +4,16 @@
  * @var \AclManager\Model\Entity\Role $role
  */
 $isEdit = !$role->isNew();
-$this->assign('title', $isEdit ? __('Edit Role') : __('Add Role'));
+$this->assign('title', $isEdit ? __d('acl_manager', 'Edit Role') : __d('acl_manager', 'Add Role'));
 ?>
 
 <div class="role-form">
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
-                <h1><?= $isEdit ? __('Edit Role') : __('Add Role') ?></h1>
+                <h1><?= $isEdit ? __d('acl_manager', 'Edit Role') : __d('acl_manager', 'Add Role') ?></h1>
                 <p class="lead">
-                    <?= $isEdit ? __('Update role information') : __('Create a new role for your application') ?>
+                    <?= $isEdit ? __d('acl_manager', 'Update role information') : __d('acl_manager', 'Create a new role for your application') ?>
                 </p>
             </div>
         </div>
@@ -25,35 +25,35 @@ $this->assign('title', $isEdit ? __('Edit Role') : __('Add Role'));
                 <div class="card-body">
                     <?= $this->Form->create($role) ?>
                     <fieldset>
-                        <legend><?= __('Role Information') ?></legend>
+                        <legend><?= __d('acl_manager', 'Role Information') ?></legend>
 
                         <?= $this->Form->control('name', [
-                            'label' => __('Name'),
+                            'label' => __d('acl_manager', 'Name'),
                             'class' => 'form-control',
-                            'placeholder' => __('e.g., Administrator, Editor, Viewer'),
+                            'placeholder' => __d('acl_manager', 'e.g., Administrator, Editor, Viewer'),
                             'required' => true
                         ]) ?>
 
                         <?= $this->Form->control('description', [
-                            'label' => __('Description'),
+                            'label' => __d('acl_manager', 'Description'),
                             'class' => 'form-control',
                             'type' => 'textarea',
                             'rows' => 3,
-                            'placeholder' => __('Brief description of this role and its purpose')
+                            'placeholder' => __d('acl_manager', 'Brief description of this role and its purpose')
                         ]) ?>
 
                         <?= $this->Form->control('priority', [
-                            'label' => __('Priority'),
+                            'label' => __d('acl_manager', 'Priority'),
                             'class' => 'form-control',
                             'type' => 'number',
                             'min' => 0,
                             'max' => 100,
                             'default' => 0,
-                            'help' => __('Higher priority roles have precedence. Range: 0-100')
+                            'help' => __d('acl_manager', 'Higher priority roles have precedence. Range: 0-100')
                         ]) ?>
 
                         <?= $this->Form->control('active', [
-                            'label' => __('Active'),
+                            'label' => __d('acl_manager', 'Status'),
                             'class' => 'form-check-input',
                             'type' => 'checkbox',
                             'checked' => $isEdit ? $role->active : true
@@ -61,11 +61,11 @@ $this->assign('title', $isEdit ? __('Edit Role') : __('Add Role'));
                     </fieldset>
 
                     <div class="form-actions mt-4">
-                        <?= $this->Form->button(__('Save Role'), [
+                        <?= $this->Form->button(__d('acl_manager', 'Save Role'), [
                             'class' => 'btn btn-primary btn-lg'
                         ]) ?>
                         <?= $this->Html->link(
-                            __('Cancel'),
+                            __d('acl_manager', 'Cancel'),
                             ['action' => 'roles'],
                             ['class' => 'btn btn-secondary btn-lg']
                         ) ?>
@@ -76,21 +76,21 @@ $this->assign('title', $isEdit ? __('Edit Role') : __('Add Role'));
 
             <?php if ($isEdit): ?>
                 <div class="card mt-4">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0"><?= __('Quick Actions') ?></h5>
+                    <div class="card-header" style="background-color: var(--primary-color); color: white;">
+                        <h5 class="mb-0"><?= __d('acl_manager', 'Quick Actions') ?></h5>
                     </div>
                     <div class="card-body">
                         <div class="list-group">
                             <?= $this->Html->link(
-                                '<i class="fas fa-key"></i> ' . __('Manage Permissions'),
+                                '<i class="fas fa-key"></i> ' . __d('acl_manager', 'Manage Permissions'),
                                 ['action' => 'manage', $role->id],
                                 ['class' => 'list-group-item list-group-item-action', 'escape' => false]
                             ) ?>
                             <?= $this->Form->postLink(
-                                '<i class="fas fa-times-circle"></i> ' . __('Clear All Permissions'),
+                                '<i class="fas fa-times-circle"></i> ' . __d('acl_manager', 'Clear All Permissions'),
                                 ['action' => 'clearPermissions', $role->id],
                                 [
-                                    'confirm' => __('Are you sure you want to clear all permissions for this role?'),
+                                    'confirm' => __d('acl_manager', 'Are you sure you want to clear all permissions for this role?'),
                                     'class' => 'list-group-item list-group-item-action text-danger',
                                     'escape' => false
                                 ]
