@@ -180,6 +180,9 @@ msgstr "Permission"
 msgid "Allow"
 msgstr "Allow"
 
+msgid "Deny"
+msgstr "Deny"
+
 msgid "Please select a role."
 msgstr "Please select a role."
 
