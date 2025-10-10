@@ -7,9 +7,9 @@ use AclManager\Model\Table\ResourcesTable;
 use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Core\Plugin;
-use Cake\Filesystem\Folder;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Inflector;
+use DirectoryIterator;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -132,8 +132,12 @@ class ResourceScannerService
     protected function scanControllersInPath(string $path, ?string $plugin = null): array
     {
         $resources = [];
-        $folder = new Folder($path);
-        $files = $folder->find('.*Controller\.php');
+
+        if (!is_dir($path)) {
+            return $resources;
+        }
+
+        $files = $this->findControllerFiles($path);
 
         foreach ($files as $file) {
             $controllerName = str_replace('Controller.php', '', $file);
@@ -164,6 +168,36 @@ class ResourceScannerService
         }
 
         return $resources;
+    }
+
+    /**
+     * Find all controller files in a directory
+     *
+     * @param string $path Directory path
+     * @return array List of controller filenames
+     */
+    protected function findControllerFiles(string $path): array
+    {
+        $files = [];
+
+        try {
+            $iterator = new DirectoryIterator($path);
+            foreach ($iterator as $fileInfo) {
+                if ($fileInfo->isDot() || $fileInfo->isDir()) {
+                    continue;
+                }
+
+                $filename = $fileInfo->getFilename();
+                if (preg_match('/.*Controller\.php$/', $filename)) {
+                    $files[] = $filename;
+                }
+            }
+        } catch (\Exception $e) {
+            // Directory not readable or doesn't exist
+            return [];
+        }
+
+        return $files;
     }
 
     /**
