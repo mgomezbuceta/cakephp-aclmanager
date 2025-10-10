@@ -5,6 +5,8 @@
  * @var \Cake\View\View $this
  */
 
+use Cake\Core\Configure;
+
 $title = $this->fetch('title');
 ?>
 <!DOCTYPE html>
