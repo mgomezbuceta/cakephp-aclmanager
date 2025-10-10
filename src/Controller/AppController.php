@@ -112,7 +112,8 @@ class AppController extends Controller
             }
 
             $this->Flash->error(__d('acl_manager', 'You must be logged in to access the Authorization Manager.'));
-            return $this->redirect($loginUrl);
+            $this->redirect($loginUrl);
+            return;
         }
 
         // Check if user is admin
