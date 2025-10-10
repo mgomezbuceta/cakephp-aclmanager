@@ -7,7 +7,8 @@ msgstr ""
 "POT-Creation-Date: 2025-01-10 10:00+0000\n"
 "PO-Revision-Date: 2025-01-10 10:00+0000\n"
 "Last-Translator: Marcos Gómez Buceta <mgomezbuceta@gmail.com>\n"
-"Language-Team: Spanish\n"
+"Language-Team: Galician\n"
+"Language: gl_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -15,7 +16,7 @@ msgstr ""
 
 # General
 msgid "Authorization Manager"
-msgstr "Gestor de Autorizaciones"
+msgstr "Xestor de Autorizacións"
 
 msgid "Dashboard"
 msgstr "Panel de Control"
@@ -27,10 +28,10 @@ msgid "Sync Resources"
 msgstr "Sincronizar Recursos"
 
 msgid "Back to App"
-msgstr "Volver a la Aplicación"
+msgstr "Volver á Aplicación"
 
 msgid "Actions"
-msgstr "Acciones"
+msgstr "Accións"
 
 msgid "Status"
 msgstr "Estado"
@@ -49,28 +50,28 @@ msgstr "Modificado"
 
 # Dashboard
 msgid "Manage Roles & Permissions"
-msgstr "Gestionar Roles y Permisos"
+msgstr "Xestionar Roles e Permisos"
 
 msgid "Overview of all roles and their permissions"
-msgstr "Vista general de todos los roles y sus permisos"
+msgstr "Vista xeral de todos os roles e os seus permisos"
 
 msgid "Role"
 msgstr "Rol"
 
 msgid "Name"
-msgstr "Nombre"
+msgstr "Nome"
 
 msgid "Description"
-msgstr "Descripción"
+msgstr "Descrición"
 
 msgid "Priority"
-msgstr "Prioridad"
+msgstr "Prioridade"
 
 msgid "Permissions"
 msgstr "Permisos"
 
 msgid "Manage Permissions"
-msgstr "Gestionar Permisos"
+msgstr "Xestionar Permisos"
 
 msgid "Edit"
 msgstr "Editar"
@@ -79,84 +80,84 @@ msgid "Delete"
 msgstr "Eliminar"
 
 msgid "New Role"
-msgstr "Nuevo Rol"
+msgstr "Novo Rol"
 
 msgid "Total Resources"
 msgstr "Total de Recursos"
 
 msgid "No roles found"
-msgstr "No se encontraron roles"
+msgstr "Non se atoparon roles"
 
 msgid "Get started by creating your first role."
-msgstr "Comienza creando tu primer rol."
+msgstr "Comeza creando o teu primeiro rol."
 
 msgid "Create First Role"
-msgstr "Crear Primer Rol"
+msgstr "Crear Primeiro Rol"
 
 # Role Form
 msgid "Add Role"
-msgstr "Añadir Rol"
+msgstr "Engadir Rol"
 
 msgid "Edit Role"
 msgstr "Editar Rol"
 
 msgid "Create a new role for your application"
-msgstr "Crear un nuevo rol para tu aplicación"
+msgstr "Crear un novo rol para a túa aplicación"
 
 msgid "Update role information"
-msgstr "Actualizar información del rol"
+msgstr "Actualizar información do rol"
 
 msgid "Role Information"
-msgstr "Información del Rol"
+msgstr "Información do Rol"
 
 msgid "e.g., Administrator, Editor, Viewer"
-msgstr "ej., Administrador, Editor, Visualizador"
+msgstr "ex., Administrador, Editor, Visualizador"
 
 msgid "Brief description of this role and its purpose"
-msgstr "Breve descripción de este rol y su propósito"
+msgstr "Breve descrición deste rol e o seu propósito"
 
 msgid "Higher priority roles have precedence. Range: 0-100"
-msgstr "Los roles de mayor prioridad tienen precedencia. Rango: 0-100"
+msgstr "Os roles de maior prioridade teñen precedencia. Rango: 0-100"
 
 msgid "Save Role"
-msgstr "Guardar Rol"
+msgstr "Gardar Rol"
 
 msgid "Cancel"
 msgstr "Cancelar"
 
 msgid "Quick Actions"
-msgstr "Acciones Rápidas"
+msgstr "Accións Rápidas"
 
 msgid "Clear All Permissions"
-msgstr "Limpiar Todos los Permisos"
+msgstr "Limpar Todos os Permisos"
 
 msgid "Are you sure you want to clear all permissions for this role?"
-msgstr "¿Estás seguro de que quieres limpiar todos los permisos de este rol?"
+msgstr "Estás seguro de que queres limpar todos os permisos deste rol?"
 
 msgid "Role created successfully."
 msgstr "Rol creado correctamente."
 
 msgid "Unable to create role. Please try again."
-msgstr "No se pudo crear el rol. Por favor, inténtalo de nuevo."
+msgstr "Non se puido crear o rol. Por favor, téntao de novo."
 
 msgid "Role updated successfully."
 msgstr "Rol actualizado correctamente."
 
 msgid "Unable to update role. Please try again."
-msgstr "No se pudo actualizar el rol. Por favor, inténtalo de nuevo."
+msgstr "Non se puido actualizar o rol. Por favor, téntao de novo."
 
 msgid "Role deleted successfully."
 msgstr "Rol eliminado correctamente."
 
 msgid "Unable to delete role. Please try again."
-msgstr "No se pudo eliminar el rol. Por favor, inténtalo de nuevo."
+msgstr "Non se puido eliminar o rol. Por favor, téntao de novo."
 
 msgid "Are you sure you want to delete {0}?"
-msgstr "¿Estás seguro de que quieres eliminar {0}?"
+msgstr "Estás seguro de que queres eliminar {0}?"
 
 # Permissions Management
 msgid "Manage Permissions for {0}"
-msgstr "Gestionar Permisos para {0}"
+msgstr "Xestionar Permisos para {0}"
 
 msgid "Role: {0}"
 msgstr "Rol: {0}"
@@ -165,10 +166,10 @@ msgid "Back"
 msgstr "Volver"
 
 msgid "Save Permissions"
-msgstr "Guardar Permisos"
+msgstr "Gardar Permisos"
 
 msgid "Clear All"
-msgstr "Limpiar Todo"
+msgstr "Limpar Todo"
 
 msgid "Action"
 msgstr "Acción"
@@ -183,46 +184,46 @@ msgid "Please select a role."
 msgstr "Por favor, selecciona un rol."
 
 msgid "Permissions saved successfully. {0} permissions granted."
-msgstr "Permisos guardados correctamente. {0} permisos concedidos."
+msgstr "Permisos gardados correctamente. {0} permisos concedidos."
 
 msgid "Error saving permissions: {0}"
-msgstr "Error al guardar permisos: {0}"
+msgstr "Erro ao gardar permisos: {0}"
 
 msgid "No resources found. Please run \"Sync Resources\" first."
-msgstr "No se encontraron recursos. Por favor, ejecuta \"Sincronizar Recursos\" primero."
+msgstr "Non se atoparon recursos. Por favor, executa \"Sincronizar Recursos\" primeiro."
 
 msgid "All permissions cleared for role \"{0}\". {1} permissions removed."
-msgstr "Todos los permisos limpiados para el rol \"{0}\". {1} permisos eliminados."
+msgstr "Todos os permisos limpados para o rol \"{0}\". {1} permisos eliminados."
 
 msgid "Error: {0}"
-msgstr "Error: {0}"
+msgstr "Erro: {0}"
 
 # Sync Resources
 msgid "Resources synchronized. Found: {0}, Created: {1}, Updated: {2}, Deactivated: {3}"
-msgstr "Recursos sincronizados. Encontrados: {0}, Creados: {1}, Actualizados: {2}, Desactivados: {3}"
+msgstr "Recursos sincronizados. Atopados: {0}, Creados: {1}, Actualizados: {2}, Desactivados: {3}"
 
 msgid "Error synchronizing resources: {0}"
-msgstr "Error al sincronizar recursos: {0}"
+msgstr "Erro ao sincronizar recursos: {0}"
 
 # Copy Permissions
 msgid "Invalid roles specified."
-msgstr "Roles especificados no válidos."
+msgstr "Roles especificados non válidos."
 
 msgid "Permissions copied successfully from \"{0}\" to \"{1}\"."
 msgstr "Permisos copiados correctamente de \"{0}\" a \"{1}\"."
 
 msgid "Error copying permissions."
-msgstr "Error al copiar permisos."
+msgstr "Erro ao copiar permisos."
 
 msgid "Invalid role specified."
-msgstr "Rol especificado no válido."
+msgstr "Rol especificado non válido."
 
 # Access Control
 msgid "You must be logged in to access the Authorization Manager."
-msgstr "Debes iniciar sesión para acceder al Gestor de Autorizaciones."
+msgstr "Debes iniciar sesión para acceder ao Xestor de Autorizacións."
 
 msgid "You do not have permission to access the Authorization Manager."
-msgstr "No tienes permiso para acceder al Gestor de Autorizaciones."
+msgstr "Non tes permiso para acceder ao Xestor de Autorizacións."
 
 # Misc
 msgid "ID"
@@ -248,10 +249,10 @@ msgid "Total Permissions"
 msgstr "Total de Permisos"
 
 msgid "Manage Roles"
-msgstr "Gestionar Roles"
+msgstr "Xestionar Roles"
 
 msgid "Create and manage user roles"
-msgstr "Crear y gestionar roles de usuario"
+msgstr "Crear e xestionar roles de usuario"
 
 msgid "Back to Dashboard"
-msgstr "Volver al Panel de Control"
+msgstr "Volver ao Panel de Control"
