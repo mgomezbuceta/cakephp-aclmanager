@@ -1,30 +1,18 @@
 <?php
 /**
- * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
- * Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
+ * Authorization Manager Layout
  *
- * Licensed under The MIT License
- * For full copyright and license information, please see the LICENSE.txt
- * Redistributions of files must retain the above copyright notice.
- *
- * @copyright     Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
- * @link          https://cakephp.org CakePHP(tm) Project
- * @since         0.10.0
- * @license       https://opensource.org/licenses/mit-license.php MIT License
  * @var \Cake\View\View $this
  */
 
-$cakeDescription = 'Authorization Manager';
+$title = $this->fetch('title');
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>
-        <?= $cakeDescription ?>:
-        <?= $this->fetch('title') ?>
-    </title>
+    <title><?= $title ? h($title) . ' - ' : '' ?><?= __d('acl_manager', 'Authorization Manager') ?></title>
     <?= $this->Html->meta('icon') ?>
 
     <!-- Bootstrap 5 CSS -->
@@ -32,39 +20,208 @@ $cakeDescription = 'Authorization Manager';
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <?= $this->Html->css(['normalize.min', 'milligram.min', 'fonts', 'cake']) ?>
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
 
     <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-bg: #ecf0f1;
+            --border-color: #bdc3c7;
+        }
+
         body {
-            background-color: #f8f9fa;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: #2c3e50;
         }
+
+        /* Navbar */
         .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 0.75rem 0;
         }
+
         .navbar-brand {
             font-weight: 600;
             color: white !important;
+            font-size: 1.25rem;
         }
-        .container-main {
-            margin-top: 30px;
-            margin-bottom: 30px;
+
+        .navbar-brand i {
+            margin-right: 0.5rem;
         }
-        .page-header {
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #dee2e6;
+
+        .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
         }
+
+        .nav-link:hover {
+            color: white !important;
+            background-color: var(--secondary-color);
+            border-radius: 0.25rem;
+        }
+
+        .nav-link i {
+            margin-right: 0.5rem;
+        }
+
+        /* Main Container */
+        .main-container {
+            padding: 2rem 0;
+            min-height: calc(100vh - 180px);
+        }
+
+        /* Cards */
         .card {
-            box-shadow: 0 2px 4px rgba(0,0,0,.08);
-            border: none;
-            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            background-color: white;
         }
-        .flash-message {
-            margin-top: 20px;
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: none;
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+
+        /* Tables */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background-color: var(--light-bg);
+            border-bottom: 2px solid var(--border-color);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0,0,0,0.02);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        /* Badges */
+        .badge {
+            padding: 0.375rem 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Flash Messages */
+        .flash-messages {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert {
+            border-radius: 0.375rem;
+            border: none;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .page-header h1 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header .lead {
+            color: #7f8c8d;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary-color);
+            color: rgba(255,255,255,0.8);
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+        }
+
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: #5dade2;
+            text-decoration: underline;
+        }
+
+        /* Form Controls */
+        .form-control, .form-select {
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem 0;
+            }
+
+            .navbar-brand {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -73,7 +230,7 @@ $cakeDescription = 'Authorization Manager';
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="<?= $this->Url->build(['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' => 'index']) ?>">
-                <i class="fas fa-shield-alt"></i> Authorization Manager
+                <i class="fas fa-shield-alt"></i> <?= __d('acl_manager', 'Authorization Manager') ?>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -82,22 +239,22 @@ $cakeDescription = 'Authorization Manager';
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build(['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' => 'index']) ?>">
-                            <i class="fas fa-home"></i> Dashboard
+                            <i class="fas fa-home"></i> <?= __d('acl_manager', 'Dashboard') ?>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build(['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' => 'roles']) ?>">
-                            <i class="fas fa-users"></i> Roles
+                            <i class="fas fa-users"></i> <?= __d('acl_manager', 'Roles') ?>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build(['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' => 'syncResources']) ?>">
-                            <i class="fas fa-sync"></i> Sync Resources
+                            <i class="fas fa-sync"></i> <?= __d('acl_manager', 'Sync Resources') ?>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build('/') ?>">
-                            <i class="fas fa-arrow-left"></i> Back to App
+                            <i class="fas fa-arrow-left"></i> <?= __d('acl_manager', 'Back to App') ?>
                         </a>
                     </li>
                 </ul>
@@ -106,24 +263,23 @@ $cakeDescription = 'Authorization Manager';
     </nav>
 
     <!-- Flash Messages -->
-    <div class="container">
-        <div class="flash-message">
-            <?= $this->Flash->render() ?>
-        </div>
+    <div class="container flash-messages">
+        <?= $this->Flash->render() ?>
     </div>
 
     <!-- Main Content -->
-    <main class="container-main">
+    <main class="main-container">
         <div class="container">
             <?= $this->fetch('content') ?>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="text-center text-muted py-4">
-        <div class="container">
+    <footer>
+        <div class="container text-center">
             <p class="mb-0">
-                Powered by <a href="https://github.com/mgomezbuceta/cakephp-aclmanager" target="_blank">CakePHP Authorization Manager</a>
+                <?= __d('acl_manager', 'Authorization Manager') ?> v<?= Configure::read('AclManager.version', '3.1.0') ?> |
+                <a href="https://github.com/mgomezbuceta/cakephp-aclmanager" target="_blank">GitHub</a>
             </p>
         </div>
     </footer>

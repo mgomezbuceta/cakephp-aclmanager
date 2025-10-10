@@ -1,0 +1,241 @@
+# LANGUAGE translation of CakePHP Authorization Manager
+# Copyright YEAR Marcos Gómez Buceta
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CakePHP Authorization Manager\n"
+"POT-Creation-Date: 2025-01-10 10:00+0000\n"
+"PO-Revision-Date: 2025-01-10 10:00+0000\n"
+"Last-Translator: Marcos Gómez Buceta <mgomezbuceta@gmail.com>\n"
+"Language-Team: Spanish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# General
+msgid "Authorization Manager"
+msgstr "Gestor de Autorizaciones"
+
+msgid "Dashboard"
+msgstr "Panel de Control"
+
+msgid "Roles"
+msgstr "Roles"
+
+msgid "Sync Resources"
+msgstr "Sincronizar Recursos"
+
+msgid "Back to App"
+msgstr "Volver a la Aplicación"
+
+msgid "Actions"
+msgstr "Acciones"
+
+msgid "Status"
+msgstr "Estado"
+
+msgid "Active"
+msgstr "Activo"
+
+msgid "Inactive"
+msgstr "Inactivo"
+
+msgid "Created"
+msgstr "Creado"
+
+msgid "Modified"
+msgstr "Modificado"
+
+# Dashboard
+msgid "Manage Roles & Permissions"
+msgstr "Gestionar Roles y Permisos"
+
+msgid "Overview of all roles and their permissions"
+msgstr "Vista general de todos los roles y sus permisos"
+
+msgid "Role"
+msgstr "Rol"
+
+msgid "Name"
+msgstr "Nombre"
+
+msgid "Description"
+msgstr "Descripción"
+
+msgid "Priority"
+msgstr "Prioridad"
+
+msgid "Permissions"
+msgstr "Permisos"
+
+msgid "Manage Permissions"
+msgstr "Gestionar Permisos"
+
+msgid "Edit"
+msgstr "Editar"
+
+msgid "Delete"
+msgstr "Eliminar"
+
+msgid "New Role"
+msgstr "Nuevo Rol"
+
+msgid "Total Resources"
+msgstr "Total de Recursos"
+
+msgid "No roles found"
+msgstr "No se encontraron roles"
+
+msgid "Get started by creating your first role."
+msgstr "Comienza creando tu primer rol."
+
+msgid "Create First Role"
+msgstr "Crear Primer Rol"
+
+# Role Form
+msgid "Add Role"
+msgstr "Añadir Rol"
+
+msgid "Edit Role"
+msgstr "Editar Rol"
+
+msgid "Create a new role for your application"
+msgstr "Crear un nuevo rol para tu aplicación"
+
+msgid "Update role information"
+msgstr "Actualizar información del rol"
+
+msgid "Role Information"
+msgstr "Información del Rol"
+
+msgid "e.g., Administrator, Editor, Viewer"
+msgstr "ej., Administrador, Editor, Visualizador"
+
+msgid "Brief description of this role and its purpose"
+msgstr "Breve descripción de este rol y su propósito"
+
+msgid "Higher priority roles have precedence. Range: 0-100"
+msgstr "Los roles de mayor prioridad tienen precedencia. Rango: 0-100"
+
+msgid "Save Role"
+msgstr "Guardar Rol"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Quick Actions"
+msgstr "Acciones Rápidas"
+
+msgid "Clear All Permissions"
+msgstr "Limpiar Todos los Permisos"
+
+msgid "Are you sure you want to clear all permissions for this role?"
+msgstr "¿Estás seguro de que quieres limpiar todos los permisos de este rol?"
+
+msgid "Role created successfully."
+msgstr "Rol creado correctamente."
+
+msgid "Unable to create role. Please try again."
+msgstr "No se pudo crear el rol. Por favor, inténtalo de nuevo."
+
+msgid "Role updated successfully."
+msgstr "Rol actualizado correctamente."
+
+msgid "Unable to update role. Please try again."
+msgstr "No se pudo actualizar el rol. Por favor, inténtalo de nuevo."
+
+msgid "Role deleted successfully."
+msgstr "Rol eliminado correctamente."
+
+msgid "Unable to delete role. Please try again."
+msgstr "No se pudo eliminar el rol. Por favor, inténtalo de nuevo."
+
+msgid "Are you sure you want to delete {0}?"
+msgstr "¿Estás seguro de que quieres eliminar {0}?"
+
+# Permissions Management
+msgid "Manage Permissions for {0}"
+msgstr "Gestionar Permisos para {0}"
+
+msgid "Role: {0}"
+msgstr "Rol: {0}"
+
+msgid "Back"
+msgstr "Volver"
+
+msgid "Save Permissions"
+msgstr "Guardar Permisos"
+
+msgid "Clear All"
+msgstr "Limpiar Todo"
+
+msgid "Action"
+msgstr "Acción"
+
+msgid "Permission"
+msgstr "Permiso"
+
+msgid "Allow"
+msgstr "Permitir"
+
+msgid "Please select a role."
+msgstr "Por favor, selecciona un rol."
+
+msgid "Permissions saved successfully. {0} permissions granted."
+msgstr "Permisos guardados correctamente. {0} permisos concedidos."
+
+msgid "Error saving permissions: {0}"
+msgstr "Error al guardar permisos: {0}"
+
+msgid "No resources found. Please run \"Sync Resources\" first."
+msgstr "No se encontraron recursos. Por favor, ejecuta \"Sincronizar Recursos\" primero."
+
+msgid "All permissions cleared for role \"{0}\". {1} permissions removed."
+msgstr "Todos los permisos limpiados para el rol \"{0}\". {1} permisos eliminados."
+
+msgid "Error: {0}"
+msgstr "Error: {0}"
+
+# Sync Resources
+msgid "Resources synchronized. Found: {0}, Created: {1}, Updated: {2}, Deactivated: {3}"
+msgstr "Recursos sincronizados. Encontrados: {0}, Creados: {1}, Actualizados: {2}, Desactivados: {3}"
+
+msgid "Error synchronizing resources: {0}"
+msgstr "Error al sincronizar recursos: {0}"
+
+# Copy Permissions
+msgid "Invalid roles specified."
+msgstr "Roles especificados no válidos."
+
+msgid "Permissions copied successfully from \"{0}\" to \"{1}\"."
+msgstr "Permisos copiados correctamente de \"{0}\" a \"{1}\"."
+
+msgid "Error copying permissions."
+msgstr "Error al copiar permisos."
+
+msgid "Invalid role specified."
+msgstr "Rol especificado no válido."
+
+# Access Control
+msgid "You must be logged in to access the Authorization Manager."
+msgstr "Debes iniciar sesión para acceder al Gestor de Autorizaciones."
+
+msgid "You do not have permission to access the Authorization Manager."
+msgstr "No tienes permiso para acceder al Gestor de Autorizaciones."
+
+# Misc
+msgid "ID"
+msgstr "ID"
+
+msgid "Controller"
+msgstr "Controlador"
+
+msgid "Plugin"
+msgstr "Plugin"
+
+msgid "Select All"
+msgstr "Seleccionar Todo"
+
+msgid "Deselect All"
+msgstr "Deseleccionar Todo"

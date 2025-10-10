@@ -15,11 +15,18 @@ declare(strict_types=1);
  */
 
 use Cake\Core\Configure;
+use Cake\I18n\I18n;
 
 /**
  * Plugin version
  */
-Configure::write('AclManager.version', '3.0.0');
+Configure::write('AclManager.version', '3.1.0');
+
+/**
+ * Load plugin translations
+ * Default language: Spanish (es_ES)
+ */
+I18n::setLocale('es_ES');
 
 /**
  * Default configuration values
