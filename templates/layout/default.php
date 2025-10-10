@@ -25,26 +25,29 @@ $title = $this->fetch('title');
 
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #34495e;
-            --accent-color: #3498db;
-            --success-color: #27ae60;
+            --primary-color: #1db58c;
+            --primary-dark: #189876;
+            --primary-light: #22d4a2;
+            --secondary-color: #ffffff;
+            --text-dark: #2d3748;
+            --text-light: #718096;
+            --success-color: #1db58c;
             --danger-color: #e74c3c;
             --warning-color: #f39c12;
-            --light-bg: #ecf0f1;
-            --border-color: #bdc3c7;
+            --light-bg: #f7fafc;
+            --border-color: #e2e8f0;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--light-bg);
-            color: #2c3e50;
+            color: var(--text-dark);
         }
 
         /* Navbar */
         .navbar {
             background-color: var(--primary-color);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(29, 181, 140, 0.2);
             padding: 0.75rem 0;
         }
 
@@ -59,14 +62,14 @@ $title = $this->fetch('title');
         }
 
         .nav-link {
-            color: rgba(255,255,255,0.85) !important;
+            color: rgba(255,255,255,0.9) !important;
             padding: 0.5rem 1rem !important;
             transition: all 0.3s ease;
         }
 
         .nav-link:hover {
             color: white !important;
-            background-color: var(--secondary-color);
+            background-color: var(--primary-dark);
             border-radius: 0.25rem;
         }
 
@@ -83,8 +86,8 @@ $title = $this->fetch('title');
         /* Cards */
         .card {
             border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
             margin-bottom: 1.5rem;
             background-color: white;
         }
@@ -95,7 +98,7 @@ $title = $this->fetch('title');
             border-bottom: none;
             padding: 1rem 1.25rem;
             font-weight: 600;
-            border-radius: 0.5rem 0.5rem 0 0;
+            border-radius: 0.75rem 0.75rem 0 0;
         }
 
         .card-body {
@@ -104,30 +107,48 @@ $title = $this->fetch('title');
 
         /* Buttons */
         .btn {
-            border-radius: 0.375rem;
-            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1.25rem;
             font-weight: 500;
             transition: all 0.3s ease;
+            border: none;
         }
 
         .btn-primary {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
         }
 
         .btn-primary:hover {
-            background-color: #2980b9;
-            border-color: #2980b9;
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            color: white;
         }
 
         .btn-success {
             background-color: var(--success-color);
             border-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
         }
 
         .btn-danger {
             background-color: var(--danger-color);
             border-color: var(--danger-color);
+        }
+
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: var(--text-dark);
+        }
+
+        .btn-secondary:hover {
+            background-color: #cbd5e0;
         }
 
         /* Tables */
@@ -139,15 +160,15 @@ $title = $this->fetch('title');
             background-color: var(--light-bg);
             border-bottom: 2px solid var(--border-color);
             font-weight: 600;
-            color: var(--primary-color);
+            color: var(--text-dark);
         }
 
         .table-striped tbody tr:nth-of-type(odd) {
-            background-color: rgba(0,0,0,0.02);
+            background-color: rgba(29, 181, 140, 0.03);
         }
 
         .table-hover tbody tr:hover {
-            background-color: rgba(52, 152, 219, 0.1);
+            background-color: rgba(29, 181, 140, 0.08);
         }
 
         /* Badges */
@@ -175,42 +196,53 @@ $title = $this->fetch('title');
         }
 
         .page-header h1 {
-            color: var(--primary-color);
+            color: var(--text-dark);
             font-weight: 600;
             margin-bottom: 0.5rem;
         }
 
         .page-header .lead {
-            color: #7f8c8d;
+            color: var(--text-light);
         }
 
         /* Footer */
         footer {
             background-color: var(--primary-color);
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.9);
             padding: 1.5rem 0;
             margin-top: 3rem;
         }
 
         footer a {
-            color: var(--accent-color);
+            color: white;
             text-decoration: none;
+            font-weight: 500;
         }
 
         footer a:hover {
-            color: #5dade2;
+            color: rgba(255,255,255,0.8);
             text-decoration: underline;
         }
 
         /* Form Controls */
         .form-control, .form-select {
-            border-radius: 0.375rem;
+            border-radius: 0.5rem;
             border: 1px solid var(--border-color);
         }
 
         .form-control:focus, .form-select:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(29, 181, 140, 0.25);
+        }
+
+        /* Badge Colors */
+        .badge-success {
+            background-color: var(--primary-color);
+        }
+
+        .badge-secondary {
+            background-color: #e2e8f0;
+            color: var(--text-dark);
         }
 
         /* Responsive */
