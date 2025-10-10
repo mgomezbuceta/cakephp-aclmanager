@@ -36,6 +36,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🐛 Fixed
 
+- **Cake\Filesystem\Folder removal**: Fixed "Class Cake\Filesystem\Folder not found" error
+  - Replaced deprecated `Cake\Filesystem\Folder` with native PHP `DirectoryIterator`
+  - Added `findControllerFiles()` method for scanning controller directories
+  - CakePHP 5.x removed the Folder class in favor of native PHP functions
 - **Configure class import**: Fixed "Class Configure not found" error in layout template
 - **Component loading**: Added graceful fallback when Authorization/Authentication components not available
 - **Version number**: Updated to 3.2.0 to reflect i18n features
