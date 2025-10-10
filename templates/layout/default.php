@@ -5,8 +5,6 @@
  * @var \Cake\View\View $this
  */
 
-use Cake\Core\Configure;
-
 $title = $this->fetch('title');
 ?>
 <!DOCTYPE html>
@@ -312,7 +310,7 @@ $title = $this->fetch('title');
     <footer>
         <div class="container text-center">
             <p class="mb-0">
-                <?= __d('acl_manager', 'Authorization Manager') ?> v<?= Configure::read('AclManager.version', '3.1.0') ?> |
+                <?= __d('acl_manager', 'Authorization Manager') ?> v<?= \Cake\Core\Configure::read('AclManager.version', '3.2.0') ?> |
                 <a href="https://github.com/mgomezbuceta/cakephp-aclmanager" target="_blank">GitHub</a>
             </p>
         </div>

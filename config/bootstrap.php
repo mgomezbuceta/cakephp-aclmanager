@@ -20,7 +20,7 @@ use Cake\I18n\I18n;
 /**
  * Plugin version
  */
-Configure::write('AclManager.version', '3.1.0');
+Configure::write('AclManager.version', '3.2.0');
 
 /**
  * Load plugin translations
