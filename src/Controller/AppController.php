@@ -95,11 +95,24 @@ class AppController extends Controller
         $identity = $this->Authentication->getIdentity();
 
         if (!$identity) {
-            // No authenticated user - redirect to login
+            // No authenticated user - redirect to login with return URL
             $loginUrl = \Cake\Core\Configure::read('AclManager.redirects.login', ['plugin' => false, 'controller' => 'Users', 'action' => 'login']);
+
+            // Store current URL to redirect back after login
+            $currentUrl = $this->request->getUri()->getPath();
+            if ($this->request->getQuery()) {
+                $currentUrl .= '?' . http_build_query($this->request->getQueryParams());
+            }
+
+            // Add redirect parameter to login URL
+            if (is_array($loginUrl)) {
+                $loginUrl['?'] = ['redirect' => $currentUrl];
+            } else {
+                $loginUrl .= (strpos($loginUrl, '?') === false ? '?' : '&') . 'redirect=' . urlencode($currentUrl);
+            }
+
             $this->Flash->error(__d('acl_manager', 'You must be logged in to access the Authorization Manager.'));
-            $this->redirect($loginUrl);
-            return;
+            return $this->redirect($loginUrl);
         }
 
         // Check if user is admin

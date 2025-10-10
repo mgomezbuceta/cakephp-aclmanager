@@ -11,10 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Internationalization (i18n) Support
 - **Full i18n implementation** using `acl_manager` translation domain
-- **Spanish (es_ES) translation**: Complete translation file with 80+ strings
+- **English (en_US) translation**: Complete translation file with 80+ strings
+- **Spanish (es_ES) translation**: Complete translation file with 80+ strings (default)
 - **Galician (gl_ES) translation**: Complete translation file with 80+ strings
 - **CakePHP i18n integration**: All strings extractable via `bin/cake i18n extract`
 - Spanish set as default locale in bootstrap configuration
+
+#### Session Management
+- **Redirect after login**: When session expires, users are redirected to login with return URL
+- **Preserve navigation state**: After authentication, users return to the original Authorization Manager page
+- **Query parameter support**: Login URL includes `redirect` parameter with original URL
 
 #### UI Improvements
 - **Brand color integration**: All templates updated with `#1db58c` primary color

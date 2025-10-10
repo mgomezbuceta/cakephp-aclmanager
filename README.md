@@ -199,6 +199,40 @@ return [
 ];
 ```
 
+### Session Timeout and Redirect
+
+When a user's session expires while using the Authorization Manager, they will be redirected to the login page with a `redirect` parameter containing the original URL.
+
+**To handle the redirect in your login controller**, add this code after successful authentication:
+
+```php
+// In your UsersController login action, after successful authentication:
+public function login()
+{
+    $result = $this->Authentication->getResult();
+
+    if ($result->isValid()) {
+        // Check if there's a redirect parameter
+        $redirect = $this->request->getQuery('redirect');
+
+        if ($redirect) {
+            // Redirect back to the original URL
+            return $this->redirect($redirect);
+        }
+
+        // Default redirect
+        $target = $this->Authentication->getLoginRedirect() ?? '/dashboard';
+        return $this->redirect($target);
+    }
+
+    if ($this->request->is('post') && !$result->isValid()) {
+        $this->Flash->error(__('Invalid username or password'));
+    }
+}
+```
+
+This ensures users are returned to the Authorization Manager page they were viewing after logging in.
+
 ### Internationalization (i18n)
 
 The plugin comes with **Spanish (es_ES)** and **Galician (gl_ES)** translations out of the box.
