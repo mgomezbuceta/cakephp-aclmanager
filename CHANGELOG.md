@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2025-12-02
+
+### 🔎 Resumen
+
+- Se han realizado varias mejoras y ajustes en configuración, plantillas, servicios y traducciones.
+- Cambios principales: ajustes en escaneo/filtrado de recursos, control de eliminación de roles admin en UI, actualizaciones de tipos de columna boolean en tablas y pequeñas correcciones en componentes y controladores.
+
+### ✨ Cambios destacados
+
+- `config/bootstrap.php` / `config/app_local.example.php`: se añade `Utilities/*` a `ignoreActions` para excluir utilidades del escaneo de recursos.
+- `src/Controller/Component/AuthorizationManagerComponent.php`: se añade fallback del parámetro `plugin` a `'App'` cuando no existe.
+- `src/Model/Table/PermissionsTable.php` y `src/Model/Table/ResourcesTable.php`: se define el tipo de columna boolean para `allowed` y `active` respectivamente.
+- `src/Service/ResourceScannerService.php`: `getGroupedResources()` ahora filtra plugins/controladores/acciones según las reglas de `ignoreActions` antes de devolverlos.
+- Plantillas (`templates/Permissions/*`): integración de `adminRoleIds` para desactivar acciones peligrosas (borrar rol) para roles administrativos; cambio en el enlace de "Clear All" para invocar la acción `clearPermissions`; ajuste en el campo oculto `plugin` para mantener su valor real.
+- Locales (`resources/locales/*/acl_manager.po`): se ha eliminado la cadena `"Deny"` en los ficheros de idiomas (limpieza/translations).
+- Nueva política: `src/Policy/AclManagerPolicy.php` añadida para usar `PermissionService` en la verificación de solicitudes.
+- Interfaz/CSS: añadido estilo `.disabled-link` en `templates/layout/default.php` para deshabilitar enlaces de acción que no deben ser interactivos.
+
+### 📝 Notas para el desarrollador
+
+- Revisar si los archivos `.snapshots/*` deben incluirse en el repositorio (actualmente aparecen añadidos). Normalmente no deberían comitearse.
+- Verificar que las modificaciones en `clearPermissions` acepten métodos `GET` (cambio realizado) y que esto entre en línea con la política de seguridad de la app.
+
 ## [3.2.0] - 2025-01-10
 
 ### 🌍 Added
