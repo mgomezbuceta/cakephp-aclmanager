@@ -34,8 +34,8 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
             <button type="submit" class="btn btn-primary btn-lg">
                 <i class="fas fa-save"></i> <?= __d('acl_manager', 'Save Permissions') ?>
             </button>
-            <?= $this->Form->postLink(
-                '<i class="fas fa-times-circle"></i> ' . __d('acl_manager', 'Clear All'),
+            <?= $this->Html->link(
+               '<i class="fas fa-times-circle"></i> ' . __d('acl_manager', 'Clear All'),
                 ['action' => 'clearPermissions', $role->id],
                 [
                     'confirm' => __d('acl_manager', 'Are you sure you want to clear all permissions for this role?'),
@@ -83,7 +83,7 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
                                                 <div class="form-check form-check-inline">
                                                     <?= $this->Form->hidden("permissions.{$fieldIndex}.controller", ['value' => $controller]) ?>
                                                     <?= $this->Form->hidden("permissions.{$fieldIndex}.action", ['value' => $actionName]) ?>
-                                                    <?= $this->Form->hidden("permissions.{$fieldIndex}.plugin", ['value' => $plugin === 'App' ? null : $plugin]) ?>
+                                                    <?= $this->Form->hidden("permissions.{$fieldIndex}.plugin", ['value' => $plugin]) ?>
                                                     <?= $this->Form->checkbox("permissions.{$fieldIndex}.allowed", [
                                                         'checked' => $isAllowed,
                                                         'class' => 'form-check-input',

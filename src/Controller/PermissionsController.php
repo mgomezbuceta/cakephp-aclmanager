@@ -39,7 +39,10 @@ class PermissionsController extends AppController
         $roles = $this->permissionService->getRolesWithPermissionCount();
         $resourceCount = $this->fetchTable('AclManager.Resources')->find()->where(['active' => true])->count();
 
-        $this->set(compact('roles', 'resourceCount'));
+        // Load configuration from config/app.php
+        $adminRoleIds = \Cake\Core\Configure::read('AclManager.adminAccess.adminRoleIds', [1]);
+
+        $this->set(compact('roles', 'resourceCount', 'adminRoleIds'));
 
         return null;
     }
@@ -152,7 +155,10 @@ class PermissionsController extends AppController
             ->order(['priority' => 'DESC'])
             ->all();
 
-        $this->set(compact('roles'));
+        // Load configuration from config/app.php
+        $adminRoleIds = \Cake\Core\Configure::read('AclManager.adminAccess.adminRoleIds', [1]);
+
+        $this->set(compact('roles', 'adminRoleIds'));
 
         return null;
     }
@@ -279,7 +285,7 @@ class PermissionsController extends AppController
      */
     public function clearPermissions(?int $roleId = null): \Cake\Http\Response
     {
-        $this->request->allowMethod(['post']);
+        $this->request->allowMethod(['post', 'get']);
 
         if (!$roleId) {
             $this->Flash->error(__d('acl_manager', 'Invalid role specified.'));

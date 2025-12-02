@@ -40,6 +40,8 @@ class ResourcesTable extends Table
         $this->setTable('resources');
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
+        
+        $this->getSchema()->setColumnType('active', 'boolean');
 
         $this->addBehavior('Timestamp');
     }

@@ -288,6 +288,22 @@ Configure::write('AclManager.defaultRoleId', 2);
 
 </details>
 
+## 🛠️ Cambios recientes (Unreleased)
+
+Pequeño resumen de cambios detectados el 2025-12-02:
+
+- Se ha añadido `Utilities/*` a `ignoreActions` para excluir utilidades del escaneo de recursos.
+- `AuthorizationManagerComponent` ahora utiliza `'App'` como valor por defecto para el parámetro `plugin` cuando no está presente.
+- `PermissionsTable` y `ResourcesTable`: tipos de columna boolean correctamente definidos (`allowed`, `active`).
+- `ResourceScannerService::getGroupedResources()` filtra plugins, controladores y acciones según `ignoreActions` antes de devolver los recursos agrupados.
+- Plantillas de permisos (`templates/Permissions/*`) integran `adminRoleIds` para evitar que roles administrativos sean eliminados desde la UI; el enlace "Clear All" ahora invoca la acción `clearPermissions` y el campo oculto `plugin` mantiene su valor real.
+- Archivos de traducción: limpieza de cadenas (ej. eliminación de la cadena "Deny").
+- Nueva política `src/Policy/AclManagerPolicy.php` que delega en `PermissionService`.
+- Se añadió la clase CSS `.disabled-link` en `templates/layout/default.php` para estilos de enlaces inactivos.
+
+Nota: Se han detectado archivos en la carpeta `.snapshots/`. Estos archivos suelen ser generados por herramientas locales y **no deberían** comitearse. Se han eliminado del repositorio y añadida una entrada en `.gitignore` para evitar futuros commits accidentales.
+
+
 <details>
 <summary><b>🗄️ Database Schema</b></summary>
 

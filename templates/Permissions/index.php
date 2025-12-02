@@ -117,16 +117,24 @@ $this->assign('title', __d('acl_manager', 'Dashboard'));
                                                 ['action' => 'editRole', $role->id],
                                                 ['class' => 'btn btn-sm btn-secondary', 'escape' => false, 'title' => __d('acl_manager', 'Edit')]
                                             ) ?>
-                                            <?= $this->Form->postLink(
-                                                '<i class="fas fa-trash"></i>',
-                                                ['action' => 'deleteRole', $role->id],
-                                                [
-                                                    'confirm' => __d('acl_manager', 'Are you sure you want to delete {0}?', $role->name),
-                                                    'class' => 'btn btn-sm btn-danger',
-                                                    'escape' => false,
-                                                    'title' => __d('acl_manager', 'Delete')
-                                                ]
-                                            ) ?>
+                                            <?php if(!in_array($role->id, $adminRoleIds)) : ?>
+                                                <?= $this->Form->postLink(
+                                                    '<i class="fas fa-trash"></i>',
+                                                    ['action' => 'deleteRole', $role->id],
+                                                    [
+                                                        'confirm' => __d('acl_manager', 'Are you sure you want to delete {0}?', $role->name),
+                                                        'class' => 'btn btn-sm btn-danger',
+                                                        'escape' => false,
+                                                        'title' => __d('acl_manager', 'Delete')
+                                                    ]
+                                                ) ?>
+                                            <?php else: ?>
+                                                <?= $this->Html->link(
+                                                    '<i class="fas fa-trash"></i>',
+                                                    '#',
+                                                    ['class' => 'btn btn-sm btn-danger disabled-link', 'escape' => false, 'title' => __d('acl_manager', 'Delete'), 'onclick' => 'return false;']
+                                                ) ?>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

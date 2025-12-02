@@ -65,7 +65,7 @@ class AuthorizationManagerComponent extends Component
 
         $controller = $this->getController()->getName();
         $action = $this->getController()->getRequest()->getParam('action');
-        $plugin = $this->getController()->getRequest()->getParam('plugin');
+        $plugin = $this->getController()->getRequest()->getParam('plugin') ?? 'App';
 
         return $this->checkPermission($roleId, $controller, $action, $plugin);
     }

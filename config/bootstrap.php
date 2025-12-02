@@ -48,7 +48,8 @@ $defaultConfig = [
         'Error/*',
         'DebugKit.*',
         'Bake.*',
-        'Migrations.*'
+        'Migrations.*',
+        'Utilities/*'
     ],
 
     // Default role for new users (optional)

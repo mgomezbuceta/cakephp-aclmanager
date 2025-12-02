@@ -43,6 +43,8 @@ class PermissionsTable extends Table
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
 
+        $this->getSchema()->setColumnType('allowed', 'boolean');
+
         $this->addBehavior('Timestamp');
 
         $this->belongsTo('Roles', [
@@ -120,9 +122,9 @@ class PermissionsTable extends Table
      * Get all permissions for a role
      *
      * @param int $roleId Role ID
-     * @return \Cake\ORM\Query\SelectQuery
+     * @return \Cake\ORM\Query
      */
-    public function findByRole(int $roleId): \Cake\ORM\Query\SelectQuery
+    public function findByRole(int $roleId): \Cake\ORM\Query
     {
         return $this->find()
             ->where(['role_id' => $roleId])

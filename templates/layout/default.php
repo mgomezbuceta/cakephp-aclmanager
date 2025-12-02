@@ -245,6 +245,12 @@ $title = $this->fetch('title');
             color: var(--text-dark);
         }
 
+        .disabled-link {
+            pointer-events: none;
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .main-container {

@@ -339,7 +339,35 @@ class ResourceScannerService
      * @return array
      */
     public function getGroupedResources(): array
-    {
-        return $this->Resources->getGroupedResources();
+    {        
+        $resources = $this->Resources->getGroupedResources();
+
+        foreach($resources as $pluginName => $controllers){
+            if(!$this->shouldIgnorePlugin($pluginName)){
+                foreach($controllers as $controllerName => $actions){
+                    if (!$this->shouldIgnoreController($controllerName, $pluginName)) {
+                        $deleteAction = false;
+                        foreach($actions as $keyAction => $action){
+                            if ($this->shouldIgnoreAction($action->action, $controllerName, $pluginName)) {                                                            
+                                unset($resources[$pluginName][$controllerName][$keyAction]);
+                                $deleteAction = true;
+                            }
+                        }
+                        if($deleteAction) {
+                            $resources[$pluginName][$controllerName] = array_values($resources[$pluginName][$controllerName]);
+                        }
+                    }
+                    else{
+                        unset($resources[$pluginName][$controllerName]);
+                    }
+                }
+            }
+            else{
+                unset($resources[$pluginName]);
+            }
+        }
+
+        return $resources;
+
     }
 }

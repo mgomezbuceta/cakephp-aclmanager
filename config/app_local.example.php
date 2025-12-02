@@ -63,6 +63,7 @@ return [
             'Authentication.*',
             'Error/*',
             'DebugKit.*',
+            'Utilities/*'
         ],
     ],
 ];
