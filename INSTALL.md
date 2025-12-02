@@ -9,6 +9,35 @@ composer require mgomezbuceta/cakephp-aclmanager
 # 2. Cargar el plugin en src/Application.php
 # Añadir: $this->addPlugin('AclManager', ['bootstrap' => true, 'routes' => true]);
 
+# 2.a Registrar la política de petición (opcional pero recomendado)
+#
+# Para que la middleware de Authorization utilice la política de petición incluida
+# en el plugin (`AclManager\Policy\AclManagerPolicy`), registra la política
+# en tu `AuthorizationService`. Si tu aplicación ya define un método
+# `getAuthorizationService(ServerRequestInterface $request)` en `src/Application.php`,
+# añade la siguiente línea antes de devolver el servicio:
+#
+# ```php
+# use AclManager\Policy\AclManagerPolicy;
+# use Authorization\AuthorizationServiceInterface;
+# use Psr\Http\Message\ServerRequestInterface;
+#
+# public function getAuthorizationService(ServerRequestInterface $request): AuthorizationServiceInterface
+# {
+#     // $authorizationService ya creado/configurado en tu aplicación
+#     // ...
+#
+#     // Registrar la política de petición del plugin
+#     $authorizationService->setRequestPolicy(new AclManagerPolicy());
+#
+#     return $authorizationService;
+# }
+# ```
+#
+# Si no tienes un `getAuthorizationService` centralizado, asegúrate de llamar
+# a `setRequestPolicy(new \AclManager\Policy\AclManagerPolicy())` cuando construyas
+# o configures el `AuthorizationService` que pasa a la `AuthorizationMiddleware`.
+
 # 3. Ejecutar las migraciones
 bin/cake migrations migrate -p AclManager
 
