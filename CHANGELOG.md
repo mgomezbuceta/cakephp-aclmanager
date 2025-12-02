@@ -32,7 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🌍 Added
 
-#### Internationalization (i18n) Support
+- #### Internationalization (i18n) Support
+
 - **Full i18n implementation** using `acl_manager` translation domain
 - **English (en_US) translation**: Complete translation file with 80+ strings
 - **Spanish (es_ES) translation**: Complete translation file with 80+ strings (default)
@@ -40,12 +41,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CakePHP i18n integration**: All strings extractable via `bin/cake i18n extract`
 - Spanish set as default locale in bootstrap configuration
 
-#### Session Management
+- #### Session Management
+
 - **Redirect after login**: When session expires, users are redirected to login with return URL
 - **Preserve navigation state**: After authentication, users return to the original Authorization Manager page
 - **Query parameter support**: Login URL includes `redirect` parameter with original URL
 
-#### UI Improvements
+- #### UI Improvements
+
 - **Brand color integration**: All templates updated with `#1db58c` primary color
 - **Consistent theming**: CSS variables for easy color customization
 - **Modern design**: Sober and professional interface with Bootstrap 5
@@ -85,11 +88,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### ⚡ BREAKING CHANGES
 
-**Complete architectural rewrite - Migration from deprecated ACL to modern Authorization system**
+- #### Complete architectural rewrite - Migration from deprecated ACL to modern Authorization system
 
 This is a major breaking change that requires migration from the old ACL system to the new Authorization-based system.
 
 #### What Changed
+
 - **Replaced**: `cakephp/acl` (deprecated) → `cakephp/authorization` (official CakePHP 5.x plugin)
 - **Database**: New simplified schema (`roles`, `permissions`, `resources`) replaces old ACL tables (`acos`, `aros`, `aros_acos`)
 - **Routes**: Changed from `/acl-manager` to `/authorization-manager`
@@ -98,18 +102,21 @@ This is a major breaking change that requires migration from the old ACL system 
 
 ### 🚀 Added
 
-#### New Architecture
+- #### New Architecture
+
 - **PermissionService**: Modern service for permission evaluation and management
 - **ResourceScannerService**: Automatic controller/action discovery system
 - **AuthorizationManagerComponent**: New component for authorization checking
 - **PermissionsController**: Complete web interface for managing permissions
 
-#### New Models
+- #### New Models
+
 - **RolesTable & Role Entity**: User role management
 - **PermissionsTable & Permission Entity**: Controller/action permissions per role
 - **ResourcesTable & Resource Entity**: Application resource catalog
 
-#### New Features
+- #### New Features
+
 - **Role-Based Permissions**: Industry-standard RBAC pattern
 - **Auto-Discovery**: Automatic scanning of controllers and actions
 - **Permission Caching**: Built-in caching for performance
@@ -117,7 +124,8 @@ This is a major breaking change that requires migration from the old ACL system 
 - **Modern UI**: Bootstrap 5 interface with intuitive permission matrices
 - **Bulk Operations**: Copy permissions between roles, clear all permissions
 
-#### New Configuration
+- #### New Configuration
+
 - Simplified configuration options
 - Permission checking modes (strict/permissive)
 - Configurable caching settings
