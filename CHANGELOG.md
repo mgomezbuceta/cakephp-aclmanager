@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.2] - 2026-03-18
+
+### 🐛 Fixed
+
+- **Plugin Class Type Declaration**: Fixed property type compatibility issue
+  - Changed `$name` property type from `string` to `?string` to match `BasePlugin` signature
+  - Resolves Fatal Error: "Type of AclManager\Plugin::$name must be ?string (as in class Cake\Core\BasePlugin)"
+  - Ensures full compatibility with CakePHP 5.x type system
+
 ## [3.2.1] - 2026-03-18
 
 ### 🐛 Fixed
