@@ -152,7 +152,7 @@ class PermissionsController extends AppController
     public function roles(): \Cake\Http\Response|null
     {
         $roles = $this->fetchTable('AclManager.Roles')->find()
-            ->order(['priority' => 'DESC'])
+            ->orderBy(['priority' => 'DESC'])
             ->all();
 
         // Load configuration from config/app.php

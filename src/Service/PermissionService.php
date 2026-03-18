@@ -173,7 +173,7 @@ class PermissionService
         $roles = $this->Roles->find()
             ->contain(['Permissions'])
             ->where(['Roles.active' => true])
-            ->order(['Roles.priority' => 'DESC'])
+            ->orderBy(['Roles.priority' => 'DESC'])
             ->all();
 
         $result = [];

@@ -40,7 +40,7 @@ class ResourcesTable extends Table
         $this->setTable('resources');
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
-        
+
         $this->getSchema()->setColumnType('active', 'boolean');
 
         $this->addBehavior('Timestamp');
@@ -95,7 +95,7 @@ class ResourcesTable extends Table
     {
         $resources = $this->find()
             ->where(['active' => true])
-            ->order(['plugin' => 'ASC', 'controller' => 'ASC', 'action' => 'ASC'])
+            ->orderBy(['plugin' => 'ASC', 'controller' => 'ASC', 'action' => 'ASC'])
             ->all();
 
         $grouped = [];

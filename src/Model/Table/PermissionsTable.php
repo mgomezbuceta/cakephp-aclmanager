@@ -128,6 +128,6 @@ class PermissionsTable extends Table
     {
         return $this->find()
             ->where(['role_id' => $roleId])
-            ->order(['plugin' => 'ASC', 'controller' => 'ASC', 'action' => 'ASC']);
+            ->orderBy(['plugin' => 'ASC', 'controller' => 'ASC', 'action' => 'ASC']);
     }
 }
