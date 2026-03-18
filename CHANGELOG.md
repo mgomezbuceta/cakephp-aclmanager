@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.4] - 2026-03-18
+
+### 🐛 Fixed
+
+- **Query Method Deprecation**: Replaced deprecated `Query::order()` with `Query::orderBy()`
+  - Updated `PermissionService::getRolesWithPermissionCount()` method
+  - Updated `PermissionsTable::findByRole()` method
+  - Updated `ResourcesTable::getGroupedResources()` method
+  - Updated `PermissionsController::roles()` method
+  - Resolves deprecation: "Since 5.0.0: Query::order() is deprecated. Use Query::orderBy() instead"
+  - Full compliance with CakePHP 5.x Query API
+
 ## [3.2.3] - 2026-03-18
 
 ### 🐛 Fixed
