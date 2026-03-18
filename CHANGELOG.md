@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.1] - 2026-03-18
+
+### 🐛 Fixed
+
+- **Plugin Class Implementation**: Added missing `Plugin.php` class to resolve CakePHP 5.3+ deprecation warning
+  - Created `src/Plugin.php` extending `BasePlugin`
+  - Implements `routes()`, `middleware()`, and `bootstrap()` methods
+  - Maintains full compatibility with CakePHP 5.2.9 and newer versions
+  - Resolves deprecation: "Loading plugins without a plugin class is deprecated"
+
 ## [Unreleased] - 2025-12-02
 
 ### 🔎 Resumen
