@@ -27,6 +27,22 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
         </div>
     </div>
 
+    <?php
+    $totalPermissions = 0;
+    foreach ($resources as $controllers) {
+        foreach ($controllers as $actions) {
+            $totalPermissions += count($actions);
+        }
+    }
+    ?>
+
+    <?php if ($totalPermissions > 800): ?>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <?= __d('acl_manager', 'This role has {0} available permissions. The form has been optimized to handle large numbers of permissions efficiently.', $totalPermissions) ?>
+        </div>
+    <?php endif; ?>
+
     <?= $this->Form->create(null, ['type' => 'post']) ?>
 
     <div class="row mb-3">
@@ -74,6 +90,7 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
                                         $isAllowed = isset($permissions[$plugin][$controller][$actionName]) &&
                                                     $permissions[$plugin][$controller][$actionName];
                                         $fieldIndex = $plugin . '_' . $controller . '_' . $actionName;
+                                        $permKey = $plugin . ':' . $controller . ':' . $actionName;
                                         ?>
                                         <tr>
                                             <td>
@@ -81,10 +98,8 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
                                             </td>
                                             <td>
                                                 <div class="form-check form-check-inline">
-                                                    <?= $this->Form->hidden("permissions.{$fieldIndex}.controller", ['value' => $controller]) ?>
-                                                    <?= $this->Form->hidden("permissions.{$fieldIndex}.action", ['value' => $actionName]) ?>
-                                                    <?= $this->Form->hidden("permissions.{$fieldIndex}.plugin", ['value' => $plugin]) ?>
-                                                    <?= $this->Form->checkbox("permissions.{$fieldIndex}.allowed", [
+                                                    <?= $this->Form->checkbox("permissions[{$permKey}]", [
+                                                        'value' => '1',
                                                         'checked' => $isAllowed,
                                                         'class' => 'form-check-input',
                                                         'id' => "permission-{$fieldIndex}"
