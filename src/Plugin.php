@@ -19,9 +19,9 @@ class Plugin extends BasePlugin
     /**
      * Plugin name
      *
-     * @var string
+     * @var ?string
      */
-    protected string $name = 'AclManager';
+    protected ?string $name = 'AclManager';
 
     /**
      * Load routes for the plugin
