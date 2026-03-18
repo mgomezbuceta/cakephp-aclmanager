@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.5] - 2026-03-18
+
+### 🐛 Fixed
+
+- **Permission Save Limit**: Fixed issue where only ~200 of 564+ permissions were saved due to PHP `max_input_vars` limit
+  - **Root Cause**: Form was sending 4 fields per permission (controller, action, plugin, allowed) = ~2256 variables for 564 permissions, exceeding default `max_input_vars=1000`
+  - **Solution**: Optimized form to send only 1 field per permission using format `permissions[plugin:controller:action]=1`
+  - **Impact**: Reduced form variables from ~2256 to ~564 (only checked permissions)
+  - **Benefits**:
+    - No server configuration changes required
+    - Works with any hosting environment
+    - More efficient data transfer
+    - Scalable for future growth
+  - Updated `templates/Permissions/manage.php` to use optimized checkbox format
+  - Updated `PermissionsController::savePermissions()` to parse new `plugin:controller:action` format
+  - Added informational message when managing roles with 800+ permissions
+  - Now successfully saves all permissions regardless of quantity
+
 ## [3.2.4] - 2026-03-18
 
 ### 🐛 Fixed
