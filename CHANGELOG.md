@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.3] - 2026-03-18
+
+### 🐛 Fixed
+
+- **Plugin Class Naming Convention**: Renamed Plugin class to comply with CakePHP 5.3+ requirements
+  - Renamed `Plugin` class to `AclManagerPlugin`
+  - Renamed file from `src/Plugin.php` to `src/AclManagerPlugin.php`
+  - Removed redundant `$name` property (automatically derived from class name)
+  - Resolves deprecation: "Loading plugins with a plugin class named `Plugin` is deprecated"
+  - Full compliance with CakePHP 5.3+ plugin naming conventions
+
 ## [3.2.2] - 2026-03-18
 
 ### 🐛 Fixed

@@ -14,15 +14,8 @@ use Cake\Routing\RouteBuilder;
  * This class provides the plugin configuration and bootstrapping
  * for the AclManager authorization plugin.
  */
-class Plugin extends BasePlugin
+class AclManagerPlugin extends BasePlugin
 {
-    /**
-     * Plugin name
-     *
-     * @var ?string
-     */
-    protected ?string $name = 'AclManager';
-
     /**
      * Load routes for the plugin
      *
