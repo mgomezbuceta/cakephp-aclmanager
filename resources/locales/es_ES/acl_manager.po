@@ -255,3 +255,6 @@ msgstr "Crear y gestionar roles de usuario"
 
 msgid "Back to Dashboard"
 msgstr "Volver al Panel de Control"
+
+msgid "Deny"
+msgstr "Denegar"

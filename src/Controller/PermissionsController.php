@@ -90,30 +90,22 @@ class PermissionsController extends AppController
             // Save new permissions
             $saved = 0;
             if (isset($data['permissions']) && is_array($data['permissions'])) {
-                foreach ($data['permissions'] as $permKey => $value) {
-                    // Skip if not checked (value != '1')
-                    if ($value !== '1') {
+                foreach ($data['permissions'] as $permission) {
+                    if (!isset($permission['controller'], $permission['action'])) {
                         continue;
                     }
 
-                    // Parse permission key: "plugin:controller:action"
-                    $parts = explode(':', $permKey, 3);
-                    if (count($parts) !== 3) {
-                        continue;
+                    $allowed = isset($permission['allowed']) && $permission['allowed'] == '1';
+
+                    if ($allowed) {
+                        $this->permissionService->grant(
+                            $roleId,
+                            $permission['controller'],
+                            $permission['action'],
+                            $permission['plugin'] ?? null
+                        );
+                        $saved++;
                     }
-
-                    [$plugin, $controller, $action] = $parts;
-
-                    // Convert 'App' to null for main application
-                    $pluginValue = ($plugin === 'App') ? null : $plugin;
-
-                    $this->permissionService->grant(
-                        $roleId,
-                        $controller,
-                        $action,
-                        $pluginValue
-                    );
-                    $saved++;
                 }
             }
 

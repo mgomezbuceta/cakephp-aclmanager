@@ -288,31 +288,30 @@ Configure::write('AclManager.defaultRoleId', 2);
 
 </details>
 
-## 🛠️ Cambios recientes (Unreleased)
-
-Pequeño resumen de cambios detectados el 2025-12-02:
-
-- Se ha añadido `Utilities/*` a `ignoreActions` para excluir utilidades del escaneo de recursos.
-- `AuthorizationManagerComponent` ahora utiliza `'App'` como valor por defecto para el parámetro `plugin` cuando no está presente.
-- `PermissionsTable` y `ResourcesTable`: tipos de columna boolean correctamente definidos (`allowed`, `active`).
-- `ResourceScannerService::getGroupedResources()` filtra plugins, controladores y acciones según `ignoreActions` antes de devolver los recursos agrupados.
-- Plantillas de permisos (`templates/Permissions/*`) integran `adminRoleIds` para evitar que roles administrativos sean eliminados desde la UI; el enlace "Clear All" ahora invoca la acción `clearPermissions` y el campo oculto `plugin` mantiene su valor real.
-- Archivos de traducción: limpieza de cadenas (ej. eliminación de la cadena "Deny").
-- Nueva política `src/Policy/AclManagerPolicy.php` que delega en `PermissionService`.
-- Se añadió la clase CSS `.disabled-link` en `templates/layout/default.php` para estilos de enlaces inactivos.
-
-Nota: Se han detectado archivos en la carpeta `.snapshots/`. Estos archivos suelen ser generados por herramientas locales y **no deberían** comitearse. Se han eliminado del repositorio y añadida una entrada en `.gitignore` para evitar futuros commits accidentales.
-
-
-### 🗄️ Database Schema
+<details>
+<summary><b>🗄️ Database Schema</b></summary>
 
 The plugin creates three tables:
 
-- **roles** — User roles: `id, name, description, priority, active, created, modified`
-- **permissions** — Role permissions: `id, role_id, controller, action, plugin, allowed, created, modified`
-- **resources** — Available resources (auto-discovered): `id, controller, action, plugin, description, active, created, modified`
+**roles** - User roles
+```sql
+id, name, description, priority, active, created, modified
+```
 
-### 🔌 Component Usage
+**permissions** - Role permissions
+```sql
+id, role_id, controller, action, plugin, allowed, created, modified
+```
+
+**resources** - Available resources (auto-discovered)
+```sql
+id, controller, action, plugin, description, active, created, modified
+```
+
+</details>
+
+<details>
+<summary><b>🔌 Component Usage</b></summary>
 
 ```php
 // Load the component
@@ -336,7 +335,10 @@ $this->AuthorizationManager->clearCache();
 return $this->AuthorizationManager->handleUnauthorized();
 ```
 
-### 🎯 Service Layer
+</details>
+
+<details>
+<summary><b>🎯 Service Layer</b></summary>
 
 ```php
 use AclManager\Service\PermissionService;
@@ -365,16 +367,17 @@ $stats = $scannerService->scanAndSync();
 $resources = $scannerService->getGroupedResources();
 ```
 
-### 🐛 Troubleshooting
+</details>
+
+<details>
+<summary><b>🐛 Troubleshooting</b></summary>
 
 **No resources showing?**
-
 ```bash
 Visit /authorization-manager and click "Sync Resources"
 ```
 
 **Permission changes not taking effect?**
-
 ```php
 // Clear cache
 Configure::write('AclManager.cachePermissions', false);
@@ -383,10 +386,13 @@ $this->AuthorizationManager->clearCache();
 ```
 
 **Getting "access denied" after setup?**
-
+```
 1. Make sure your User has a role_id assigned
 2. Verify permissions are granted for that role
 3. Check isAuthorized() is properly implemented
+```
+
+</details>
 
 ---
 
@@ -394,35 +400,30 @@ $this->AuthorizationManager->clearCache();
 
 > **⚠️ BREAKING CHANGE**: Version 3.0 uses Authorization plugin instead of deprecated ACL.
 
-### Migration Steps
+### Migration Steps:
 
 1. **Backup your data**
-
 ```sql
 CREATE TABLE backup_aros_acos AS SELECT * FROM aros_acos;
 ```
 
-1. **Update composer.json**
-
+2. **Update composer.json**
 ```bash
 composer remove cakephp/acl
 composer require cakephp/authorization
 composer update mgomezbuceta/cakephp-aclmanager
 ```
 
-1. **Run new migrations**
-
+3. **Run new migrations**
 ```bash
 bin/cake migrations migrate -p AclManager
 ```
 
-1. **Update routes**
+4. **Update routes**
+   - Old: `/acl-manager`
+   - New: `/authorization-manager`
 
-- Old: `/acl-manager`
-- New: `/authorization-manager`
-
-1. **Update component**
-
+5. **Update component**
 ```php
 // Old
 $this->loadComponent('AclManager.AclManager');
@@ -431,17 +432,16 @@ $this->loadComponent('AclManager.AclManager');
 $this->loadComponent('AclManager.AuthorizationManager');
 ```
 
-1. **Rebuild permissions**
-
-- Create new roles matching your old ARO structure
-- Use "Sync Resources" to discover controllers
-- Manually assign permissions (old ACL data cannot be migrated)
+6. **Rebuild permissions**
+   - Create new roles matching your old ARO structure
+   - Use "Sync Resources" to discover controllers
+   - Manually assign permissions (old ACL data cannot be migrated)
 
 ---
 
 ## 🏗️ Architecture
 
-```text
+```
 ┌─────────────────────────────────────────┐
 │      PermissionsController               │
 │      (Web Interface)                     │
@@ -466,7 +466,7 @@ $this->loadComponent('AclManager.AuthorizationManager');
       │  • permissions            │
       │  • resources              │
       └───────────────────────────┘
-```text
+```
 
 ---
 
@@ -488,7 +488,7 @@ Contributions are welcome!
 
 This project is licensed under the **MIT License** - see [LICENSE.md](LICENSE.md) for details.
 
-```text
+```
 Copyright (c) 2025 Marcos Gómez Buceta
 Copyright (c) 2016 Iván Amat
 ```
@@ -497,10 +497,14 @@ Copyright (c) 2016 Iván Amat
 
 ## 👨‍💻 Author
 
-### Marcos Gómez Buceta
+<div align="center">
+
+**Marcos Gómez Buceta**
 
 [![GitHub](https://img.shields.io/badge/GitHub-mgomezbuceta-181717?style=flat-square&logo=github)](https://github.com/mgomezbuceta)
 [![Email](https://img.shields.io/badge/Email-mgomezbuceta%40gmail.com-EA4335?style=flat-square&logo=gmail&logoColor=white)](mailto:mgomezbuceta@gmail.com)
+
+</div>
 
 ---
 
@@ -515,8 +519,12 @@ Special thanks to the CakePHP community for their continuous support.
 
 ---
 
-### ⭐ If you find this plugin useful, please give it a star! ⭐
+<div align="center">
+
+**⭐ If you find this plugin useful, please give it a star! ⭐**
 
 Made with ❤️ for the CakePHP community
 
 [Report Bug](https://github.com/mgomezbuceta/cakephp-aclmanager/issues) • [Request Feature](https://github.com/mgomezbuceta/cakephp-aclmanager/issues)
+
+</div>

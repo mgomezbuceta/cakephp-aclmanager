@@ -256,3 +256,6 @@ msgstr "Create and manage user roles"
 
 msgid "Back to Dashboard"
 msgstr "Back to Dashboard"
+
+msgid "Deny"
+msgstr "Deny"

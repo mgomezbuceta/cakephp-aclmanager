@@ -5,95 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.2.5] - 2026-03-18
-
-### 🐛 Fixed
-
-- **Permission Save Limit**: Fixed issue where only ~200 of 564+ permissions were saved due to PHP `max_input_vars` limit
-  - **Root Cause**: Form was sending 4 fields per permission (controller, action, plugin, allowed) = ~2256 variables for 564 permissions, exceeding default `max_input_vars=1000`
-  - **Solution**: Optimized form to send only 1 field per permission using format `permissions[plugin:controller:action]=1`
-  - **Impact**: Reduced form variables from ~2256 to ~564 (only checked permissions)
-  - **Benefits**:
-    - No server configuration changes required
-    - Works with any hosting environment
-    - More efficient data transfer
-    - Scalable for future growth
-  - Updated `templates/Permissions/manage.php` to use optimized checkbox format
-  - Updated `PermissionsController::savePermissions()` to parse new `plugin:controller:action` format
-  - Added informational message when managing roles with 800+ permissions
-  - Now successfully saves all permissions regardless of quantity
-
-## [3.2.4] - 2026-03-18
-
-### 🐛 Fixed
-
-- **Query Method Deprecation**: Replaced deprecated `Query::order()` with `Query::orderBy()`
-  - Updated `PermissionService::getRolesWithPermissionCount()` method
-  - Updated `PermissionsTable::findByRole()` method
-  - Updated `ResourcesTable::getGroupedResources()` method
-  - Updated `PermissionsController::roles()` method
-  - Resolves deprecation: "Since 5.0.0: Query::order() is deprecated. Use Query::orderBy() instead"
-  - Full compliance with CakePHP 5.x Query API
-
-## [3.2.3] - 2026-03-18
-
-### 🐛 Fixed
-
-- **Plugin Class Naming Convention**: Renamed Plugin class to comply with CakePHP 5.3+ requirements
-  - Renamed `Plugin` class to `AclManagerPlugin`
-  - Renamed file from `src/Plugin.php` to `src/AclManagerPlugin.php`
-  - Removed redundant `$name` property (automatically derived from class name)
-  - Resolves deprecation: "Loading plugins with a plugin class named `Plugin` is deprecated"
-  - Full compliance with CakePHP 5.3+ plugin naming conventions
-
-## [3.2.2] - 2026-03-18
-
-### 🐛 Fixed
-
-- **Plugin Class Type Declaration**: Fixed property type compatibility issue
-  - Changed `$name` property type from `string` to `?string` to match `BasePlugin` signature
-  - Resolves Fatal Error: "Type of AclManager\Plugin::$name must be ?string (as in class Cake\Core\BasePlugin)"
-  - Ensures full compatibility with CakePHP 5.x type system
-
-## [3.2.1] - 2026-03-18
-
-### 🐛 Fixed
-
-- **Plugin Class Implementation**: Added missing `Plugin.php` class to resolve CakePHP 5.3+ deprecation warning
-  - Created `src/Plugin.php` extending `BasePlugin`
-  - Implements `routes()`, `middleware()`, and `bootstrap()` methods
-  - Maintains full compatibility with CakePHP 5.2.9 and newer versions
-  - Resolves deprecation: "Loading plugins without a plugin class is deprecated"
-
-## [Unreleased] - 2025-12-02
-
-### 🔎 Resumen
-
-- Se han realizado varias mejoras y ajustes en configuración, plantillas, servicios y traducciones.
-- Cambios principales: ajustes en escaneo/filtrado de recursos, control de eliminación de roles admin en UI, actualizaciones de tipos de columna boolean en tablas y pequeñas correcciones en componentes y controladores.
-
-### ✨ Cambios destacados
-
-- `config/bootstrap.php` / `config/app_local.example.php`: se añade `Utilities/*` a `ignoreActions` para excluir utilidades del escaneo de recursos.
-- `src/Controller/Component/AuthorizationManagerComponent.php`: se añade fallback del parámetro `plugin` a `'App'` cuando no existe.
-- `src/Model/Table/PermissionsTable.php` y `src/Model/Table/ResourcesTable.php`: se define el tipo de columna boolean para `allowed` y `active` respectivamente.
-- `src/Service/ResourceScannerService.php`: `getGroupedResources()` ahora filtra plugins/controladores/acciones según las reglas de `ignoreActions` antes de devolverlos.
-- Plantillas (`templates/Permissions/*`): integración de `adminRoleIds` para desactivar acciones peligrosas (borrar rol) para roles administrativos; cambio en el enlace de "Clear All" para invocar la acción `clearPermissions`; ajuste en el campo oculto `plugin` para mantener su valor real.
-- Locales (`resources/locales/*/acl_manager.po`): se ha eliminado la cadena `"Deny"` en los ficheros de idiomas (limpieza/translations).
-- Nueva política: `src/Policy/AclManagerPolicy.php` añadida para usar `PermissionService` en la verificación de solicitudes.
-- Interfaz/CSS: añadido estilo `.disabled-link` en `templates/layout/default.php` para deshabilitar enlaces de acción que no deben ser interactivos.
-
-### 📝 Notas para el desarrollador
-
-- Revisar si los archivos `.snapshots/*` deben incluirse en el repositorio (actualmente aparecen añadidos). Normalmente no deberían comitearse.
-- Verificar que las modificaciones en `clearPermissions` acepten métodos `GET` (cambio realizado) y que esto entre en línea con la política de seguridad de la app.
-
 ## [3.2.0] - 2025-01-10
 
 ### 🌍 Added
 
-- #### Internationalization (i18n) Support
-
+#### Internationalization (i18n) Support
 - **Full i18n implementation** using `acl_manager` translation domain
 - **English (en_US) translation**: Complete translation file with 80+ strings
 - **Spanish (es_ES) translation**: Complete translation file with 80+ strings (default)
@@ -101,14 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CakePHP i18n integration**: All strings extractable via `bin/cake i18n extract`
 - Spanish set as default locale in bootstrap configuration
 
-- #### Session Management
-
+#### Session Management
 - **Redirect after login**: When session expires, users are redirected to login with return URL
 - **Preserve navigation state**: After authentication, users return to the original Authorization Manager page
 - **Query parameter support**: Login URL includes `redirect` parameter with original URL
 
-- #### UI Improvements
-
+#### UI Improvements
 - **Brand color integration**: All templates updated with `#1db58c` primary color
 - **Consistent theming**: CSS variables for easy color customization
 - **Modern design**: Sober and professional interface with Bootstrap 5
@@ -148,12 +62,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### ⚡ BREAKING CHANGES
 
-- #### Complete architectural rewrite - Migration from deprecated ACL to modern Authorization system
+**Complete architectural rewrite - Migration from deprecated ACL to modern Authorization system**
 
 This is a major breaking change that requires migration from the old ACL system to the new Authorization-based system.
 
 #### What Changed
-
 - **Replaced**: `cakephp/acl` (deprecated) → `cakephp/authorization` (official CakePHP 5.x plugin)
 - **Database**: New simplified schema (`roles`, `permissions`, `resources`) replaces old ACL tables (`acos`, `aros`, `aros_acos`)
 - **Routes**: Changed from `/acl-manager` to `/authorization-manager`
@@ -162,21 +75,18 @@ This is a major breaking change that requires migration from the old ACL system 
 
 ### 🚀 Added
 
-- #### New Architecture
-
+#### New Architecture
 - **PermissionService**: Modern service for permission evaluation and management
 - **ResourceScannerService**: Automatic controller/action discovery system
 - **AuthorizationManagerComponent**: New component for authorization checking
 - **PermissionsController**: Complete web interface for managing permissions
 
-- #### New Models
-
+#### New Models
 - **RolesTable & Role Entity**: User role management
 - **PermissionsTable & Permission Entity**: Controller/action permissions per role
 - **ResourcesTable & Resource Entity**: Application resource catalog
 
-- #### New Features
-
+#### New Features
 - **Role-Based Permissions**: Industry-standard RBAC pattern
 - **Auto-Discovery**: Automatic scanning of controllers and actions
 - **Permission Caching**: Built-in caching for performance
@@ -184,8 +94,7 @@ This is a major breaking change that requires migration from the old ACL system 
 - **Modern UI**: Bootstrap 5 interface with intuitive permission matrices
 - **Bulk Operations**: Copy permissions between roles, clear all permissions
 
-- #### New Configuration
-
+#### New Configuration
 - Simplified configuration options
 - Permission checking modes (strict/permissive)
 - Configurable caching settings
