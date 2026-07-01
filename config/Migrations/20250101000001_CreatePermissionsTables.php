@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-use Migrations\AbstractMigration;
+use Migrations\BaseMigration;
 
 /**
  * CreatePermissionsTables migration
  *
  * Creates the necessary tables for the Authorization Manager system
  */
-class CreatePermissionsTables extends AbstractMigration
+class CreatePermissionsTables extends BaseMigration
 {
     /**
      * Change Method.

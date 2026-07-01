@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use Migrations\AbstractMigration;
+use Migrations\BaseMigration;
 
 /**
  * UpdateExistingPermissionsTables migration
@@ -9,7 +9,7 @@ use Migrations\AbstractMigration;
  * Updates existing tables to match the Authorization Manager schema
  * without losing existing data
  */
-class UpdateExistingPermissionsTables extends AbstractMigration
+class UpdateExistingPermissionsTables extends BaseMigration
 {
     /**
      * Change Method.

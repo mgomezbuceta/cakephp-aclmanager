@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-use Migrations\AbstractMigration;
+use Migrations\BaseMigration;
 
 /**
  * AddMissingColumnsToRoles migration
  *
  * Adds missing columns to existing roles table without losing data
  */
-class AddMissingColumnsToRoles extends AbstractMigration
+class AddMissingColumnsToRoles extends BaseMigration
 {
     /**
      * Change Method.
