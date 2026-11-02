@@ -265,6 +265,12 @@ msgstr "Denegar"
 msgid "The form data was incomplete (check the PHP max_input_vars setting). No permissions were changed."
 msgstr "Los datos del formulario estaban incompletos (revisa la configuración max_input_vars de PHP). No se modificó ningún permiso."
 
+msgid "The form was missing its version token. No permissions were changed; reload the page and try again."
+msgstr "Al formulario le faltaba el token de versión. No se modificó ningún permiso; recarga la página e inténtalo de nuevo."
+
+msgid "Another administrator changed the permissions of this role while you were editing. The page has been reloaded with the current data; apply your changes again."
+msgstr "Otro administrador cambió los permisos de este rol mientras los editabas. La página se ha recargado con los datos actuales; vuelve a aplicar tus cambios."
+
 msgid "Administrator roles cannot be deleted."
 msgstr "Los roles de administrador no se pueden eliminar."
 

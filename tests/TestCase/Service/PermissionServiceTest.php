@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace AclManager\Test\TestCase\Service;
 
 use AclManager\Service\PermissionService;
+use AclManager\Service\StalePermissionsException;
 use Cake\TestSuite\TestCase;
 
 class PermissionServiceTest extends TestCase
@@ -121,6 +122,59 @@ class PermissionServiceTest extends TestCase
         $this->assertFalse($this->service->copyPermissions(1, 1));
 
         $this->assertSame(['App:Articles:delete:1', 'App:Articles:index:1'], $this->rows(1));
+    }
+
+    public function testVersionIsStableAndIgnoresInsertionOrder(): void
+    {
+        $first = $this->service->getPermissionsVersion(1);
+
+        $this->assertSame($first, $this->service->getPermissionsVersion(1));
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{40}$/', $first);
+        // Same content for another role gives the same token (content based, not id based).
+        $this->service->copyPermissions(1, 2);
+        $this->assertSame($first, $this->service->getPermissionsVersion(2));
+    }
+
+    public function testVersionChangesWhenGrantIsAddedOrRemoved(): void
+    {
+        $before = $this->service->getPermissionsVersion(1);
+
+        $this->service->grant(1, 'Articles', 'view');
+        $added = $this->service->getPermissionsVersion(1);
+        $this->assertNotSame($before, $added);
+
+        $this->service->deny(1, 'Articles', 'view');
+        $this->assertSame($before, $this->service->getPermissionsVersion(1));
+    }
+
+    public function testVersionOfRoleWithoutGrantsIsStable(): void
+    {
+        $this->service->revokeAll(1);
+
+        $this->assertSame($this->service->getPermissionsVersion(1), $this->service->getPermissionsVersion(1));
+        $this->assertNotSame($this->service->getPermissionsVersion(2), $this->service->getPermissionsVersion(1));
+    }
+
+    public function testReplaceWithStaleVersionThrowsAndLeavesRowsUntouched(): void
+    {
+        $stale = $this->service->getPermissionsVersion(1);
+        $this->service->grant(1, 'Articles', 'view'); // another administrator saves meanwhile
+        $before = $this->rows(1);
+
+        try {
+            $this->service->replaceRolePermissions(1, [2], $stale);
+            $this->fail('Expected StalePermissionsException');
+        } catch (StalePermissionsException) {
+            $this->assertSame($before, $this->rows(1));
+        }
+    }
+
+    public function testReplaceWithCurrentVersionSucceeds(): void
+    {
+        $version = $this->service->getPermissionsVersion(1);
+
+        $this->assertSame(1, $this->service->replaceRolePermissions(1, [2], $version));
+        $this->assertSame(['App:Articles:edit:1'], $this->rows(1));
     }
 
     public function testMatrixKeysAppPermissionsUnderApp(): void

@@ -4,6 +4,7 @@
  * @var \AclManager\Model\Entity\Role $role
  * @var array $resources
  * @var array $permissions
+ * @var string $permissionsVersion
  */
 $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->name));
 ?>
@@ -112,6 +113,9 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
         </div>
     <?php endif; ?>
 
+    <?= $this->Form->hidden('permissions_version', ['value' => $permissionsVersion]) ?>
+    <?php // Filled by the script below on submit; without JavaScript the checkboxes are posted instead. ?>
+    <?= $this->Form->hidden('resource_ids_csv', ['value' => '', 'disabled' => true, 'id' => 'resource-ids-csv']) ?>
     <?php // Must stay the last field: PHP truncates oversized POSTs from the end, so its absence reveals truncation. ?>
     <?= $this->Form->hidden('permissions_submitted', ['value' => '1']) ?>
 
@@ -187,5 +191,35 @@ document.addEventListener('DOMContentLoaded', function() {
         header.appendChild(selectAllBtn);
         header.appendChild(deselectAllBtn);
     });
+
+    // Post the granted ids as ONE field instead of one field per checkbox (keeps the POST far below max_input_vars).
+    var csvField = document.getElementById('resource-ids-csv');
+    var form = csvField ? csvField.form : null;
+    if (!form) {
+        return;
+    }
+    function restoreCheckboxes() {
+        csvField.disabled = true;
+        form.querySelectorAll('input[name="resource_ids[]"]').forEach(function (cb) {
+            cb.disabled = false;
+        });
+    }
+    form.addEventListener('submit', function () {
+        var boxes = form.querySelectorAll('input[name="resource_ids[]"]');
+        var ids = [];
+        boxes.forEach(function (cb) {
+            if (cb.checked) {
+                ids.push(cb.value);
+            }
+        });
+        csvField.value = ids.join(',');
+        csvField.disabled = false;
+        boxes.forEach(function (cb) {
+            cb.disabled = true;
+        });
+        // The browser builds the POST right after this event; if the submit was cancelled, undo at once.
+        setTimeout(restoreCheckboxes, 0);
+    });
+    window.addEventListener('pageshow', restoreCheckboxes);
 });
 </script>
