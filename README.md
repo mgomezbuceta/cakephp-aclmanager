@@ -577,6 +577,8 @@ Contributions are welcome!
 6. 🚀 Push to the branch (`git push origin feature/amazing-feature`)
 7. 🎉 Open a Pull Request
 
+Before opening it, run `composer check` (phpcs, phpstan and phpunit). The CI workflow runs the same checks on PHP 8.1 to 8.4, plus a run against the lowest supported dependencies.
+
 ---
 
 ## 📄 License

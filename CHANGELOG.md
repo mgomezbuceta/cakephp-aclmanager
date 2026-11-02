@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- GitHub Actions CI (`.github/workflows/ci.yml`): the test suite on PHP 8.1 to 8.4 (plus a run with the lowest supported dependencies on PHP 8.1), and a job with `composer validate`, phpcs and phpstan. Actions are pinned by commit SHA.
 - `AclManager.mountPath` (default `'/authorization-manager'`): URL path where the manager is mounted, normalized defensively with a fallback to the default.
 - Optimistic concurrency on the permissions form: it carries a version token (`PermissionService::getPermissionsVersion()`, a hash of the role's allowed permissions) and `replaceRolePermissions()` accepts an optional `$expectedVersion`. A stale token throws `StalePermissionsException` before anything is changed and the UI shows a translated conflict message; a missing token is rejected as an incomplete form. Known limitation: the check and the write share a transaction but no row lock (portable across SQLite/MySQL/Postgres), so two saves landing within milliseconds can still race.
 - Single-field submit: with JavaScript the form posts the granted ids as one comma-separated `resource_ids_csv` field (a constant handful of POST variables, so `max_input_vars` no longer limits saving). Without JavaScript the `resource_ids[]` checkboxes keep working; if both are sent, the CSV wins.

@@ -577,6 +577,8 @@ $this->loadComponent('AclManager.AuthorizationManager');
 6. 🚀 Sube la rama (`git push origin feature/amazing-feature`)
 7. 🎉 Abre un Pull Request
 
+Antes de abrirlo, ejecuta `composer check` (phpcs, phpstan y phpunit). El workflow de CI ejecuta las mismas comprobaciones en PHP 8.1 a 8.4, más una ejecución con las dependencias mínimas admitidas.
+
 ---
 
 ## 📄 Licencia
