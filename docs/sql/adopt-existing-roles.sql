@@ -4,7 +4,8 @@
 -- REVIEW BEFORE RUNNING AND TAKE A BACKUP. Run only the statements for columns that are
 -- missing (the engines fail on a duplicate column). Required columns besides id:
 --   name, description, priority, active, created, modified
--- NOT EXECUTED IN CI: none of the engine variants below were run by the test suite.
+-- NOT EXECUTED IN CI. The MySQL block was run by hand against MySQL 8.0 on a roles table holding
+-- only `id`; the PostgreSQL and SQLite blocks were not executed.
 -- The same approach applies to `permissions` and `resources`: compare with the CREATE TABLE
 -- statements in mysql.sql / postgres.sql / sqlite.sql and add what is missing.
 

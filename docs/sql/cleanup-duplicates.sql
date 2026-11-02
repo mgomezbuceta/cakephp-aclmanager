@@ -2,7 +2,8 @@
 --
 -- REVIEW BEFORE RUNNING AND TAKE A BACKUP. The DELETE statements remove rows permanently.
 -- The migration itself never deletes anything: it aborts when the SELECTs below return rows.
--- Tested only against SQLite semantics; the MySQL/PostgreSQL variants are NOT EXECUTED IN CI.
+-- Tested in CI only against SQLite. The MySQL section 3 was also run by hand against MySQL 8.0;
+-- the PostgreSQL variant was not executed.
 --
 -- An empty-plugin row (plugin NULL or '', both mean the application) collides when an 'App' row has the same key, or another empty-plugin row with a
 -- lower id has the same key (resources: controller+action; permissions: role_id+controller+action).
