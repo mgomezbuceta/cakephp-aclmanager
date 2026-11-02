@@ -5,6 +5,7 @@ namespace AclManager\Service;
 
 use AclManager\Model\Table\PermissionsTable;
 use AclManager\Model\Table\RolesTable;
+use Cake\ORM\Exception\PersistenceFailedException;
 use Cake\ORM\TableRegistry;
 
 /**
@@ -14,6 +15,8 @@ use Cake\ORM\TableRegistry;
  */
 class PermissionService
 {
+    private const RESOURCE_CHUNK_SIZE = 500;
+
     private PermissionsTable $Permissions;
     private RolesTable $Roles;
 
@@ -37,6 +40,8 @@ class PermissionService
      */
     public function isAuthorized(int $roleId, string $controller, string $action, ?string $plugin = null): bool
     {
+        $plugin = PermissionsTable::normalizePlugin($plugin);
+
         return $this->Permissions->isAuthorized($roleId, $controller, $action, $plugin);
     }
 
@@ -52,7 +57,7 @@ class PermissionService
 
         $matrix = [];
         foreach ($permissions as $permission) {
-            $pluginKey = $permission->plugin ?? 'App';
+            $pluginKey = PermissionsTable::normalizePlugin($permission->plugin);
             $matrix[$pluginKey][$permission->controller][$permission->action] = $permission->allowed;
         }
 
@@ -99,12 +104,13 @@ class PermissionService
      */
     protected function setPermission(int $roleId, string $controller, string $action, ?string $plugin, bool $allowed): bool
     {
+        $plugin = PermissionsTable::normalizePlugin($plugin);
         $existing = $this->Permissions->find()
             ->where([
                 'role_id' => $roleId,
                 'controller' => $controller,
                 'action' => $action,
-                'plugin IS' => $plugin,
+                'plugin' => $plugin,
             ])
             ->first();
 
@@ -138,8 +144,9 @@ class PermissionService
     /**
      * Replace all permissions of a role with grants for the given resource ids
      *
-     * Unknown and inactive resources are ignored. App-level resources (NULL plugin)
-     * are stored with plugin 'App', which is what the policy and component look up.
+     * Only positive integer ids (int or digit-only string) are accepted; anything else is
+     * ignored before the transaction starts. Unknown and inactive resources are ignored and
+     * resources sharing a controller/action/plugin collapse into one permission.
      * Runs in a single transaction so a failure never leaves the role half-updated.
      *
      * @param int $roleId Role ID
@@ -148,62 +155,78 @@ class PermissionService
      */
     public function replaceRolePermissions(int $roleId, array $resourceIds): int
     {
-        $ids = array_values(array_unique(array_filter(
-            array_map('intval', $resourceIds),
-            fn(int $id): bool => $id > 0,
-        )));
+        $ids = [];
+        foreach ($resourceIds as $value) {
+            if ((is_string($value) || is_int($value)) && ctype_digit((string)$value) && (int)$value > 0) {
+                $ids[(int)$value] = (int)$value;
+            }
+        }
+        $ids = array_values($ids);
 
         return $this->Permissions->getConnection()->transactional(function () use ($roleId, $ids): int {
             $this->Permissions->deleteAll(['role_id' => $roleId]);
 
-            if (!$ids) {
-                return 0;
-            }
-
-            $resources = TableRegistry::getTableLocator()->get('AclManager.Resources')
-                ->find()
-                ->where(['id IN' => $ids, 'active' => true])
-                ->all();
-
+            $resourcesTable = TableRegistry::getTableLocator()->get('AclManager.Resources');
             $entities = [];
-            foreach ($resources as $resource) {
-                $entities[] = $this->Permissions->newEntity([
-                    'role_id' => $roleId,
-                    'controller' => $resource->controller,
-                    'action' => $resource->action,
-                    'plugin' => $resource->plugin ?? 'App',
-                    'allowed' => true,
-                ]);
+            foreach (array_chunk($ids, self::RESOURCE_CHUNK_SIZE) as $chunk) {
+                $resources = $resourcesTable->find()
+                    ->where(['id IN' => $chunk, 'active' => true])
+                    ->all();
+
+                foreach ($resources as $resource) {
+                    $plugin = PermissionsTable::normalizePlugin($resource->plugin);
+                    $key = $plugin . '|' . $resource->controller . '|' . $resource->action;
+                    $entities[$key] ??= $this->Permissions->newEntity([
+                        'role_id' => $roleId,
+                        'controller' => $resource->controller,
+                        'action' => $resource->action,
+                        'plugin' => $plugin,
+                        'allowed' => true,
+                    ]);
+                }
             }
-            $this->Permissions->saveManyOrFail($entities);
+
+            if ($entities) {
+                $this->Permissions->saveManyOrFail(array_values($entities));
+            }
 
             return count($entities);
         });
     }
 
     /**
-     * Copy permissions from one role to another
+     * Copy permissions from one role to another, replacing the target's permissions
      *
      * @param int $sourceRoleId Source role ID
      * @param int $targetRoleId Target role ID
-     * @return bool Success
+     * @return bool False when both roles are the same or the copy failed (nothing is changed)
      */
     public function copyPermissions(int $sourceRoleId, int $targetRoleId): bool
     {
-        $sourcePermissions = $this->Permissions->findByRole($sourceRoleId)->all();
+        if ($sourceRoleId === $targetRoleId) {
+            return false;
+        }
 
-        foreach ($sourcePermissions as $sourcePermission) {
-            $newPermission = $this->Permissions->newEntity([
-                'role_id' => $targetRoleId,
-                'controller' => $sourcePermission->controller,
-                'action' => $sourcePermission->action,
-                'plugin' => $sourcePermission->plugin,
-                'allowed' => $sourcePermission->allowed,
-            ]);
+        try {
+            $this->Permissions->getConnection()->transactional(function () use ($sourceRoleId, $targetRoleId): void {
+                $copies = [];
+                foreach ($this->Permissions->findByRole($sourceRoleId)->all() as $source) {
+                    $copies[] = $this->Permissions->newEntity([
+                        'role_id' => $targetRoleId,
+                        'controller' => $source->controller,
+                        'action' => $source->action,
+                        'plugin' => PermissionsTable::normalizePlugin($source->plugin),
+                        'allowed' => $source->allowed,
+                    ]);
+                }
 
-            if (!$this->Permissions->save($newPermission)) {
-                return false;
-            }
+                $this->Permissions->deleteAll(['role_id' => $targetRoleId]);
+                if ($copies) {
+                    $this->Permissions->saveManyOrFail($copies);
+                }
+            });
+        } catch (PersistenceFailedException) {
+            return false;
         }
 
         return true;

@@ -17,6 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Saving permissions no longer depends on PHP `max_input_vars`: the form posts one `resource_ids[]` value per granted action instead of ~5 fields per action.
 - A truncated POST is detected through a trailing sentinel field and aborts without touching existing permissions.
 - Permissions are replaced in a single transaction with a bulk save; app-level permissions keep the `'App'` plugin value expected by the policy.
+- `'App'` is now the single plugin value for application-level resources and permissions. `PermissionService::grant()`, `deny()` and `isAuthorized()` normalize a missing plugin to `'App'`, so API callers no longer write or read rows the policy never matches.
+- The resource scanner stores application controllers with plugin `'App'` and no longer creates duplicates on re-scan.
+- `replaceRolePermissions()` only accepts positive integer ids (`'5abc'`, arrays, `'-1'`, `'0'` are ignored), collapses resources that map to the same permission, and loads resources in chunks of 500 ids.
+- `copyPermissions()` is transactional, replaces the target role's permissions, saves in bulk and rejects copying a role onto itself (the UI shows an error).
+- Migrations: `0001` skips tables that already exist and `0003` is a no-op when the roles table is missing or already complete.
+
+### Changed
+- `scanAndSync()` preloads resources once and saves in bulk inside a single transaction (same statistics array).
+- **Run the new migration**: `bin/cake migrations migrate -p AclManager` (`20250101000004_NormalizeAppPlugin`). It removes duplicate NULL-plugin rows and converts remaining NULL plugins to `'App'` in `resources` and `permissions`. Rolling it back sets `resources.plugin` to NULL again; permissions stay `'App'`.
 
 ### Added
 - PHPUnit test suite (SQLite in-memory) covering permission saving.

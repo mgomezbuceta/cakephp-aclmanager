@@ -256,6 +256,11 @@ class PermissionsController extends AppController
             return $this->redirect(['action' => 'index']);
         }
 
+        if ($sourceId === $targetId) {
+            $this->Flash->error(__d('acl_manager', 'Source and target roles must be different.'));
+            return $this->redirect(['action' => 'index']);
+        }
+
         try {
             $rolesTable = $this->fetchTable('AclManager.Roles');
             $sourceRole = $rolesTable->get($sourceId);

@@ -17,6 +17,12 @@ class AddMissingColumnsToRoles extends AbstractMigration
      */
     public function change(): void
     {
+        // Migration 0002 already adds these columns to existing tables and 0001 creates
+        // them on fresh installs, so this is a no-op unless the table is still missing some.
+        if (!$this->hasTable('roles')) {
+            return;
+        }
+
         $table = $this->table('roles');
 
         // Add description column if it doesn't exist

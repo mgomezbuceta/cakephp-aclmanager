@@ -357,8 +357,9 @@ use AclManager\Service\ResourceScannerService;
 // Permission management
 $permissionService = new PermissionService();
 
-// Grant permission
+// Grant permission (no plugin = application controller, stored as 'App')
 $permissionService->grant($roleId, 'Articles', 'edit');
+$permissionService->grant($roleId, 'Comments', 'view', 'Blog'); // plugin controller
 
 // Deny permission
 $permissionService->deny($roleId, 'Articles', 'delete');
@@ -366,7 +367,7 @@ $permissionService->deny($roleId, 'Articles', 'delete');
 // Get permission matrix
 $matrix = $permissionService->getPermissionMatrix($roleId);
 
-// Copy permissions between roles
+// Copy permissions between roles (replaces the target's permissions; roles must differ)
 $permissionService->copyPermissions($sourceRoleId, $targetRoleId);
 
 // Resource scanning
