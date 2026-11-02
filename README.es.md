@@ -146,7 +146,7 @@ Mantén el resto de tu middleware habitual (manejo de errores, assets, CSRF...);
 5. La identidad tiene `email` y `AclManager.adminAccess.adminEmails` no está vacío: es admin si el email figura en la lista.
 6. En otro caso: acceso denegado.
 
-Un campo que coincide corta la evaluación (un usuario con `role_id` nunca se comprueba por email). Los no administradores se redirigen a `AclManager.redirects.unauthorized`.
+Decide el primer campo que esté presente en la identidad y se ignoran los siguientes; las reglas no se combinan con OR. Ejemplo: una identidad con `role_id` 2 e `is_admin` 1 NO es administradora, porque `role_id` está presente y `is_admin` nunca se consulta. `adminEmails` solo se aplica cuando la identidad no tiene ninguno de `role_name`, `role_id` ni `is_admin`. El resultado de `customCheck` se convierte a booleano y los ids de rol se comparan como cadenas (`"1"` coincide con `1`). Los no administradores se redirigen a `AclManager.redirects.unauthorized`.
 
 **¿Sin `cakephp/authentication`?** Sin el componente Authentication el plugin falla en cerrado (HTTP 403). Solo si proteges el gestor por otro medio (por ejemplo, autenticación HTTP en el servidor web), pon `AclManager.adminAccess.allowWithoutAuthentication` a `true`, o define un `customCheck` (en este caso se invoca con `null`).
 
@@ -463,6 +463,8 @@ $resources = $scannerService->getGroupedResources();
 **Cómo funciona el guardado y el mensaje de conflicto.** Cada formulario incluye un token de versión (un hash de los permisos concedidos del rol en ese momento). Al guardar, el servidor lo compara con el estado actual dentro de la misma transacción y se niega a sobrescribir cambios hechos después de cargar el formulario. Si aparece "Otro administrador cambió los permisos de este rol mientras los editabas", alguien guardó ese rol antes: la página se ha recargado con los datos actuales, así que revísalos y vuelve a aplicar tus cambios. Un formulario sin token se rechaza por incompleto. Limitación conocida: la comprobación no bloquea filas, por lo que dos guardados que coincidan en unos pocos milisegundos aún pueden competir.
 
 **Sync Resources o Clear Permissions devuelven 405.** Solo aceptan POST (los botones usan `postLink`); un enlace GET o un marcador no funcionará, y tu layout debe incluir el token CSRF si usas `CsrfProtectionMiddleware`.
+
+**Un mensaje indica que una operación "no se pudo guardar", "sincronizar", "copiar" o "eliminar".** Los errores inesperados ya no muestran el texto de la excepción en el navegador, porque puede revelar SQL, rutas u otros detalles internos. La excepción completa (clase, mensaje y traza) se escribe en el registro de la aplicación: consulta `logs/error.log`.
 
 **No aparecen recursos.** Abre `/authorization-manager` y usa *Sync Resources*. Las acciones que coinciden con `AclManager.ignoreActions` se omiten.
 

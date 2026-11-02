@@ -146,7 +146,7 @@ Keep your usual middleware (error handler, asset, CSRF, ...) in the queue as wel
 5. Identity has an `email` and `AclManager.adminAccess.adminEmails` is not empty: admin if the email is listed.
 6. Otherwise: denied.
 
-A matching field short-circuits the later ones (a user with a `role_id` is never checked by email). Non-admins are redirected to `AclManager.redirects.unauthorized`.
+The first field that is present on the identity decides and the later ones are ignored; the rules are not combined with OR. Example: an identity with `role_id` 2 and `is_admin` 1 is NOT an administrator, because `role_id` is present and `is_admin` is never looked at. `adminEmails` only applies when the identity has none of `role_name`, `role_id` or `is_admin`. The result of `customCheck` is converted to a boolean and role ids are compared as strings (`"1"` matches `1`). Non-admins are redirected to `AclManager.redirects.unauthorized`.
 
 **No `cakephp/authentication`?** Without the Authentication component the plugin fails closed (HTTP 403). Only if you protect the manager some other way (e.g. HTTP auth in the web server) set `AclManager.adminAccess.allowWithoutAuthentication` to `true`, or provide a `customCheck` callable (it is called with `null` in this case).
 
@@ -463,6 +463,8 @@ $resources = $scannerService->getGroupedResources();
 **How saving works and the conflict message.** Each form carries a version token (a hash of the role's currently granted permissions). On save, the server compares it with the current state inside the same transaction and refuses to overwrite changes made after the form was loaded. If you see "Another administrator changed the permissions of this role while you were editing", someone else saved that role first: the page has been reloaded with the current data, so review it and apply your changes again. A form without the token is rejected as incomplete. Known limitation: the check does not lock rows, so two saves landing within the same few milliseconds can still race.
 
 **Sync Resources or Clear Permissions return 405.** They only accept POST (buttons use `postLink`); a GET link or bookmark will not work, and your layout must include the CSRF token if you use `CsrfProtectionMiddleware`.
+
+**A flash message says an operation "could not be saved", "synchronized", "copied" or "cleared".** Unexpected errors no longer show the exception text in the browser, because it can expose SQL, paths or other internals. The full exception (class, message and stack trace) is written to the application log: look in `logs/error.log`.
 
 **No resources showing.** Open `/authorization-manager` and use *Sync Resources*. Actions matching `AclManager.ignoreActions` are skipped.
 

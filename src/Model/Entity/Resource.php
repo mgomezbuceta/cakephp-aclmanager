@@ -30,7 +30,5 @@ class Resource extends Entity
         'plugin' => true,
         'description' => true,
         'active' => true,
-        'created' => true,
-        'modified' => true,
     ];
 }

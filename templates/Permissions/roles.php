@@ -82,7 +82,8 @@ $this->assign('title', __d('acl_manager', 'Roles'));
                                                     [
                                                         'confirm' => __d('acl_manager', 'Are you sure you want to delete {0}?', $role->name),
                                                         'class' => 'btn btn-sm btn-danger',
-                                                        'escape' => false,
+                                                        // Only the icon title is raw HTML; attributes (the confirm text holds the role name) stay escaped.
+                                                        'escapeTitle' => false,
                                                         'title' => __d('acl_manager', 'Delete')
                                                     ]
                                                 ) ?>

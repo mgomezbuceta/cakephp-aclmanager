@@ -38,6 +38,7 @@ class Application extends BaseApplication implements
     public function routes(RouteBuilder $routes): void
     {
         $routes->connect('/no-auth', ['controller' => 'NoAuth', 'action' => 'index']);
+        $routes->connect('/failing-component', ['controller' => 'FailingComponent', 'action' => 'index']);
     }
 
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue

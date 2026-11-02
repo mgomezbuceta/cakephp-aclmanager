@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `clearPermissions` and `syncResources` only accept POST (GET returns 405); the UI uses `Form->postLink`, closing a CSRF-via-GET hole.
 - Roles listed in `AclManager.adminAccess.adminRoleIds` can no longer be deleted or deactivated (enforced server-side, not only hidden in the UI).
 - **BREAKING:** the plugin now fails closed when the Authentication component is not available (403) instead of granting access to everyone. Apps without `cakephp/authentication` must set `AclManager.adminAccess.allowWithoutAuthentication` to `true` (new key, default `false`) or provide a `customCheck` callback.
+- Mass assignment lockdown: `Role`, `Permission` and `Resource` no longer expose `id`, `created`, `modified` or the `permissions`/`role` associations to `newEntity()`/`patchEntity()`, and `addRole`/`editRole` only accept `name`, `description`, `priority` and `active`.
+- Unexpected errors in `savePermissions`, `syncResources`, `copyPermissions` and `clearPermissions` no longer flash the exception message (it could leak SQL or paths); the exception is logged with `Log::error()` and a generic translated message is shown.
+- Output escaping: the role name inside the delete confirmation of the roles and dashboard pages was rendered unescaped in an HTML attribute (stored XSS by a role name); the checkbox label `for` attribute is escaped too.
 
 ### Removed
 - **Breaking:** `AclManager.admin`. It never worked: the `Admin` prefix mount had no controller (`MissingControllerException`) and produced `/admin/admin/authorization-manager`. Use `AclManager.mountPath` instead.
@@ -26,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unreferenced `webroot/` assets, the tracked `README.cp3.md` and the unused `Resource::_getFullIdentifier()`.
 
 ### Fixed
+- `isUserAdmin()` tolerates a `customCheck` returning a non-boolean (it is cast to bool instead of raising a `TypeError`), role names that are not strings, and compares role ids as strings with strict comparison (`"1"` still matches `1`). The precedence (`customCheck`, `role_name`, `role_id`, `is_admin`, `email`; the first present field decides) is unchanged and now documented.
+- A failure while loading the optional Authorization/Authentication components is logged as a warning (component name and message) instead of being swallowed silently; access stays fail-closed.
 - Texts in `AuthorizationManagerComponent::handleUnauthorized()` use the `acl_manager` translation domain (`__d`) and the msgid was added to the `en_US`, `es_ES` and `gl_ES` catalogs; the stale `Modified` msgid was removed.
 - Saving permissions no longer depends on PHP `max_input_vars`: the form posts one `resource_ids[]` value per granted action instead of ~5 fields per action.
 - A truncated POST is detected through a trailing sentinel field and aborts without touching existing permissions.
@@ -37,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Migrations: `0001` skips tables that already exist and `0003` is a no-op when the roles table is missing or already complete.
 
 ### Changed
+- Flash messages for unexpected failures are generic: `Error saving permissions: {0}`, `Error synchronizing resources: {0}` and `Error: {0}` were replaced by four fixed messages (saved, synchronized, copied, cleared) in the `en_US`, `es_ES` and `gl_ES` catalogs. Details go to the application log (`logs/error.log`).
 - **Locale is no longer forced.** The plugin's `config/bootstrap.php` stopped calling `I18n::setLocale('es_ES')`, which changed the locale of the whole host application. Plugin pages follow the host locale (English texts when none is set). New optional `AclManager.locale` (default `null`): when set, the plugin's controllers apply it for the request.
 - `scanAndSync()` preloads resources once and saves in bulk inside a single transaction (same statistics array).
 - **Run the new migration**: `bin/cake migrations migrate -p AclManager` (`20250101000004_NormalizeAppPlugin`). It converts NULL plugins to `'App'` in `resources` and `permissions` and **never deletes data**: if the conversion would collide with an existing row it aborts before changing anything, reports the counts per table and points to `docs/sql/cleanup-duplicates.sql` (back up, review, run, retry). Rolling it back sets `resources.plugin` to NULL again; permissions stay `'App'`.

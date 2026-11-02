@@ -183,8 +183,8 @@ msgstr "Please select a role."
 msgid "Permissions saved successfully. {0} permissions granted."
 msgstr "Permissions saved successfully. {0} permissions granted."
 
-msgid "Error saving permissions: {0}"
-msgstr "Error saving permissions: {0}"
+msgid "The permissions could not be saved. Check the application log for details."
+msgstr "The permissions could not be saved. Check the application log for details."
 
 msgid "No resources found. Please run \"Sync Resources\" first."
 msgstr "No resources found. Please run \"Sync Resources\" first."
@@ -192,15 +192,15 @@ msgstr "No resources found. Please run \"Sync Resources\" first."
 msgid "All permissions cleared for role \"{0}\". {1} permissions removed."
 msgstr "All permissions cleared for role \"{0}\". {1} permissions removed."
 
-msgid "Error: {0}"
-msgstr "Error: {0}"
+msgid "The permissions could not be cleared. Check the application log for details."
+msgstr "The permissions could not be cleared. Check the application log for details."
 
 # Sync Resources
 msgid "Resources synchronized. Found: {0}, Created: {1}, Updated: {2}, Deactivated: {3}"
 msgstr "Resources synchronized. Found: {0}, Created: {1}, Updated: {2}, Deactivated: {3}"
 
-msgid "Error synchronizing resources: {0}"
-msgstr "Error synchronizing resources: {0}"
+msgid "The resources could not be synchronized. Check the application log for details."
+msgstr "The resources could not be synchronized. Check the application log for details."
 
 # Copy Permissions
 msgid "Invalid roles specified."
@@ -214,6 +214,9 @@ msgstr "Permissions copied successfully from \"{0}\" to \"{1}\"."
 
 msgid "Error copying permissions."
 msgstr "Error copying permissions."
+
+msgid "The permissions could not be copied. Check the application log for details."
+msgstr "The permissions could not be copied. Check the application log for details."
 
 msgid "Invalid role specified."
 msgstr "Invalid role specified."

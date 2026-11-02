@@ -7,6 +7,8 @@ use AclManager\Service\PermissionService;
 use AclManager\Service\ResourceScannerService;
 use AclManager\Service\StalePermissionsException;
 use Cake\Core\Configure;
+use Cake\Log\Log;
+use Throwable;
 
 /**
  * Permissions Controller
@@ -15,6 +17,9 @@ use Cake\Core\Configure;
  */
 class PermissionsController extends AppController
 {
+    /** Role fields an administrator may submit through the role forms. */
+    private const ROLE_FIELDS = ['name', 'description', 'priority', 'active'];
+
     private PermissionService $permissionService;
     private ResourceScannerService $scannerService;
 
@@ -116,7 +121,11 @@ class PermissionsController extends AppController
                 . 'The page has been reloaded with the current data; apply your changes again.',
             ));
         } catch (\Exception $e) {
-            $this->Flash->error(__d('acl_manager', 'Error saving permissions: {0}', $e->getMessage()));
+            $this->logFailure('savePermissions', $e);
+            $this->Flash->error(__d(
+                'acl_manager',
+                'The permissions could not be saved. Check the application log for details.',
+            ));
         }
 
         return $this->redirect(['action' => 'manage', $roleId]);
@@ -162,7 +171,11 @@ class PermissionsController extends AppController
 
             $this->Flash->success($message);
         } catch (\Exception $e) {
-            $this->Flash->error(__d('acl_manager', 'Error synchronizing resources: {0}', $e->getMessage()));
+            $this->logFailure('syncResources', $e);
+            $this->Flash->error(__d(
+                'acl_manager',
+                'The resources could not be synchronized. Check the application log for details.',
+            ));
         }
 
         return $this->redirect(['action' => 'index']);
@@ -198,7 +211,7 @@ class PermissionsController extends AppController
         $role = $rolesTable->newEmptyEntity();
 
         if ($this->request->is('post')) {
-            $role = $rolesTable->patchEntity($role, $this->request->getData());
+            $role = $rolesTable->patchEntity($role, $this->request->getData(), ['fields' => self::ROLE_FIELDS]);
 
             if ($rolesTable->save($role)) {
                 $this->Flash->success(__d('acl_manager', 'Role created successfully.'));
@@ -231,7 +244,7 @@ class PermissionsController extends AppController
                 return $this->redirect(['action' => 'roles']);
             }
 
-            $role = $rolesTable->patchEntity($role, $this->request->getData());
+            $role = $rolesTable->patchEntity($role, $this->request->getData(), ['fields' => self::ROLE_FIELDS]);
 
             if ($rolesTable->save($role)) {
                 $this->Flash->success(__d('acl_manager', 'Role updated successfully.'));
@@ -312,7 +325,11 @@ class PermissionsController extends AppController
                 $this->Flash->error(__d('acl_manager', 'Error copying permissions.'));
             }
         } catch (\Exception $e) {
-            $this->Flash->error(__d('acl_manager', 'Error: {0}', $e->getMessage()));
+            $this->logFailure('copyPermissions', $e);
+            $this->Flash->error(__d(
+                'acl_manager',
+                'The permissions could not be copied. Check the application log for details.',
+            ));
         }
 
         return $this->redirect(['action' => 'index']);
@@ -344,10 +361,35 @@ class PermissionsController extends AppController
                 $count
             ));
         } catch (\Exception $e) {
-            $this->Flash->error(__d('acl_manager', 'Error: {0}', $e->getMessage()));
+            $this->logFailure('clearPermissions', $e);
+            $this->Flash->error(__d(
+                'acl_manager',
+                'The permissions could not be cleared. Check the application log for details.',
+            ));
         }
 
         return $this->redirect(['action' => 'manage', $roleId]);
+    }
+
+    /**
+     * Log an unexpected failure with enough context to diagnose it; users only see a generic flash.
+     *
+     * @param string $action Controller action that failed
+     * @param \Throwable $e The exception
+     * @return void
+     */
+    private function logFailure(string $action, Throwable $e): void
+    {
+        Log::error(sprintf(
+            'AclManager %s failed: %s: %s in %s:%d%s%s',
+            $action,
+            $e::class,
+            $e->getMessage(),
+            $e->getFile(),
+            $e->getLine(),
+            "\n",
+            $e->getTraceAsString(),
+        ));
     }
 
     /**

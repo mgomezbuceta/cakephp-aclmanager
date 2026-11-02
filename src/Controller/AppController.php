@@ -27,6 +27,7 @@ use Cake\Event\EventInterface;
 use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Response;
 use Cake\I18n\I18n;
+use Cake\Log\Log;
 
 /**
  * AppController
@@ -46,18 +47,29 @@ class AppController extends Controller
 
         $this->loadComponent('Flash');
 
-        // Try to load Authorization component if available
-        try {
-            $this->loadComponent('Authorization.Authorization');
-        } catch (\Exception $e) {
-            // Authorization component not available, continue without it
-        }
+        // Optional components: a failure keeps the request fail-closed (checkAdminAccess() denies
+        // access without Authentication) but is logged so integrators can diagnose the resulting 403.
+        $this->loadOptionalComponent('Authorization.Authorization');
+        $this->loadOptionalComponent('Authentication.Authentication');
+    }
 
-        // Try to load Authentication component if available
+    /**
+     * Load a component, logging a warning instead of failing when it is not available.
+     *
+     * @param string $name Component name, e.g. `Authentication.Authentication`
+     * @return void
+     */
+    private function loadOptionalComponent(string $name): void
+    {
         try {
-            $this->loadComponent('Authentication.Authentication');
+            $this->loadComponent($name);
         } catch (\Exception $e) {
-            // Authentication component not available, continue without it
+            Log::warning(sprintf(
+                'AclManager could not load the %s component and continues without it: %s: %s',
+                $name,
+                $e::class,
+                $e->getMessage(),
+            ));
         }
     }
 
@@ -160,6 +172,17 @@ class AppController extends Controller
      *
      * Override this method in your application if you need custom logic
      *
+     * Precedence (the FIRST check whose data is present decides; the later ones are ignored):
+     * 1. `AclManager.adminAccess.customCheck`, when configured and callable (result cast to bool)
+     * 2. `role_name` on the identity, compared case-insensitively with `adminRoleNames`
+     * 3. `role_id` on the identity, compared with `adminRoleIds`
+     * 4. `is_admin` on the identity
+     * 5. `email` on the identity, compared with `adminEmails` (only when that list is not empty)
+     *
+     * Example: an identity with `role_id` 2 and `is_admin` 1 is NOT an administrator, because
+     * `role_id` is present and decides before `is_admin` is looked at. Without any of these
+     * fields, access is denied.
+     *
      * @param \Authentication\IdentityInterface $identity User identity
      * @return bool
      */
@@ -173,17 +196,26 @@ class AppController extends Controller
 
         // Custom callback function (highest priority)
         if (is_callable($customCheck)) {
-            return $customCheck($identity);
+            return (bool)$customCheck($identity);
         }
 
         // Method 1: Check by role name (if you have a role_name field)
         if (isset($identity->role_name)) {
-            return in_array(strtolower($identity->role_name), array_map('strtolower', $adminRoleNames));
+            return in_array(
+                strtolower((string)$identity->role_name),
+                array_map(fn($name): string => strtolower((string)$name), (array)$adminRoleNames),
+                true,
+            );
         }
 
-        // Method 2: Check by role_id (common pattern)
+        // Method 2: Check by role_id (common pattern). Ids are compared as strings because
+        // database drivers return them as either int or string.
         if (isset($identity->role_id)) {
-            return in_array($identity->role_id, $adminRoleIds);
+            return in_array(
+                (string)$identity->role_id,
+                array_map(fn($id): string => (string)$id, (array)$adminRoleIds),
+                true,
+            );
         }
 
         // Method 3: Check by is_admin flag
@@ -193,7 +225,7 @@ class AppController extends Controller
 
         // Method 4: Check by email (useful for initial setup)
         if (isset($identity->email) && !empty($adminEmails)) {
-            return in_array($identity->email, $adminEmails);
+            return in_array($identity->email, $adminEmails, true);
         }
 
         // Default: deny access if we can't determine admin status

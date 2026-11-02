@@ -90,7 +90,7 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
                                                         'class' => 'form-check-input',
                                                         'id' => "permission-{$fieldIndex}",
                                                     ]) ?>
-                                                    <label class="form-check-label" for="permission-<?= $fieldIndex ?>">
+                                                    <label class="form-check-label" for="permission-<?= h($fieldIndex) ?>">
                                                         <?= __d('acl_manager', 'Allow') ?>
                                                     </label>
                                                 </div>

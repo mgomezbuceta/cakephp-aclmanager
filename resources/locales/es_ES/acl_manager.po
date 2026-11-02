@@ -182,8 +182,8 @@ msgstr "Por favor, selecciona un rol."
 msgid "Permissions saved successfully. {0} permissions granted."
 msgstr "Permisos guardados correctamente. {0} permisos concedidos."
 
-msgid "Error saving permissions: {0}"
-msgstr "Error al guardar permisos: {0}"
+msgid "The permissions could not be saved. Check the application log for details."
+msgstr "No se pudieron guardar los permisos. Consulta el registro de la aplicación para más detalles."
 
 msgid "No resources found. Please run \"Sync Resources\" first."
 msgstr "No se encontraron recursos. Por favor, ejecuta \"Sincronizar Recursos\" primero."
@@ -191,15 +191,15 @@ msgstr "No se encontraron recursos. Por favor, ejecuta \"Sincronizar Recursos\" 
 msgid "All permissions cleared for role \"{0}\". {1} permissions removed."
 msgstr "Todos los permisos limpiados para el rol \"{0}\". {1} permisos eliminados."
 
-msgid "Error: {0}"
-msgstr "Error: {0}"
+msgid "The permissions could not be cleared. Check the application log for details."
+msgstr "No se pudieron eliminar los permisos. Consulta el registro de la aplicación para más detalles."
 
 # Sync Resources
 msgid "Resources synchronized. Found: {0}, Created: {1}, Updated: {2}, Deactivated: {3}"
 msgstr "Recursos sincronizados. Encontrados: {0}, Creados: {1}, Actualizados: {2}, Desactivados: {3}"
 
-msgid "Error synchronizing resources: {0}"
-msgstr "Error al sincronizar recursos: {0}"
+msgid "The resources could not be synchronized. Check the application log for details."
+msgstr "No se pudieron sincronizar los recursos. Consulta el registro de la aplicación para más detalles."
 
 # Copy Permissions
 msgid "Invalid roles specified."
@@ -213,6 +213,9 @@ msgstr "Permisos copiados correctamente de \"{0}\" a \"{1}\"."
 
 msgid "Error copying permissions."
 msgstr "Error al copiar permisos."
+
+msgid "The permissions could not be copied. Check the application log for details."
+msgstr "No se pudieron copiar los permisos. Consulta el registro de la aplicación para más detalles."
 
 msgid "Invalid role specified."
 msgstr "Rol especificado no válido."
