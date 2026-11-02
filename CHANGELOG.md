@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-11-02
+
 ### Added
 - GitHub Actions CI (`.github/workflows/ci.yml`): the test suite on PHP 8.1 to 8.4 (plus a run with the lowest supported dependencies on PHP 8.1), and a job with `composer validate`, phpcs and phpstan. Actions are pinned by commit SHA.
 - `AclManager.mountPath` (default `'/authorization-manager'`): URL path where the manager is mounted, normalized defensively with a fallback to the default.
