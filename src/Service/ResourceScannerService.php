@@ -56,36 +56,45 @@ class ResourceScannerService
 
         $key = fn(string $plugin, string $controller, string $action): string => "$plugin|$controller|$action";
 
+        // Legacy installs can hold several rows per key (plugin NULL and 'App'), so keep a list.
         $existing = [];
-        foreach ($this->Resources->find()->all() as $resource) {
+        foreach ($this->Resources->find()->all()->sortBy('id', SORT_ASC) as $resource) {
             $plugin = PermissionsTable::normalizePlugin($resource->plugin);
-            $existing[$key($plugin, $resource->controller, $resource->action)] = $resource;
+            $existing[$key($plugin, $resource->controller, $resource->action)][] = $resource;
         }
 
-        $this->Resources->getConnection()->transactional(function () use ($found, $key, &$existing, &$stats): void {
+        $this->Resources->getConnection()->transactional(function () use ($found, $key, $existing, &$stats): void {
             $toSave = [];
             $seen = [];
             foreach ($found as $resource) {
-                $resource['plugin'] = PermissionsTable::normalizePlugin($resource['plugin'] ?? null);
+                // The scan already tags application controllers with 'App'.
                 $id = $key($resource['plugin'], $resource['controller'], $resource['action']);
+                if (isset($seen[$id])) {
+                    continue;
+                }
                 $seen[$id] = true;
 
                 if (!isset($existing[$id])) {
                     $toSave[] = $this->Resources->newEntity($resource);
                     $stats['created']++;
-                } elseif (!$existing[$id]->active) {
-                    $existing[$id]->active = true;
-                    $toSave[] = $existing[$id];
+                } elseif (!array_filter($existing[$id], fn($row): bool => (bool)$row->active)) {
+                    // Reactivate a single row, preferring the canonical 'App' one.
+                    $rows = $existing[$id];
+                    usort($rows, fn($a, $b): int => ($b->plugin === 'App') <=> ($a->plugin === 'App'));
+                    $rows[0]->active = true;
+                    $toSave[] = $rows[0];
                     $stats['updated']++;
                 }
             }
 
-            // Deactivate resources that no longer exist
-            foreach ($existing as $id => $resource) {
-                if ($resource->active && !isset($seen[$id])) {
-                    $resource->active = false;
-                    $toSave[] = $resource;
-                    $stats['deactivated']++;
+            // Deactivate every active row whose key no longer exists
+            foreach ($existing as $id => $rows) {
+                foreach ($rows as $resource) {
+                    if ($resource->active && !isset($seen[$id])) {
+                        $resource->active = false;
+                        $toSave[] = $resource;
+                        $stats['deactivated']++;
+                    }
                 }
             }
 

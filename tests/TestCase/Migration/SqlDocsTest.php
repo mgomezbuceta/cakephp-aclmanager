@@ -72,13 +72,15 @@ class SqlDocsTest extends TestCase
         $res('both', null);
         $res('both', 'App');
         $res('solo', null);
+        $res('empty', '');
+        $res('empty', 'App');
         $this->db->insert('roles', ['name' => 'r', 'created' => $now, 'modified' => $now]);
         foreach ([null, null] as $plugin) {
             $this->db->insert('permissions', [
                 'role_id' => 1, 'controller' => 'C', 'action' => 'dup', 'plugin' => $plugin, 'created' => $now, 'modified' => $now,
             ]);
         }
-        $this->assertSame(['resources' => 2, 'permissions' => 1], AppPluginNormalization::findCollisions($this->fetchAll(...)));
+        $this->assertSame(['resources' => 3, 'permissions' => 1], AppPluginNormalization::findCollisions($this->fetchAll(...)));
 
         $this->runScript((string)file_get_contents(dirname(__DIR__, 3) . '/docs/sql/cleanup-duplicates.sql'));
 

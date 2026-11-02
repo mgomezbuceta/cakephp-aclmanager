@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace AclManager\Test\TestCase\Migration;
 
 use AclManager\Migration\SchemaCompatibility;
+use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
 use InvalidArgumentException;
 use RuntimeException;
@@ -76,5 +77,27 @@ class SchemaCompatibilityTest extends TestCase
     {
         $columns = ['id', ...SchemaCompatibility::REQUIRED['resources']];
         $this->assertSame(SchemaCompatibility::ADOPT, SchemaCompatibility::decide('resources', true, $columns, true));
+    }
+
+    public function testDecideForReadsTheFlagAndUsesCallables(): void
+    {
+        $present = fn(string $t): bool => $t === 'roles';
+        $columns = fn(string $t): array => ['id', 'name'];
+
+        $this->assertSame(SchemaCompatibility::CREATE, SchemaCompatibility::decideFor('resources', $present, $columns));
+
+        try {
+            SchemaCompatibility::decideFor('roles', $present, $columns);
+            $this->fail('Expected a RuntimeException');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('description', $e->getMessage());
+        }
+
+        Configure::write('AclManager.migrations.adoptExistingTables', true);
+        try {
+            $this->assertSame(SchemaCompatibility::ADOPT, SchemaCompatibility::decideFor('roles', $present, $columns));
+        } finally {
+            Configure::delete('AclManager.migrations.adoptExistingTables');
+        }
     }
 }

@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 use AclManager\Migration\SchemaCompatibility;
-use Cake\Core\Configure;
 use Migrations\BaseMigration;
 
 /**
@@ -13,15 +12,15 @@ use Migrations\BaseMigration;
 class CreatePermissionsTables extends BaseMigration
 {
     /**
-     * Change Method.
+     * Creates the tables that do not exist yet.
      *
      * @return void
      */
-    public function change(): void
+    public function up(): void
     {
         // Roles table
         // Existing tables are never altered here; decide() throws if one is incompatible.
-        if ($this->decide('roles') === SchemaCompatibility::CREATE) {
+        if (SchemaCompatibility::decideForMigration($this, 'roles') === SchemaCompatibility::CREATE) {
             $roles = $this->table('roles');
             $roles->addColumn('name', 'string', [
                     'limit' => 100,
@@ -54,7 +53,7 @@ class CreatePermissionsTables extends BaseMigration
 
         // Permissions table
         // Existing tables are never altered here; decide() throws if one is incompatible.
-        if ($this->decide('permissions') === SchemaCompatibility::CREATE) {
+        if (SchemaCompatibility::decideForMigration($this, 'permissions') === SchemaCompatibility::CREATE) {
             $permissions = $this->table('permissions');
             $permissions->addColumn('role_id', 'integer', [
                     'null' => false,
@@ -100,7 +99,7 @@ class CreatePermissionsTables extends BaseMigration
 
         // Resources table (optional - to track available controllers/actions)
         // Existing tables are never altered here; decide() throws if one is incompatible.
-        if ($this->decide('resources') === SchemaCompatibility::CREATE) {
+        if (SchemaCompatibility::decideForMigration($this, 'resources') === SchemaCompatibility::CREATE) {
             $resources = $this->table('resources');
             $resources->addColumn('controller', 'string', [
                     'limit' => 100,
@@ -136,19 +135,24 @@ class CreatePermissionsTables extends BaseMigration
     }
 
     /**
-     * @param string $table Table name
-     * @return string One of the SchemaCompatibility decisions
+     * Drops only the tables this migration created
+     *
+     * A host table that was adopted (it existed before) has none of the plugin's own unique
+     * indexes, so it is left alone together with its rows. Drop order is FK-safe.
+     *
+     * @return void
      */
-    private function decide(string $table): string
+    public function down(): void
     {
-        $exists = $this->hasTable($table);
-        $columns = $exists ? array_map(fn($c) => $c->getName(), $this->table($table)->getColumns()) : [];
-
-        return SchemaCompatibility::decide(
-            $table,
-            $exists,
-            $columns,
-            (bool)Configure::read('AclManager.migrations.adoptExistingTables', false),
-        );
+        $owned = [
+            'permissions' => 'idx_permissions_unique',
+            'resources' => 'idx_resources_unique',
+            'roles' => 'idx_roles_name_unique',
+        ];
+        foreach ($owned as $name => $marker) {
+            if ($this->hasTable($name) && $this->table($name)->hasIndexByName($marker)) {
+                $this->table($name)->drop()->save();
+            }
+        }
     }
 }

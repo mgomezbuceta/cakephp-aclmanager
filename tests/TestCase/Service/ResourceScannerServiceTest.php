@@ -86,4 +86,71 @@ class ResourceScannerServiceTest extends TestCase
         $this->assertSame(2, $stats['created']);
         $this->assertSame(['App:Comments:view' => true, 'Blog:Comments:view' => true], $this->stored());
     }
+
+    private function legacy(int $id, ?string $plugin, bool $active): void
+    {
+        $this->getTableLocator()->get('AclManager.Resources')->getConnection()->insert('resources', [
+            'id' => $id, 'controller' => 'Articles', 'action' => 'index', 'plugin' => $plugin,
+            'description' => 'x', 'active' => $active, 'created' => '2025-01-01 00:00:00', 'modified' => '2025-01-01 00:00:00',
+        ]);
+    }
+
+    /**
+     * @return array<int, int> ids of active rows
+     */
+    private function activeIds(): array
+    {
+        $ids = $this->getTableLocator()->get('AclManager.Resources')->find()->where(['active' => true])->all()->extract('id')->toList();
+        sort($ids);
+
+        return $ids;
+    }
+
+    public function testDuplicateFoundEntriesAreCreatedOnlyOnce(): void
+    {
+        $this->scanner->found = [$this->res('Articles', 'index'), $this->res('Articles', 'index')];
+
+        $stats = $this->scanner->scanAndSync();
+
+        $this->assertSame(1, $stats['created']);
+        $this->assertSame(['App:Articles:index' => true], $this->stored());
+        $this->assertSame(1, $this->getTableLocator()->get('AclManager.Resources')->find()->count());
+    }
+
+    public function testLegacyNullAndAppRowsAreReactivatedAsOne(): void
+    {
+        $this->legacy(1, null, false);
+        $this->legacy(2, 'App', false);
+        $this->scanner->found = [$this->res('Articles', 'index')];
+
+        $stats = $this->scanner->scanAndSync();
+
+        $this->assertSame(['found' => 1, 'created' => 0, 'updated' => 1, 'deactivated' => 0], $stats);
+        $this->assertCount(1, $this->activeIds());
+        $this->assertSame(2, $this->getTableLocator()->get('AclManager.Resources')->find()->count());
+    }
+
+    public function testLegacyRowsAlreadyActiveAreLeftAlone(): void
+    {
+        $this->legacy(1, null, true);
+        $this->legacy(2, 'App', false);
+        $this->scanner->found = [$this->res('Articles', 'index')];
+
+        $stats = $this->scanner->scanAndSync();
+
+        $this->assertSame(['found' => 1, 'created' => 0, 'updated' => 0, 'deactivated' => 0], $stats);
+        $this->assertSame([1], $this->activeIds());
+    }
+
+    public function testEveryActiveLegacyRowIsDeactivatedWhenNotFound(): void
+    {
+        $this->legacy(1, null, true);
+        $this->legacy(2, 'App', true);
+        $this->scanner->found = [];
+
+        $stats = $this->scanner->scanAndSync();
+
+        $this->assertSame(['found' => 0, 'created' => 0, 'updated' => 0, 'deactivated' => 2], $stats);
+        $this->assertSame([], $this->activeIds());
+    }
 }

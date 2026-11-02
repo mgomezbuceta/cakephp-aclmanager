@@ -40,8 +40,7 @@ class PermissionService
      */
     public function isAuthorized(int $roleId, string $controller, string $action, ?string $plugin = null): bool
     {
-        $plugin = PermissionsTable::normalizePlugin($plugin);
-
+        // PermissionsTable::isAuthorized() normalizes the plugin.
         return $this->Permissions->isAuthorized($roleId, $controller, $action, $plugin);
     }
 

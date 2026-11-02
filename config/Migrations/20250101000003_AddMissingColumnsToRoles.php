@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 use AclManager\Migration\SchemaCompatibility;
-use Cake\Core\Configure;
 use Migrations\BaseMigration;
 
 /**
@@ -13,23 +12,16 @@ use Migrations\BaseMigration;
 class AddMissingColumnsToRoles extends BaseMigration
 {
     /**
-     * Change Method.
+     * Adds what is missing when adoption is enabled.
      *
      * @return void
      */
-    public function change(): void
+    public function up(): void
     {
         // Migration 0002 already adds these columns when adoption is enabled and 0001 creates
         // them on fresh installs, so this is a no-op unless the table is still missing some.
         // Existing tables are only altered when AclManager.migrations.adoptExistingTables is true.
-        $exists = $this->hasTable('roles');
-        $columns = $exists ? array_map(fn($c) => $c->getName(), $this->table('roles')->getColumns()) : [];
-        $decision = SchemaCompatibility::decide(
-            'roles',
-            $exists,
-            $columns,
-            (bool)Configure::read('AclManager.migrations.adoptExistingTables', false),
-        );
+        $decision = SchemaCompatibility::decideForMigration($this, 'roles');
         if ($decision !== SchemaCompatibility::ADOPT) {
             return;
         }
@@ -62,5 +54,17 @@ class AddMissingColumnsToRoles extends BaseMigration
         }
 
         $table->update();
+    }
+
+    /**
+     * Intentionally a no-op.
+     *
+     * Only columns/indexes missing from a host table are added, and it is not recorded which
+     * ones, so removing anything here could destroy host data. Migration 0001 owns the tables.
+     *
+     * @return void
+     */
+    public function down(): void
+    {
     }
 }

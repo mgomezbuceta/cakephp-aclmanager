@@ -127,6 +127,39 @@ class AppPluginNormalizationTest extends TestCase
         $this->assertSame([], $this->column('SELECT id FROM permissions WHERE plugin IS NULL'));
     }
 
+    public function testEmptyStringPluginIsTreatedLikeNull(): void
+    {
+        $this->emptyTables();
+        $this->insertResource(1, 'a', '');
+        $this->insertResource(2, 'a', 'App');
+        $this->insertResource(3, 'b', null);
+        $this->insertResource(4, 'b', '');
+        $this->insertResource(5, 'c', '');
+        $this->insertPermission(1, 1, 'a', '');
+        $this->insertPermission(2, 1, 'a', null);
+        $this->insertPermission(3, 1, 'z', '');
+
+        $this->assertSame(
+            ['resources' => 2, 'permissions' => 1],
+            AppPluginNormalization::findCollisions($this->runners()[0]),
+        );
+        $this->expectException(RuntimeException::class);
+        AppPluginNormalization::up(...$this->runners());
+    }
+
+    public function testCleanEmptyStringPluginIsConverted(): void
+    {
+        $this->emptyTables();
+        $this->insertResource(1, 'a', '');
+        $this->insertResource(2, 'b', null);
+        $this->insertPermission(1, 1, 'a', '');
+
+        AppPluginNormalization::up(...$this->runners());
+
+        $this->assertSame(['App', 'App'], $this->column('SELECT plugin FROM resources'));
+        $this->assertSame(['App'], $this->column('SELECT plugin FROM permissions'));
+    }
+
     public function testDownRevertsResourcesOnly(): void
     {
         $this->emptyTables();

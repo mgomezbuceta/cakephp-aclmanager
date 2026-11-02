@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace AclManager\Migration;
 
+use Cake\Core\Configure;
 use InvalidArgumentException;
 use RuntimeException;
 
@@ -73,5 +74,42 @@ final class SchemaCompatibility
             $table,
             implode(', ', $missing),
         ));
+    }
+
+    /**
+     * Single entry point for the migrations: reads the flag and the table state through callables
+     *
+     * @param string $table One of roles, permissions, resources
+     * @param callable(string): bool $hasTable Whether a table exists
+     * @param callable(string): array<int, string> $columnNames Column names of an existing table
+     * @return string CREATE, SKIP or ADOPT
+     * @throws \RuntimeException When the table exists, is incompatible and adoption is not enabled
+     */
+    public static function decideFor(string $table, callable $hasTable, callable $columnNames): string
+    {
+        $exists = $hasTable($table);
+
+        return self::decide(
+            $table,
+            $exists,
+            $exists ? $columnNames($table) : [],
+            (bool)Configure::read('AclManager.migrations.adoptExistingTables', false),
+        );
+    }
+
+    /**
+     * Same as decideFor() using a migration's own table API (hasTable() and table()->getColumns())
+     *
+     * @param object $migration A Migrations\BaseMigration
+     * @param string $table One of roles, permissions, resources
+     * @return string CREATE, SKIP or ADOPT
+     */
+    public static function decideForMigration(object $migration, string $table): string
+    {
+        return self::decideFor(
+            $table,
+            fn(string $t): bool => $migration->hasTable($t),
+            fn(string $t): array => array_map(fn($c) => $c->getName(), $migration->table($t)->getColumns()),
+        );
     }
 }

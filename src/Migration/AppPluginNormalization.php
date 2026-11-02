@@ -15,9 +15,9 @@ use RuntimeException;
 final class AppPluginNormalization
 {
     /**
-     * Count NULL-plugin rows that would collide once mapped to 'App'
+     * Count rows with an empty plugin (NULL or '') that would collide once mapped to 'App'
      *
-     * A row collides when an 'App' row has the same key, or another NULL row with a lower id does.
+     * A row collides when an 'App' row has the same key, or another empty-plugin row with a lower id does.
      *
      * @param callable(string): array<int, array<int|string, mixed>> $fetchAll Returns rows readable by column alias
      * @return array{resources: int, permissions: int}
@@ -26,9 +26,9 @@ final class AppPluginNormalization
     {
         $count = static function (string $table, array $keys) use ($fetchAll): int {
             $same = implode(' AND ', array_map(fn(string $k): string => "x.$k = r.$k", $keys));
-            $sql = "SELECT COUNT(*) AS n FROM $table r WHERE r.plugin IS NULL AND ("
+            $sql = "SELECT COUNT(*) AS n FROM $table r WHERE (r.plugin IS NULL OR r.plugin = '') AND ("
                 . "EXISTS (SELECT 1 FROM $table x WHERE x.plugin = 'App' AND $same)"
-                . " OR EXISTS (SELECT 1 FROM $table x WHERE x.plugin IS NULL AND x.id < r.id AND $same))";
+                . " OR EXISTS (SELECT 1 FROM $table x WHERE (x.plugin IS NULL OR x.plugin = '') AND x.id < r.id AND $same))";
 
             $row = $fetchAll($sql)[0] ?? [];
 
@@ -42,7 +42,7 @@ final class AppPluginNormalization
     }
 
     /**
-     * Convert NULL plugin rows to 'App', or throw before any change when rows would collide
+     * Convert empty-plugin rows (NULL or '') to 'App', or throw before any change when rows would collide
      *
      * @param callable(string): array<int, array<int|string, mixed>> $fetchAll Returns rows readable by column alias
      * @param callable(string): mixed $execute Runs a statement
@@ -55,7 +55,7 @@ final class AppPluginNormalization
         if (array_sum($collisions) > 0) {
             throw new RuntimeException(sprintf(
                 'Migration NormalizeAppPlugin aborted, nothing was changed. '
-                . "Converting plugin NULL to 'App' would collide with existing rows "
+                . "Converting an empty plugin (NULL or '') to 'App' would collide with existing rows "
                 . '(resources: %d, permissions: %d). '
                 . 'Review and clean the duplicates with docs/sql/cleanup-duplicates.sql '
                 . '(back up first), then run the migration again. See the CHANGELOG for details.',
@@ -77,8 +77,8 @@ final class AppPluginNormalization
     public static function statements(): array
     {
         return [
-            "UPDATE resources SET plugin = 'App' WHERE plugin IS NULL",
-            "UPDATE permissions SET plugin = 'App' WHERE plugin IS NULL",
+            "UPDATE resources SET plugin = 'App' WHERE plugin IS NULL OR plugin = ''",
+            "UPDATE permissions SET plugin = 'App' WHERE plugin IS NULL OR plugin = ''",
         ];
     }
 

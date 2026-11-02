@@ -176,7 +176,7 @@ The migrations create the three tables with their indexes and foreign key. See "
 
 - If the table already has every required column, the migrations leave it untouched and continue.
 - If columns are missing, `bin/cake migrations migrate -p AclManager` stops with an error naming the table, the missing columns, the config flag and `docs/sql/`. Choose:
-  - **B1, let the migrations add the columns:** set `Configure::write('AclManager.migrations.adoptExistingTables', true);` in `config/app.php` (or `config/bootstrap.php`) **before** running the migration. Missing columns are added with safe defaults; existing data is kept.
+  - **B1, let the migrations add the columns:** set `Configure::write('AclManager.migrations.adoptExistingTables', true);` in `config/app.php` (or `config/bootstrap.php`) **before** running the migration. Missing columns are added with safe defaults; existing data is kept. Only columns are added: indexes and foreign keys of an adopted table are not created (copy them from `docs/sql/` if you want them), and rolling back never drops a table the migrations did not create.
   - **B2, apply the SQL yourself:** run the statements from [`docs/sql/adopt-existing-roles.sql`](docs/sql/adopt-existing-roles.sql) for your engine (compare `permissions` and `resources` with the schema scripts), then run the migrations; they will find a compatible table and do nothing to it.
 
 Required columns (besides `id`): `roles`: `name, description, priority, active, created, modified`; `permissions`: `role_id, controller, action, plugin, allowed, created, modified`; `resources`: `controller, action, plugin, description, active, created, modified`.
@@ -185,7 +185,7 @@ Required columns (besides `id`): `roles`: `name, description, priority, active, 
 
 ### Migration 0004 never deletes data
 
-`20250101000004_NormalizeAppPlugin` converts `plugin IS NULL` to `'App'` in `resources` and `permissions` (so the policy can match application controllers). It only runs `UPDATE`s. If converting would create a duplicate, it **aborts before changing any row** and tells you how many rows collide in each table:
+`20250101000004_NormalizeAppPlugin` converts an empty plugin (`NULL` or `''`) to `'App'` in `resources` and `permissions` (so the policy can match application controllers). It only runs `UPDATE`s. If converting would create a duplicate, it **aborts before changing any row** and tells you how many rows collide in each table:
 
 ```
 Migration NormalizeAppPlugin aborted, nothing was changed. ... (resources: 2, permissions: 0). Review and clean the duplicates with docs/sql/cleanup-duplicates.sql ...
@@ -303,6 +303,8 @@ To add your own translation, copy `resources/locales/es_ES/acl_manager.po` to `r
 **No resources showing.** Open `/authorization-manager` and use *Sync Resources*. Actions matching `AclManager.ignoreActions` are skipped.
 
 **Access denied after enabling the policy.** The user needs a `role_id`, and the role needs the action ticked in *Manage Permissions*. Everything not granted is denied.
+
+**Table prefixes are not supported.** The plugin's tables are always named `roles`, `permissions` and `resources`, and the migration SQL does not apply datasource table prefixes (CakePHP 4+ no longer supports them).
 
 ## Upgrading from 3.2.0
 
