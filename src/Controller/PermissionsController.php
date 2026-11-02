@@ -5,6 +5,7 @@ namespace AclManager\Controller;
 
 use AclManager\Service\PermissionService;
 use AclManager\Service\ResourceScannerService;
+use AclManager\Service\StalePermissionsException;
 use Cake\Core\Configure;
 
 /**
@@ -69,7 +70,9 @@ class PermissionsController extends AppController
             return $this->savePermissions($roleId);
         }
 
-        $this->set(compact('role', 'resources', 'permissions'));
+        $permissionsVersion = $this->permissionService->getPermissionsVersion($roleId);
+
+        $this->set(compact('role', 'resources', 'permissions', 'permissionsVersion'));
 
         return null;
     }
@@ -92,16 +95,48 @@ class PermissionsController extends AppController
             return $this->redirect(['action' => 'manage', $roleId]);
         }
 
+        $version = $this->request->getData('permissions_version');
+        if (!is_string($version) || $version === '') {
+            $this->Flash->error(__d(
+                'acl_manager',
+                'The form was missing its version token. No permissions were changed; reload the page and try again.',
+            ));
+
+            return $this->redirect(['action' => 'manage', $roleId]);
+        }
+
         try {
-            $resourceIds = (array)$this->request->getData('resource_ids', []);
-            $saved = $this->permissionService->replaceRolePermissions($roleId, $resourceIds);
+            $saved = $this->permissionService->replaceRolePermissions($roleId, $this->submittedResourceIds(), $version);
 
             $this->Flash->success(__d('acl_manager', 'Permissions saved successfully. {0} permissions granted.', $saved));
+        } catch (StalePermissionsException) {
+            $this->Flash->error(__d(
+                'acl_manager',
+                'Another administrator changed the permissions of this role while you were editing. '
+                . 'The page has been reloaded with the current data; apply your changes again.',
+            ));
         } catch (\Exception $e) {
             $this->Flash->error(__d('acl_manager', 'Error saving permissions: {0}', $e->getMessage()));
         }
 
         return $this->redirect(['action' => 'manage', $roleId]);
+    }
+
+    /**
+     * Resource ids posted by the form: the single CSV field (JS) wins over the checkbox array (no-JS fallback).
+     *
+     * Items are only trimmed and split here; replaceRolePermissions() does the strict validation.
+     *
+     * @return array<int, mixed>
+     */
+    private function submittedResourceIds(): array
+    {
+        $csv = $this->request->getData('resource_ids_csv');
+        if (is_string($csv)) {
+            return array_values(array_filter(array_map('trim', explode(',', $csv)), fn(string $v): bool => $v !== ''));
+        }
+
+        return (array)$this->request->getData('resource_ids', []);
     }
 
     /**

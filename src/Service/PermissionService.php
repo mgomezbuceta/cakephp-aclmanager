@@ -64,6 +64,30 @@ class PermissionService
     }
 
     /**
+     * Content token of a role's allowed permissions, used to detect concurrent edits
+     *
+     * sha1 of the sorted "plugin|controller|action" keys of the allowed permissions, so it
+     * does not depend on timestamps or row ids; an empty set has a stable token too.
+     *
+     * @param int $roleId Role ID
+     * @return string
+     */
+    public function getPermissionsVersion(int $roleId): string
+    {
+        $keys = [];
+        foreach ($this->Permissions->findByRole($roleId)->all() as $permission) {
+            if ($permission->allowed) {
+                $keys[] = PermissionsTable::normalizePlugin($permission->plugin)
+                    . '|' . $permission->controller . '|' . $permission->action;
+            }
+        }
+        $keys = array_values(array_unique($keys));
+        sort($keys, SORT_STRING);
+
+        return sha1(implode("\n", $keys));
+    }
+
+    /**
      * Grant permission to a role
      *
      * @param int $roleId Role ID
@@ -148,11 +172,18 @@ class PermissionService
      * resources sharing a controller/action/plugin collapse into one permission.
      * Runs in a single transaction so a failure never leaves the role half-updated.
      *
+     * When $expectedVersion is given it must match getPermissionsVersion() at write time,
+     * otherwise StalePermissionsException is thrown before anything is changed.
+     * Known limitation: the check and the write share a transaction but no row lock (portable
+     * across SQLite/MySQL/Postgres), so two requests landing within milliseconds can still race.
+     *
      * @param int $roleId Role ID
      * @param array $resourceIds Resource ids to grant
+     * @param string|null $expectedVersion Version the editing form was loaded with; null skips the check
      * @return int Number of permissions granted
+     * @throws \AclManager\Service\StalePermissionsException When the role changed since $expectedVersion
      */
-    public function replaceRolePermissions(int $roleId, array $resourceIds): int
+    public function replaceRolePermissions(int $roleId, array $resourceIds, ?string $expectedVersion = null): int
     {
         $ids = [];
         foreach ($resourceIds as $value) {
@@ -162,7 +193,15 @@ class PermissionService
         }
         $ids = array_values($ids);
 
-        return $this->Permissions->getConnection()->transactional(function () use ($roleId, $ids): int {
+        $connection = $this->Permissions->getConnection();
+
+        return $connection->transactional(function () use ($roleId, $ids, $expectedVersion): int {
+            if ($expectedVersion !== null && !hash_equals($this->getPermissionsVersion($roleId), $expectedVersion)) {
+                throw new StalePermissionsException(
+                    'The permissions of this role changed after the form was loaded.',
+                );
+            }
+
             $this->Permissions->deleteAll(['role_id' => $roleId]);
 
             $resourcesTable = TableRegistry::getTableLocator()->get('AclManager.Resources');
