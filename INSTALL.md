@@ -5,6 +5,8 @@
 ```bash
 # 1. Instalar el plugin
 composer require mgomezbuceta/cakephp-aclmanager
+composer require cakephp/authorization cakephp/authentication
+# Configurar AuthenticationMiddleware en Application::middleware() (ver "Control de acceso" más abajo)
 
 # 2. Cargar el plugin en src/Application.php
 # Añadir: $this->addPlugin('AclManager', ['bootstrap' => true, 'routes' => true]);

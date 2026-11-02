@@ -195,7 +195,10 @@ class AdminAccessTest extends TestCase
 
         $this->assertResponseOk();
         $body = (string)$this->_response->getBody();
-        $this->assertStringContainsString('action="/authorization-manager/clear-permissions/1"', $body);
+        $this->assertMatchesRegularExpression(
+            '#<form\b[^>]*\bmethod="post"[^>]*\baction="/authorization-manager/clear-permissions/1"#i',
+            $body,
+        );
         $this->assertStringNotContainsString('href="/authorization-manager/clear-permissions/1"', $body);
     }
 }
