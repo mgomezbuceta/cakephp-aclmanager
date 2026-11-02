@@ -1,15 +1,18 @@
 <?php
 declare(strict_types=1);
 
-use Migrations\AbstractMigration;
+use AclManager\Migration\SchemaCompatibility;
+use Cake\Core\Configure;
+use Migrations\BaseMigration;
 
 /**
  * UpdateExistingPermissionsTables migration
  *
- * Updates existing tables to match the Authorization Manager schema
- * without losing existing data
+ * Updates existing tables to match the Authorization Manager schema without losing data.
+ * Only runs when AclManager.migrations.adoptExistingTables is true; otherwise an existing
+ * incompatible table makes it throw and compatible tables are left untouched.
  */
-class UpdateExistingPermissionsTables extends AbstractMigration
+class UpdateExistingPermissionsTables extends BaseMigration
 {
     /**
      * Change Method.
@@ -19,7 +22,7 @@ class UpdateExistingPermissionsTables extends AbstractMigration
     public function change(): void
     {
         // Check and update roles table
-        if ($this->hasTable('roles')) {
+        if ($this->decide('roles') === SchemaCompatibility::ADOPT) {
             $roles = $this->table('roles');
 
             // Add missing columns if they don't exist
@@ -80,7 +83,7 @@ class UpdateExistingPermissionsTables extends AbstractMigration
         }
 
         // Check and update permissions table
-        if ($this->hasTable('permissions')) {
+        if ($this->decide('permissions') === SchemaCompatibility::ADOPT) {
             $permissions = $this->table('permissions');
 
             if (!$permissions->hasColumn('role_id')) {
@@ -167,7 +170,7 @@ class UpdateExistingPermissionsTables extends AbstractMigration
         }
 
         // Check and update resources table
-        if ($this->hasTable('resources')) {
+        if ($this->decide('resources') === SchemaCompatibility::ADOPT) {
             $resources = $this->table('resources');
 
             if (!$resources->hasColumn('controller')) {
@@ -232,5 +235,22 @@ class UpdateExistingPermissionsTables extends AbstractMigration
                 ])->update();
             }
         }
+    }
+
+    /**
+     * @param string $table Table name
+     * @return string One of the SchemaCompatibility decisions
+     */
+    private function decide(string $table): string
+    {
+        $exists = $this->hasTable($table);
+        $columns = $exists ? array_map(fn($c) => $c->getName(), $this->table($table)->getColumns()) : [];
+
+        return SchemaCompatibility::decide(
+            $table,
+            $exists,
+            $columns,
+            (bool)Configure::read('AclManager.migrations.adoptExistingTables', false),
+        );
     }
 }

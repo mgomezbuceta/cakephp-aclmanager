@@ -57,6 +57,9 @@ $defaultConfig = [
         'allowWithoutAuthentication' => false,
     ],
 
+    // Migrations never alter pre-existing roles/permissions/resources tables unless this is true
+    'migrations' => ['adoptExistingTables' => false],
+
     // Default role for new users (optional)
     'defaultRoleId' => null,
 

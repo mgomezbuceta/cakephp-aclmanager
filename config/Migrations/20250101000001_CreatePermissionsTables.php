@@ -1,14 +1,16 @@
 <?php
 declare(strict_types=1);
 
-use Migrations\AbstractMigration;
+use AclManager\Migration\SchemaCompatibility;
+use Cake\Core\Configure;
+use Migrations\BaseMigration;
 
 /**
  * CreatePermissionsTables migration
  *
  * Creates the necessary tables for the Authorization Manager system
  */
-class CreatePermissionsTables extends AbstractMigration
+class CreatePermissionsTables extends BaseMigration
 {
     /**
      * Change Method.
@@ -18,8 +20,8 @@ class CreatePermissionsTables extends AbstractMigration
     public function change(): void
     {
         // Roles table
-        // Guarded so installs that already have the table keep their data.
-        if (!$this->hasTable('roles')) {
+        // Existing tables are never altered here; decide() throws if one is incompatible.
+        if ($this->decide('roles') === SchemaCompatibility::CREATE) {
             $roles = $this->table('roles');
             $roles->addColumn('name', 'string', [
                     'limit' => 100,
@@ -51,8 +53,8 @@ class CreatePermissionsTables extends AbstractMigration
         }
 
         // Permissions table
-        // Guarded so installs that already have the table keep their data.
-        if (!$this->hasTable('permissions')) {
+        // Existing tables are never altered here; decide() throws if one is incompatible.
+        if ($this->decide('permissions') === SchemaCompatibility::CREATE) {
             $permissions = $this->table('permissions');
             $permissions->addColumn('role_id', 'integer', [
                     'null' => false,
@@ -97,8 +99,8 @@ class CreatePermissionsTables extends AbstractMigration
         }
 
         // Resources table (optional - to track available controllers/actions)
-        // Guarded so installs that already have the table keep their data.
-        if (!$this->hasTable('resources')) {
+        // Existing tables are never altered here; decide() throws if one is incompatible.
+        if ($this->decide('resources') === SchemaCompatibility::CREATE) {
             $resources = $this->table('resources');
             $resources->addColumn('controller', 'string', [
                     'limit' => 100,
@@ -131,5 +133,22 @@ class CreatePermissionsTables extends AbstractMigration
                 ])
                 ->create();
         }
+    }
+
+    /**
+     * @param string $table Table name
+     * @return string One of the SchemaCompatibility decisions
+     */
+    private function decide(string $table): string
+    {
+        $exists = $this->hasTable($table);
+        $columns = $exists ? array_map(fn($c) => $c->getName(), $this->table($table)->getColumns()) : [];
+
+        return SchemaCompatibility::decide(
+            $table,
+            $exists,
+            $columns,
+            (bool)Configure::read('AclManager.migrations.adoptExistingTables', false),
+        );
     }
 }

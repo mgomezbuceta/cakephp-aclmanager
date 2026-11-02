@@ -1,14 +1,16 @@
 <?php
 declare(strict_types=1);
 
-use Migrations\AbstractMigration;
+use AclManager\Migration\SchemaCompatibility;
+use Cake\Core\Configure;
+use Migrations\BaseMigration;
 
 /**
  * AddMissingColumnsToRoles migration
  *
  * Adds missing columns to existing roles table without losing data
  */
-class AddMissingColumnsToRoles extends AbstractMigration
+class AddMissingColumnsToRoles extends BaseMigration
 {
     /**
      * Change Method.
@@ -17,9 +19,18 @@ class AddMissingColumnsToRoles extends AbstractMigration
      */
     public function change(): void
     {
-        // Migration 0002 already adds these columns to existing tables and 0001 creates
+        // Migration 0002 already adds these columns when adoption is enabled and 0001 creates
         // them on fresh installs, so this is a no-op unless the table is still missing some.
-        if (!$this->hasTable('roles')) {
+        // Existing tables are only altered when AclManager.migrations.adoptExistingTables is true.
+        $exists = $this->hasTable('roles');
+        $columns = $exists ? array_map(fn($c) => $c->getName(), $this->table('roles')->getColumns()) : [];
+        $decision = SchemaCompatibility::decide(
+            'roles',
+            $exists,
+            $columns,
+            (bool)Configure::read('AclManager.migrations.adoptExistingTables', false),
+        );
+        if ($decision !== SchemaCompatibility::ADOPT) {
             return;
         }
 
