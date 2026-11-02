@@ -286,9 +286,11 @@ $title = $this->fetch('title');
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' => 'syncResources']) ?>">
-                            <i class="fas fa-sync"></i> <?= __d('acl_manager', 'Sync Resources') ?>
-                        </a>
+                        <?= $this->Form->postLink(
+                            '<i class="fas fa-sync"></i> ' . __d('acl_manager', 'Sync Resources'),
+                            ['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' => 'syncResources'],
+                            ['class' => 'nav-link', 'escape' => false]
+                        ) ?>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build('/') ?>">

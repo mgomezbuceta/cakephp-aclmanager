@@ -5,6 +5,8 @@
 ```bash
 # 1. Instalar el plugin
 composer require mgomezbuceta/cakephp-aclmanager
+composer require cakephp/authorization cakephp/authentication
+# Configurar AuthenticationMiddleware en Application::middleware() (ver "Control de acceso" más abajo)
 
 # 2. Cargar el plugin en src/Application.php
 # Añadir: $this->addPlugin('AclManager', ['bootstrap' => true, 'routes' => true]);
@@ -155,6 +157,23 @@ bin/cake migrations mark_migrated -p AclManager
 # Probar acceso
 # Ir a: http://tu-app/authorization-manager
 ```
+
+## Control de acceso (importante)
+
+El plugin solo es accesible para administradores y requiere el plugin `cakephp/authentication`.
+Si el componente `Authentication` no está disponible, el acceso se deniega (403). Para permitirlo
+explícitamente (no recomendado en producción), añade a `config/app.php`:
+
+```php
+'AclManager' => [
+    'adminAccess' => [
+        'allowWithoutAuthentication' => true,
+    ],
+],
+```
+
+Las acciones destructivas (`clearPermissions`, `syncResources`, `deleteRole`) solo aceptan POST.
+Los roles listados en `adminAccess.adminRoleIds` (por defecto `[1]`) no se pueden eliminar ni desactivar.
 
 ## ¿Necesitas ayuda?
 

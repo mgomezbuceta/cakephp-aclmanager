@@ -52,6 +52,11 @@ $defaultConfig = [
         'Utilities/*'
     ],
 
+    // Admin access: set 'allowWithoutAuthentication' => true to allow access when the Authentication component is missing
+    'adminAccess' => [
+        'allowWithoutAuthentication' => false,
+    ],
+
     // Default role for new users (optional)
     'defaultRoleId' => null,
 

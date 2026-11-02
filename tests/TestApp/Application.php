@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace AclManager\Test\TestApp;
 
+use Authentication\AuthenticationService;
+use Authentication\AuthenticationServiceInterface;
+use Authentication\AuthenticationServiceProviderInterface;
+use Authentication\Middleware\AuthenticationMiddleware;
 use Authorization\AuthorizationService;
 use Authorization\AuthorizationServiceInterface;
 use Authorization\AuthorizationServiceProviderInterface;
@@ -18,10 +22,13 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Minimal host application used by the integration tests.
  *
- * Authentication is intentionally not configured: the plugin's AppController then
- * skips its admin check, while the Authorization component still needs a service.
+ * Authentication uses the session authenticator, so tests log in with
+ * `$this->session(['Auth' => [...]])`. `/no-auth` hits a controller that does not load
+ * the Authentication component (a host app without cakephp/authentication).
  */
-class Application extends BaseApplication implements AuthorizationServiceProviderInterface
+class Application extends BaseApplication implements
+    AuthorizationServiceProviderInterface,
+    AuthenticationServiceProviderInterface
 {
     public function bootstrap(): void
     {
@@ -30,7 +37,7 @@ class Application extends BaseApplication implements AuthorizationServiceProvide
 
     public function routes(RouteBuilder $routes): void
     {
-        // Only plugin routes are needed; they are loaded by RoutingMiddleware.
+        $routes->connect('/no-auth', ['controller' => 'NoAuth', 'action' => 'index']);
     }
 
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
@@ -38,7 +45,18 @@ class Application extends BaseApplication implements AuthorizationServiceProvide
         return $middlewareQueue
             ->add(new RoutingMiddleware($this))
             ->add(new BodyParserMiddleware())
-            ->add(new AuthorizationMiddleware($this));
+            ->add(new AuthenticationMiddleware($this))
+            ->add(new AuthorizationMiddleware($this, ['requireAuthorizationCheck' => false]));
+    }
+
+    public function getAuthenticationService(ServerRequestInterface $request): AuthenticationServiceInterface
+    {
+        $service = new AuthenticationService();
+        $service->loadAuthenticator('Authentication.Session', [
+            'identifier' => ['Authentication.Password'],
+        ]);
+
+        return $service;
     }
 
     public function getAuthorizationService(ServerRequestInterface $request): AuthorizationServiceInterface

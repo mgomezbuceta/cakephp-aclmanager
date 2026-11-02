@@ -73,6 +73,7 @@ Traditional ACL systems (acos/aros) are **deprecated in CakePHP 5.x**. This plug
 | PHP | ≥ 8.1 |
 | CakePHP | ≥ 5.0 |
 | CakePHP Authorization | ≥ 3.0 |
+| CakePHP Authentication | ≥ 3.0 (required unless `allowWithoutAuthentication` is enabled) |
 
 ---
 
@@ -83,7 +84,12 @@ Traditional ACL systems (acos/aros) are **deprecated in CakePHP 5.x**. This plug
 ```bash
 composer require mgomezbuceta/cakephp-aclmanager
 composer require cakephp/authorization
+composer require cakephp/authentication
 ```
+
+The manager only lets administrators in, so it needs to know who the current user is. Configure `AuthenticationMiddleware` in your `Application::middleware()` as described in the [CakePHP Authentication docs](https://book.cakephp.org/authentication/3/en/index.html); the plugin loads the `Authentication` component itself.
+
+> Without cakephp/authentication every request to the manager gets a **403**. Only if you protect the manager by other means (e.g. HTTP auth at the web server), set `AclManager.adminAccess.allowWithoutAuthentication` to `true` (see [Admin Access Control](#admin-access-control)).
 
 ### Step 2: Load the Plugin
 
@@ -190,6 +196,10 @@ return [
             'adminEmails' => [
                 'admin@example.com',
             ],
+
+            // Only for apps without cakephp/authentication: allow access to everyone.
+            // Default false (access is denied with a 403 when the Authentication component is missing).
+            'allowWithoutAuthentication' => false,
         ],
         'redirects' => [
             'login' => ['controller' => 'Users', 'action' => 'login'],

@@ -20,7 +20,7 @@ $this->assign('title', __d('acl_manager', 'Dashboard'));
     <div class="row mb-4">
         <div class="col-md-12">
             <div class="btn-toolbar" role="toolbar">
-                <?= $this->Html->link(
+                <?= $this->Form->postLink(
                     '<i class="fas fa-sync"></i> ' . __d('acl_manager', 'Sync Resources'),
                     ['action' => 'syncResources'],
                     ['class' => 'btn btn-primary me-2', 'escape' => false]
