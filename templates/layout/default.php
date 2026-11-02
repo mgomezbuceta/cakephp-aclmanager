@@ -331,7 +331,7 @@ $rolesUrl = ['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' =
         <div class="container text-center">
             <p class="mb-0">
                 <?= __d('acl_manager', 'Authorization Manager') ?>
-                v<?= Configure::read('AclManager.version', '3.2.0') ?> |
+                v<?= Configure::read('AclManager.version', '5.0.0') ?> |
                 <a href="https://github.com/mgomezbuceta/cakephp-aclmanager" target="_blank">GitHub</a>
             </p>
         </div>

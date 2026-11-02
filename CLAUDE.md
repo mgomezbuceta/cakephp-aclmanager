@@ -6,10 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a modern CakePHP plugin for managing role-based permissions using CakePHP's Authorization plugin for CakePHP 5.x applications. The project has been completely refactored from the deprecated ACL system to the modern Authorization system, following Clean Code principles and modern PHP 8.1+ standards.
 
-**Version**: 3.2.0
+**Version**: 5.0.0
 **Status**: Production-ready for CakePHP 5.x applications.
 
-### Key Features (v3.2.0)
+### Key Features (v5.0.0)
 - **Modern Authorization**: Uses CakePHP's official Authorization plugin (not deprecated ACL)
 - **Role-Based Access Control (RBAC)**: Industry-standard permission system
 - **i18n**: Spanish (es_ES), Galician (gl_ES) and English (en_US) catalogs included; the plugin follows the host application's locale
@@ -39,7 +39,7 @@ Only keys the code reads (`config/bootstrap.php` writes the defaults without ove
 - **AclManager.mountPath**: URL path of the manager (default `/authorization-manager`)
 - **AclManager.locale**: optional locale applied to the plugin pages for the request (null = follow the host app)
 - **AclManager.migrations.adoptExistingTables**: let migrations add missing columns to existing tables (default `false`)
-- **AclManager.version**: informational version shown in the footer (3.2.0)
+- **AclManager.version**: informational version shown in the footer (5.0.0)
 
 ### Internationalization
 - **Locale**: follows the host application; set `AclManager.locale` to force one on plugin pages
@@ -134,7 +134,7 @@ The plugin uses a service layer for better separation of concerns:
 - Descriptive method and variable names
 - Service layer pattern for business logic
 
-### UI/UX Features (v3.2.0)
+### UI/UX Features (v5.0.0)
 - **Bootstrap 5** responsive design
 - **Brand Colors**: Primary color #1db58c (customizable via CSS variables)
 - **CSS Variables**: `--primary-color`, `--primary-dark`, `--primary-light`, etc.

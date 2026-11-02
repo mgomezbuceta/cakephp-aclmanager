@@ -246,7 +246,7 @@ Only keys that the code reads are listed. Set them in the `AclManager` array of 
 | `AclManager.mountPath` | `'/authorization-manager'` | URL path where the manager is served, for example `'/admin/authorization-manager'`. Generated links follow it. Access is still limited by the plugin's own administrator check; the path does not add any protection. An invalid or empty value falls back to the default. |
 | `AclManager.locale` | `null` | Locale applied to the plugin's own pages for the request (for example `'es_ES'`). `null` follows your application's locale. |
 | `AclManager.migrations.adoptExistingTables` | `false` | `true` lets migrations 0001-0003 add missing columns to already existing `roles`/`permissions`/`resources` tables. |
-| `AclManager.version` | `'3.2.0'` | Informational (shown in the footer). |
+| `AclManager.version` | `'5.0.0'` | Informational (shown in the footer). |
 
 Example:
 
@@ -313,7 +313,7 @@ To add your own translation, copy `resources/locales/es_ES/acl_manager.po` to `r
 
 **Table prefixes are not supported.** The plugin's tables are always named `roles`, `permissions` and `resources`, and the migration SQL does not apply datasource table prefixes (CakePHP 4+ no longer supports them).
 
-## Upgrading from 3.2.0
+## Upgrading from 3.x
 
 1. Back up the database, then `composer update mgomezbuceta/cakephp-aclmanager`.
 2. Run `bin/cake migrations migrate -p AclManager`. The new migration `20250101000004_NormalizeAppPlugin` converts `plugin IS NULL` to `'App'`. It never deletes rows: if duplicates would collide it aborts with the counts and nothing is changed (see "Migration 0004 never deletes data").

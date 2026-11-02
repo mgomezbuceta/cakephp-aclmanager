@@ -53,7 +53,7 @@ return [
         /**
          * Other Plugin Settings
          */
-        'version' => '3.0.0',
+        'version' => '5.0.0',
 
         // Actions/Controllers to ignore during resource scanning
         'ignoreActions' => [

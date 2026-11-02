@@ -19,7 +19,7 @@ use Cake\Core\Configure;
 /**
  * Plugin version
  */
-Configure::write('AclManager.version', '3.2.0');
+Configure::write('AclManager.version', '5.0.0');
 
 /**
  * Default configuration values

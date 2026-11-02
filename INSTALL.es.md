@@ -246,7 +246,7 @@ Solo se listan las claves que el código lee. Defínelas en el array `AclManager
 | `AclManager.mountPath` | `'/authorization-manager'` | Ruta URL donde se sirve el gestor, por ejemplo `'/admin/authorization-manager'`. Los enlaces generados la siguen. El acceso sigue limitado por la comprobación de administrador del propio plugin; la ruta no añade ninguna protección. Un valor no válido o vacío vuelve al valor por defecto. |
 | `AclManager.locale` | `null` | Idioma que se aplica a las páginas del propio plugin durante la petición (por ejemplo `'es_ES'`). `null` sigue el idioma de tu aplicación. |
 | `AclManager.migrations.adoptExistingTables` | `false` | `true` permite que las migraciones 0001-0003 añadan las columnas que falten a tablas `roles`/`permissions`/`resources` ya existentes. |
-| `AclManager.version` | `'3.2.0'` | Informativa (se muestra en el pie). |
+| `AclManager.version` | `'5.0.0'` | Informativa (se muestra en el pie). |
 
 Ejemplo:
 
@@ -313,7 +313,7 @@ Para añadir tu propia traducción, copia `resources/locales/es_ES/acl_manager.p
 
 **Los prefijos de tabla no están soportados.** Las tablas del plugin se llaman siempre `roles`, `permissions` y `resources`, y el SQL de la migración no aplica prefijos de tabla del datasource (CakePHP 4+ ya no los admite).
 
-## Actualizar desde la 3.2.0
+## Actualizar desde la 3.x
 
 1. Haz copia de seguridad de la base de datos y ejecuta `composer update mgomezbuceta/cakephp-aclmanager`.
 2. Ejecuta `bin/cake migrations migrate -p AclManager`. La nueva migración `20250101000004_NormalizeAppPlugin` convierte `plugin IS NULL` en `'App'`. Nunca borra filas: si hubiera duplicados que colisionan, se aborta mostrando los recuentos y sin cambiar nada (ver "La migración 0004 nunca borra datos").

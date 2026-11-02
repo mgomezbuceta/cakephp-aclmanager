@@ -13,7 +13,7 @@
 
 **Una interfaz web potente y moderna para gestionar permisos por roles con el plugin Authorization de CakePHP.**
 
-[Características](#-características) • [Instalación](#-instalación) • [Inicio rápido](#-inicio-rápido) • [Documentación](#-documentación) • [Actualización](#-actualizar-desde-la-320) • [Migración](#-migración-desde-v2x)
+[Características](#-características) • [Instalación](#-instalación) • [Inicio rápido](#-inicio-rápido) • [Documentación](#-documentación) • [Actualización](#-actualizar-desde-la-3x) • [Migración](#-migración-desde-v2x)
 
 ---
 
@@ -334,7 +334,7 @@ Solo se listan las claves que el código lee. Defínelas en el array `AclManager
 | `AclManager.mountPath` | `'/authorization-manager'` | Ruta URL donde se sirve el gestor, por ejemplo `'/admin/authorization-manager'`. Los enlaces generados la siguen. El acceso sigue limitado por la comprobación de administrador del propio plugin; la ruta no añade ninguna protección. Un valor no válido o vacío vuelve al valor por defecto. |
 | `AclManager.locale` | `null` | Idioma que se aplica a las páginas del propio plugin durante la petición (por ejemplo `'es_ES'`). `null` sigue el idioma de tu aplicación. |
 | `AclManager.migrations.adoptExistingTables` | `false` | `true` permite que las migraciones 0001-0003 añadan las columnas que falten a tablas `roles`/`permissions`/`resources` ya existentes. |
-| `AclManager.version` | `'3.2.0'` | Informativa (se muestra en el pie). |
+| `AclManager.version` | `'5.0.0'` | Informativa (se muestra en el pie). |
 
 Ejemplo:
 
@@ -478,7 +478,7 @@ $resources = $scannerService->getGroupedResources();
 
 ---
 
-## 🔼 Actualizar desde la 3.2.0
+## 🔼 Actualizar desde la 3.x
 
 1. Haz copia de seguridad de la base de datos y ejecuta `composer update mgomezbuceta/cakephp-aclmanager`.
 2. Ejecuta `bin/cake migrations migrate -p AclManager`. La nueva migración `20250101000004_NormalizeAppPlugin` convierte `plugin IS NULL` en `'App'`. Nunca borra filas: si hubiera duplicados que colisionan, se aborta mostrando los recuentos y sin cambiar nada (ver "La migración 0004 nunca borra datos").
