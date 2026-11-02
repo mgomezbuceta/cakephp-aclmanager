@@ -136,6 +136,52 @@ class PermissionService
     }
 
     /**
+     * Replace all permissions of a role with grants for the given resource ids
+     *
+     * Unknown and inactive resources are ignored. App-level resources (NULL plugin)
+     * are stored with plugin 'App', which is what the policy and component look up.
+     * Runs in a single transaction so a failure never leaves the role half-updated.
+     *
+     * @param int $roleId Role ID
+     * @param array $resourceIds Resource ids to grant
+     * @return int Number of permissions granted
+     */
+    public function replaceRolePermissions(int $roleId, array $resourceIds): int
+    {
+        $ids = array_values(array_unique(array_filter(
+            array_map('intval', $resourceIds),
+            fn(int $id): bool => $id > 0,
+        )));
+
+        return $this->Permissions->getConnection()->transactional(function () use ($roleId, $ids): int {
+            $this->Permissions->deleteAll(['role_id' => $roleId]);
+
+            if (!$ids) {
+                return 0;
+            }
+
+            $resources = TableRegistry::getTableLocator()->get('AclManager.Resources')
+                ->find()
+                ->where(['id IN' => $ids, 'active' => true])
+                ->all();
+
+            $entities = [];
+            foreach ($resources as $resource) {
+                $entities[] = $this->Permissions->newEntity([
+                    'role_id' => $roleId,
+                    'controller' => $resource->controller,
+                    'action' => $resource->action,
+                    'plugin' => $resource->plugin ?? 'App',
+                    'allowed' => true,
+                ]);
+            }
+            $this->Permissions->saveManyOrFail($entities);
+
+            return count($entities);
+        });
+    }
+
+    /**
      * Copy permissions from one role to another
      *
      * @param int $sourceRoleId Source role ID

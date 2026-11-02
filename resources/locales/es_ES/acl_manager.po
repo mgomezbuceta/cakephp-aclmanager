@@ -258,3 +258,6 @@ msgstr "Volver al Panel de Control"
 
 msgid "Deny"
 msgstr "Denegar"
+
+msgid "The form data was incomplete (check the PHP max_input_vars setting). No permissions were changed."
+msgstr "Los datos del formulario estaban incompletos (revisa la configuración max_input_vars de PHP). No se modificó ningún permiso."

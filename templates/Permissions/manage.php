@@ -81,13 +81,12 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
                                             </td>
                                             <td>
                                                 <div class="form-check form-check-inline">
-                                                    <?= $this->Form->hidden("permissions.{$fieldIndex}.controller", ['value' => $controller]) ?>
-                                                    <?= $this->Form->hidden("permissions.{$fieldIndex}.action", ['value' => $actionName]) ?>
-                                                    <?= $this->Form->hidden("permissions.{$fieldIndex}.plugin", ['value' => $plugin]) ?>
-                                                    <?= $this->Form->checkbox("permissions.{$fieldIndex}.allowed", [
+                                                    <?= $this->Form->checkbox('resource_ids[]', [
+                                                        'value' => $action->id,
                                                         'checked' => $isAllowed,
+                                                        'hiddenField' => false,
                                                         'class' => 'form-check-input',
-                                                        'id' => "permission-{$fieldIndex}"
+                                                        'id' => "permission-{$fieldIndex}",
                                                     ]) ?>
                                                     <label class="form-check-label" for="permission-<?= $fieldIndex ?>">
                                                         <?= __d('acl_manager', 'Allow') ?>
@@ -111,6 +110,9 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
             <?= __d('acl_manager', 'No resources found. Please run "Sync Resources" first.') ?>
         </div>
     <?php endif; ?>
+
+    <?php // Must stay the last field: PHP truncates oversized POSTs from the end, so its absence reveals truncation. ?>
+    <?= $this->Form->hidden('permissions_submitted', ['value' => '1']) ?>
 
     <div class="row">
         <div class="col-md-12">

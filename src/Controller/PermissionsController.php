@@ -81,33 +81,19 @@ class PermissionsController extends AppController
      */
     protected function savePermissions(int $roleId): \Cake\Http\Response
     {
-        $data = $this->request->getData();
+        // The sentinel is the last form field; if PHP truncated the POST (max_input_vars) it is missing.
+        if (!$this->request->getData('permissions_submitted')) {
+            $this->Flash->error(__d(
+                'acl_manager',
+                'The form data was incomplete (check the PHP max_input_vars setting). No permissions were changed.',
+            ));
+
+            return $this->redirect(['action' => 'manage', $roleId]);
+        }
 
         try {
-            // Clear existing permissions
-            $this->permissionService->revokeAll($roleId);
-
-            // Save new permissions
-            $saved = 0;
-            if (isset($data['permissions']) && is_array($data['permissions'])) {
-                foreach ($data['permissions'] as $permission) {
-                    if (!isset($permission['controller'], $permission['action'])) {
-                        continue;
-                    }
-
-                    $allowed = isset($permission['allowed']) && $permission['allowed'] == '1';
-
-                    if ($allowed) {
-                        $this->permissionService->grant(
-                            $roleId,
-                            $permission['controller'],
-                            $permission['action'],
-                            $permission['plugin'] ?? null
-                        );
-                        $saved++;
-                    }
-                }
-            }
+            $resourceIds = (array)$this->request->getData('resource_ids', []);
+            $saved = $this->permissionService->replaceRolePermissions($roleId, $resourceIds);
 
             $this->Flash->success(__d('acl_manager', 'Permissions saved successfully. {0} permissions granted.', $saved));
         } catch (\Exception $e) {
