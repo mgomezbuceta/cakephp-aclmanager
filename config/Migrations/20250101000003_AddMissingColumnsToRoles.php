@@ -1,22 +1,31 @@
 <?php
 declare(strict_types=1);
 
-use Migrations\AbstractMigration;
+use AclManager\Migration\SchemaCompatibility;
+use Migrations\BaseMigration;
 
 /**
  * AddMissingColumnsToRoles migration
  *
  * Adds missing columns to existing roles table without losing data
  */
-class AddMissingColumnsToRoles extends AbstractMigration
+class AddMissingColumnsToRoles extends BaseMigration
 {
     /**
-     * Change Method.
+     * Adds what is missing when adoption is enabled.
      *
      * @return void
      */
-    public function change(): void
+    public function up(): void
     {
+        // Migration 0002 already adds these columns when adoption is enabled and 0001 creates
+        // them on fresh installs, so this is a no-op unless the table is still missing some.
+        // Existing tables are only altered when AclManager.migrations.adoptExistingTables is true.
+        $decision = SchemaCompatibility::decideForMigration($this, 'roles');
+        if ($decision !== SchemaCompatibility::ADOPT) {
+            return;
+        }
+
         $table = $this->table('roles');
 
         // Add description column if it doesn't exist
@@ -45,5 +54,17 @@ class AddMissingColumnsToRoles extends AbstractMigration
         }
 
         $table->update();
+    }
+
+    /**
+     * Intentionally a no-op.
+     *
+     * Only columns/indexes missing from a host table are added, and it is not recorded which
+     * ones, so removing anything here could destroy host data. Migration 0001 owns the tables.
+     *
+     * @return void
+     */
+    public function down(): void
+    {
     }
 }

@@ -1,25 +1,31 @@
 <?php
 declare(strict_types=1);
 
-use Migrations\AbstractMigration;
+use AclManager\Migration\SchemaCompatibility;
+use Migrations\BaseMigration;
 
 /**
  * UpdateExistingPermissionsTables migration
  *
- * Updates existing tables to match the Authorization Manager schema
- * without losing existing data
+ * Updates existing tables to match the Authorization Manager schema without losing data.
+ * Only runs when AclManager.migrations.adoptExistingTables is true; otherwise an existing
+ * incompatible table makes it throw and compatible tables are left untouched.
+ *
+ * Adoption adds missing COLUMNS only. Indexes and foreign keys are never added to a host table:
+ * they could fail on host data, and migration 0001 treats its own unique indexes as the marker
+ * that it created a table (so rollback never drops an adopted one).
  */
-class UpdateExistingPermissionsTables extends AbstractMigration
+class UpdateExistingPermissionsTables extends BaseMigration
 {
     /**
-     * Change Method.
+     * Adds what is missing when adoption is enabled.
      *
      * @return void
      */
-    public function change(): void
+    public function up(): void
     {
         // Check and update roles table
-        if ($this->hasTable('roles')) {
+        if (SchemaCompatibility::decideForMigration($this, 'roles') === SchemaCompatibility::ADOPT) {
             $roles = $this->table('roles');
 
             // Add missing columns if they don't exist
@@ -69,18 +75,10 @@ class UpdateExistingPermissionsTables extends AbstractMigration
                     'update' => 'CURRENT_TIMESTAMP',
                 ])->update();
             }
-
-            // Add index if it doesn't exist
-            if (!$roles->hasIndex(['name'])) {
-                $roles->addIndex(['name'], [
-                    'unique' => true,
-                    'name' => 'idx_roles_name_unique'
-                ])->update();
-            }
         }
 
         // Check and update permissions table
-        if ($this->hasTable('permissions')) {
+        if (SchemaCompatibility::decideForMigration($this, 'permissions') === SchemaCompatibility::ADOPT) {
             $permissions = $this->table('permissions');
 
             if (!$permissions->hasColumn('role_id')) {
@@ -136,38 +134,10 @@ class UpdateExistingPermissionsTables extends AbstractMigration
                     'update' => 'CURRENT_TIMESTAMP',
                 ])->update();
             }
-
-            // Add indexes if they don't exist
-            if (!$permissions->hasIndex(['role_id'])) {
-                $permissions->addIndex(['role_id'], [
-                    'name' => 'idx_permissions_role_id'
-                ])->update();
-            }
-
-            if (!$permissions->hasIndex(['controller', 'action'])) {
-                $permissions->addIndex(['controller', 'action'], [
-                    'name' => 'idx_permissions_controller_action'
-                ])->update();
-            }
-
-            if (!$permissions->hasIndex(['role_id', 'controller', 'action', 'plugin'])) {
-                $permissions->addIndex(['role_id', 'controller', 'action', 'plugin'], [
-                    'unique' => true,
-                    'name' => 'idx_permissions_unique'
-                ])->update();
-            }
-
-            // Add foreign key if it doesn't exist
-            if (!$permissions->hasForeignKey('role_id')) {
-                $permissions->addForeignKey('role_id', 'roles', 'id', [
-                    'delete' => 'CASCADE',
-                    'update' => 'NO_ACTION'
-                ])->update();
-            }
         }
 
         // Check and update resources table
-        if ($this->hasTable('resources')) {
+        if (SchemaCompatibility::decideForMigration($this, 'resources') === SchemaCompatibility::ADOPT) {
             $resources = $this->table('resources');
 
             if (!$resources->hasColumn('controller')) {
@@ -223,14 +193,18 @@ class UpdateExistingPermissionsTables extends AbstractMigration
                     'update' => 'CURRENT_TIMESTAMP',
                 ])->update();
             }
-
-            // Add index if it doesn't exist
-            if (!$resources->hasIndex(['controller', 'action', 'plugin'])) {
-                $resources->addIndex(['controller', 'action', 'plugin'], [
-                    'unique' => true,
-                    'name' => 'idx_resources_unique'
-                ])->update();
-            }
         }
+    }
+
+    /**
+     * Intentionally a no-op.
+     *
+     * Only columns/indexes missing from a host table are added, and it is not recorded which
+     * ones, so removing anything here could destroy host data. Migration 0001 owns the tables.
+     *
+     * @return void
+     */
+    public function down(): void
+    {
     }
 }

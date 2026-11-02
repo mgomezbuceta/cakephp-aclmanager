@@ -30,6 +30,22 @@ use Cake\Validation\Validator;
 class PermissionsTable extends Table
 {
     /**
+     * Canonical plugin value for application-level (non-plugin) controllers.
+     */
+    public const APP_PLUGIN = 'App';
+
+    /**
+     * Map the "no plugin" forms (null, empty string) to the canonical 'App' value
+     *
+     * @param string|null $plugin Plugin name
+     * @return string
+     */
+    public static function normalizePlugin(?string $plugin): string
+    {
+        return $plugin === null || $plugin === '' ? self::APP_PLUGIN : $plugin;
+    }
+
+    /**
      * Initialize method
      *
      * @param array<string, mixed> $config The configuration for the Table.
@@ -111,7 +127,7 @@ class PermissionsTable extends Table
                 'role_id' => $roleId,
                 'controller' => $controller,
                 'action' => $action,
-                'plugin IS' => $plugin,
+                'plugin' => self::normalizePlugin($plugin),
             ])
             ->first();
 

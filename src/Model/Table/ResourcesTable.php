@@ -100,7 +100,7 @@ class ResourcesTable extends Table
 
         $grouped = [];
         foreach ($resources as $resource) {
-            $pluginKey = $resource->plugin ?? 'App';
+            $pluginKey = PermissionsTable::normalizePlugin($resource->plugin);
             $grouped[$pluginKey][$resource->controller][] = $resource;
         }
 

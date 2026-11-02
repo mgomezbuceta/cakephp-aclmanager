@@ -209,6 +209,9 @@ msgstr "Error synchronizing resources: {0}"
 msgid "Invalid roles specified."
 msgstr "Invalid roles specified."
 
+msgid "Source and target roles must be different."
+msgstr "Source and target roles must be different."
+
 msgid "Permissions copied successfully from \"{0}\" to \"{1}\"."
 msgstr "Permissions copied successfully from \"{0}\" to \"{1}\"."
 

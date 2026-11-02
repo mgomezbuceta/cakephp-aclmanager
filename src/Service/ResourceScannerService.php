@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace AclManager\Service;
 
+use AclManager\Model\Table\PermissionsTable;
 use AclManager\Model\Table\ResourcesTable;
 use Cake\Core\App;
 use Cake\Core\Configure;
@@ -53,44 +54,54 @@ class ResourceScannerService
             'deactivated' => 0,
         ];
 
-        // Create or update resources
-        foreach ($found as $resource) {
-            $existing = $this->Resources->find()
-                ->where([
-                    'controller' => $resource['controller'],
-                    'action' => $resource['action'],
-                    'plugin IS' => $resource['plugin'],
-                ])
-                ->first();
+        $key = fn(string $plugin, string $controller, string $action): string => "$plugin|$controller|$action";
 
-            if ($existing) {
-                if (!$existing->active) {
-                    $existing->active = true;
-                    $this->Resources->save($existing);
+        // Legacy installs can hold several rows per key (plugin NULL and 'App'), so keep a list.
+        $existing = [];
+        foreach ($this->Resources->find()->all()->sortBy('id', SORT_ASC) as $resource) {
+            $plugin = PermissionsTable::normalizePlugin($resource->plugin);
+            $existing[$key($plugin, $resource->controller, $resource->action)][] = $resource;
+        }
+
+        $this->Resources->getConnection()->transactional(function () use ($found, $key, $existing, &$stats): void {
+            $toSave = [];
+            $seen = [];
+            foreach ($found as $resource) {
+                // The scan already tags application controllers with 'App'.
+                $id = $key($resource['plugin'], $resource['controller'], $resource['action']);
+                if (isset($seen[$id])) {
+                    continue;
+                }
+                $seen[$id] = true;
+
+                if (!isset($existing[$id])) {
+                    $toSave[] = $this->Resources->newEntity($resource);
+                    $stats['created']++;
+                } elseif (!array_filter($existing[$id], fn($row): bool => (bool)$row->active)) {
+                    // Reactivate a single row, preferring the canonical 'App' one.
+                    $rows = $existing[$id];
+                    usort($rows, fn($a, $b): int => ($b->plugin === 'App') <=> ($a->plugin === 'App'));
+                    $rows[0]->active = true;
+                    $toSave[] = $rows[0];
                     $stats['updated']++;
                 }
-            } else {
-                $entity = $this->Resources->newEntity($resource);
-                if ($this->Resources->save($entity)) {
-                    $stats['created']++;
+            }
+
+            // Deactivate every active row whose key no longer exists
+            foreach ($existing as $id => $rows) {
+                foreach ($rows as $resource) {
+                    if ($resource->active && !isset($seen[$id])) {
+                        $resource->active = false;
+                        $toSave[] = $resource;
+                        $stats['deactivated']++;
+                    }
                 }
             }
-        }
 
-        // Deactivate resources that no longer exist
-        $foundIdentifiers = array_map(function ($r) {
-            return $r['controller'] . '::' . $r['action'] . '::' . ($r['plugin'] ?? 'null');
-        }, $found);
-
-        $allResources = $this->Resources->find()->where(['active' => true])->all();
-        foreach ($allResources as $resource) {
-            $identifier = $resource->controller . '::' . $resource->action . '::' . ($resource->plugin ?? 'null');
-            if (!in_array($identifier, $foundIdentifiers)) {
-                $resource->active = false;
-                $this->Resources->save($resource);
-                $stats['deactivated']++;
+            if ($toSave) {
+                $this->Resources->saveManyOrFail($toSave);
             }
-        }
+        });
 
         return $stats;
     }
@@ -160,7 +171,7 @@ class ResourceScannerService
                 $resources[] = [
                     'controller' => $controllerName,
                     'action' => $action,
-                    'plugin' => $plugin,
+                    'plugin' => PermissionsTable::normalizePlugin($plugin),
                     'description' => $this->generateDescription($controllerName, $action, $plugin),
                     'active' => true,
                 ];

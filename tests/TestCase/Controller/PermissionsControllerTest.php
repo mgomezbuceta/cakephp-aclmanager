@@ -62,6 +62,8 @@ class PermissionsControllerTest extends TestCase
         $this->post(self::MANAGE_URL, ['resource_ids' => [1], 'permissions_submitted' => '1']);
 
         $this->assertSame(['2:App:Articles:edit:1'], $this->permissionRows(2));
+        // The save really happened: role 1 has exactly the submitted grant.
+        $this->assertSame(['1:App:Articles:index:1'], $this->permissionRows(1));
     }
 
     public function testSaveIgnoresUnknownAndInactiveResourceIds(): void

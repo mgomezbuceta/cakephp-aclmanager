@@ -17,9 +17,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Saving permissions no longer depends on PHP `max_input_vars`: the form posts one `resource_ids[]` value per granted action instead of ~5 fields per action.
 - A truncated POST is detected through a trailing sentinel field and aborts without touching existing permissions.
 - Permissions are replaced in a single transaction with a bulk save; app-level permissions keep the `'App'` plugin value expected by the policy.
+- `'App'` is now the single plugin value for application-level resources and permissions. `PermissionService::grant()`, `deny()` and `isAuthorized()` normalize a missing plugin to `'App'`, so API callers no longer write or read rows the policy never matches.
+- The resource scanner stores application controllers with plugin `'App'` and no longer creates duplicates on re-scan.
+- `replaceRolePermissions()` only accepts positive integer ids (`'5abc'`, arrays, `'-1'`, `'0'` are ignored), collapses resources that map to the same permission, and loads resources in chunks of 500 ids.
+- `copyPermissions()` is transactional, replaces the target role's permissions, saves in bulk and rejects copying a role onto itself (the UI shows an error).
+- Migrations: `0001` skips tables that already exist and `0003` is a no-op when the roles table is missing or already complete.
+
+### Changed
+- `scanAndSync()` preloads resources once and saves in bulk inside a single transaction (same statistics array).
+- **Run the new migration**: `bin/cake migrations migrate -p AclManager` (`20250101000004_NormalizeAppPlugin`). It converts NULL plugins to `'App'` in `resources` and `permissions` and **never deletes data**: if the conversion would collide with an existing row it aborts before changing anything, reports the counts per table and points to `docs/sql/cleanup-duplicates.sql` (back up, review, run, retry). Rolling it back sets `resources.plugin` to NULL again; permissions stay `'App'`.
+- **Migrations now extend `Migrations\BaseMigration`** and require `cakephp/migrations` ^4.5 or ^5.0. This fixes failures on migrations 5.x, which rejects the legacy `AbstractMigration`. Migration 0004 no longer touches the connection directly: it uses the migration's own `fetchAll()` and `execute()`. Verified by running the four migrations against SQLite with migrations 4.6.6 and 5.x.
+- **Migration `0001` is reversible**: it has explicit `up()`/`down()`. Rolling back drops `permissions`, `resources` and `roles` only when they carry the unique index this migration created, so an adopted host table (and its rows) survives a full rollback. `0002` and `0003` have a documented no-op `down()`. Adoption (`adoptExistingTables`) now adds missing columns only, never indexes or foreign keys to a host table.
+- Migration `0004` and `docs/sql/cleanup-duplicates.sql` treat an empty-string plugin like NULL (matching `normalizePlugin()`), for both collision detection and the conversion.
+- `ResourceScannerService::scanAndSync()` skips duplicate found entries, handles legacy rows (plugin NULL and `'App'` for the same controller/action) as a list per key, and is now all-or-nothing: it saves with `saveManyOrFail`, so the first validation failure aborts the whole sync with the entity errors instead of silently skipping rows.
+- Table prefixes are not supported (CakePHP 4+ no longer supports datasource prefixes); the migration SQL uses plain table names.
+- Migrations `0001`-`0003` share one entry point, `SchemaCompatibility::decideForMigration()`.
+- Migrations `0001`-`0003` no longer alter pre-existing `roles`/`permissions`/`resources` tables by default. If a table lacks required columns they throw naming the table, the missing columns, the config flag and `docs/sql/`. Set `AclManager.migrations.adoptExistingTables` to `true` to restore the old behavior of adding the missing columns.
 
 ### Added
 - PHPUnit test suite (SQLite in-memory) covering permission saving.
+- `AclManager.migrations.adoptExistingTables` config flag (default `false`).
+- `docs/sql/`: full schema for MySQL, PostgreSQL and SQLite, duplicate detection and cleanup SQL, and ALTER statements to adopt an existing `roles` table. The SQLite script and the cleanup are run by the test suite; the MySQL and PostgreSQL scripts are not executed in CI.
+- `cakephp/migrations` in `require-dev` and `MigrationsRunTest`, which runs the plugin migrations in-process against SQLite (fresh install, full rollback, adoption, collisions).
+- Tests for `AclManagerPolicy` wiring through `MapResolver`.
+- `composer.json` `suggest`: `cakephp/migrations` (^4.5 || ^5.0) and `cakephp/authentication`.
+
+### Documentation
+- Installation and configuration guides are available in English (README.md, INSTALL.md) and Spanish (README.es.md, INSTALL.es.md); a test (`GuidesParityTest`) keeps their structure identical.
+- README.md and INSTALL.md rewritten as an ordered, step-by-step installation guide (authentication, authorization, plugin load, database paths A/B/C, `role_id`, first run, troubleshooting, upgrade notes).
+- The configuration reference lists only keys the code reads. `permissionMode`, `cachePermissions`, `cacheDuration`, `defaultRoleId`, `paginationLimits` and `{roles,permissions,resources}.limit` are documented as not implemented (their bootstrap defaults remain but nothing reads them).
+- Documented the real `isUserAdmin()` rules and that the plugin bootstrap forces the `es_ES` locale.
 
 ## [3.2.0] - 2025-01-10
 
