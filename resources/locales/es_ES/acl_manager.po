@@ -231,12 +231,6 @@ msgstr "No tienes permiso para acceder al Gestor de Autorizaciones."
 msgid "ID"
 msgstr "ID"
 
-msgid "Controller"
-msgstr "Controlador"
-
-msgid "Plugin"
-msgstr "Plugin"
-
 msgid "Select All"
 msgstr "Seleccionar Todo"
 

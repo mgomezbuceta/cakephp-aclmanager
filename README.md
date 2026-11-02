@@ -26,10 +26,10 @@ English | [Español](README.es.md)
 <td width="50%">
 
 ### 🎯 **Role-Based Access Control**
-Simple yet powerful RBAC system with role priorities and hierarchical permission management.
+Role-based permissions: grant each role the controller actions it may run. A role's priority only sets the order in which roles are listed; permissions are not inherited between roles.
 
 ### 🔄 **Auto-Discovery**
-Automatically scans your application for controllers and actions—no manual configuration needed.
+Scans your application for controllers and actions when you press *Sync Resources*; no manual listing needed.
 
 ### 🎨 **Modern UI**
 Beautiful Bootstrap 5 interface with intuitive permission matrices and visual role management.
@@ -40,8 +40,8 @@ Built-in i18n support with Spanish and Galician translations ready to use.
 </td>
 <td width="50%">
 
-### ⚡ **High Performance**
-Built on CakePHP's Authorization plugin; the permission lookups use your own database.
+### ⚡ **Plain Database Lookups**
+Built on CakePHP's Authorization plugin; permissions are plain rows in your own database, and the component can cache results per instance.
 
 ### 🛡️ **Secure by Default**
 Deny by default: an action is only allowed when a permission is granted to the user's role, and only administrators can open the manager.
@@ -63,7 +63,7 @@ Traditional ACL systems (acos/aros) are **deprecated in CakePHP 5.x**. This plug
 - ✅ **Simplified Structure** - No more complex ACO/ARO trees
 - ✅ **Visual Management** - Web interface for managing permissions
 - ✅ **Role-Based** - Industry-standard RBAC pattern
-- ✅ **Easy Integration** - Drop-in authorization solution
+- ✅ **Two Building Blocks** - A policy for `cakephp/authorization` and a component to enforce the permissions
 - ✅ **Multilingual** - Spanish and Galician translations included
 
 ---
@@ -154,7 +154,7 @@ The first field that is present on the identity decides and the later ones are i
 
 Installing the manager only gives you the screens to edit permissions. Your application decides what to enforce, and the plugin offers two building blocks. Both look up `role_id` and the request's controller/action/plugin, and both are **deny by default**: an action with no granted permission for the role is refused. Application controllers are stored with plugin `'App'`.
 
-**Option 1: policy (`AclManager\Policy\AclManagerPolicy`).** A request policy for `cakephp/authorization`. It reads `role_id` from the original identity data (`$identity->getOriginalData()->role_id`), so your identifier must return an entity or object, not a plain array. Register it for `ServerRequest`:
+**Option 1: policy (`AclManager\Policy\AclManagerPolicy`).** A request policy for `cakephp/authorization`. It reads `role_id` from the original identity data (`$identity->getOriginalData()['role_id']`); the original data can be an entity or a plain array. Register it for `ServerRequest`:
 
 ```php
 use AclManager\Policy\AclManagerPolicy;
@@ -578,6 +578,8 @@ Contributions are welcome!
 7. 🎉 Open a Pull Request
 
 Before opening it, run `composer check` (phpcs, phpstan and phpunit). The CI workflow runs the same checks on PHP 8.1 to 8.4, plus a run against the lowest supported dependencies.
+
+The suite is held to a minimum line coverage, enforced in CI by a separate job. To check it locally you need a coverage driver (Xdebug with `XDEBUG_MODE=coverage`, or PCOV) and run `composer coverage`; it fails below the minimum, which is currently 100% (set in the `coverage` script of `composer.json`). Raise it when coverage improves; never lower it to make a change pass.
 
 ---
 

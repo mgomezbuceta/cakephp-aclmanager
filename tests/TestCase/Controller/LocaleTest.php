@@ -81,4 +81,15 @@ class LocaleTest extends TestCase
 
         $this->assertSame('fr_FR', I18n::getLocale());
     }
+
+    public function testPageLanguageAttributeFollowsTheActiveLocale(): void
+    {
+        $this->session(['Auth' => ['id' => 10, 'role_id' => 1]]);
+        I18n::setLocale('en_US');
+
+        $this->get('/authorization-manager');
+
+        $this->assertResponseOk();
+        $this->assertResponseContains('<html lang="en">');
+    }
 }

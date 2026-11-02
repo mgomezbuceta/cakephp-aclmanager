@@ -84,7 +84,7 @@ The first field that is present on the identity decides and the later ones are i
 
 Installing the manager only gives you the screens to edit permissions. Your application decides what to enforce, and the plugin offers two building blocks. Both look up `role_id` and the request's controller/action/plugin, and both are **deny by default**: an action with no granted permission for the role is refused. Application controllers are stored with plugin `'App'`.
 
-**Option 1: policy (`AclManager\Policy\AclManagerPolicy`).** A request policy for `cakephp/authorization`. It reads `role_id` from the original identity data (`$identity->getOriginalData()->role_id`), so your identifier must return an entity or object, not a plain array. Register it for `ServerRequest`:
+**Option 1: policy (`AclManager\Policy\AclManagerPolicy`).** A request policy for `cakephp/authorization`. It reads `role_id` from the original identity data (`$identity->getOriginalData()['role_id']`); the original data can be an entity or a plain array. Register it for `ServerRequest`:
 
 ```php
 use AclManager\Policy\AclManagerPolicy;

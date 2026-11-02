@@ -5,13 +5,14 @@
  * @var \Cake\View\View $this
  */
 use Cake\Core\Configure;
+use Cake\I18n\I18n;
 
 $title = $this->fetch('title');
 $dashboardUrl = ['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' => 'index'];
 $rolesUrl = ['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' => 'roles'];
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<?= h(substr(I18n::getLocale(), 0, 2)) ?>">
 <head>
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">

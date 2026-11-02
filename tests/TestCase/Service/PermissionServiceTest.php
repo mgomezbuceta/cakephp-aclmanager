@@ -128,6 +128,18 @@ class PermissionServiceTest extends TestCase
         $this->assertSame(['App:Articles:delete:1', 'App:Articles:index:1'], $this->rows(1));
     }
 
+    public function testCopyFailureReturnsFalseAndKeepsTargetPermissions(): void
+    {
+        // A legacy source row whose controller name no longer passes validation (> 100 chars).
+        $this->getTableLocator()->get('AclManager.Permissions')->getConnection()->insert('permissions', [
+            'role_id' => 1, 'controller' => str_repeat('X', 101), 'action' => 'index', 'plugin' => 'App',
+            'allowed' => true, 'created' => '2025-01-01 00:00:00', 'modified' => '2025-01-01 00:00:00',
+        ]);
+
+        $this->assertFalse($this->service->copyPermissions(1, 2));
+        $this->assertSame(['App:Articles:edit:1'], $this->rows(2));
+    }
+
     public function testVersionIsStableAndIgnoresInsertionOrder(): void
     {
         $first = $this->service->getPermissionsVersion(1);

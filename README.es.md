@@ -26,10 +26,10 @@
 <td width="50%">
 
 ### 🎯 **Control de acceso por roles**
-Sistema RBAC sencillo y potente, con prioridades de rol y gestión jerárquica de permisos.
+Permisos basados en roles: concede a cada rol las acciones de controlador que puede ejecutar. La prioridad de un rol solo fija el orden en que se listan los roles; los permisos no se heredan entre roles.
 
 ### 🔄 **Autodescubrimiento**
-Escanea automáticamente tu aplicación en busca de controladores y acciones, sin configuración manual.
+Escanea tu aplicación en busca de controladores y acciones cuando pulsas *Sync Resources*; no hace falta listarlos a mano.
 
 ### 🎨 **Interfaz moderna**
 Interfaz Bootstrap 5 con matrices de permisos intuitivas y gestión visual de roles.
@@ -40,8 +40,8 @@ Soporte i18n integrado con traducciones al español y al gallego listas para usa
 </td>
 <td width="50%">
 
-### ⚡ **Alto rendimiento**
-Construido sobre el plugin Authorization de CakePHP; las consultas de permisos usan tu propia base de datos.
+### ⚡ **Consultas simples a base de datos**
+Construido sobre el plugin Authorization de CakePHP; los permisos son filas normales de tu propia base de datos y el componente puede cachear resultados por instancia.
 
 ### 🛡️ **Seguro por defecto**
 Denegación por defecto: una acción solo se permite cuando se ha concedido un permiso al rol del usuario, y solo los administradores pueden abrir el gestor.
@@ -63,7 +63,7 @@ Los sistemas ACL tradicionales (acos/aros) están **obsoletos en CakePHP 5.x**. 
 - ✅ **Estructura simplificada** - Sin árboles ACO/ARO complejos
 - ✅ **Gestión visual** - Interfaz web para gestionar permisos
 - ✅ **Basado en roles** - El patrón RBAC estándar de la industria
-- ✅ **Fácil integración** - Solución de autorización lista para usar
+- ✅ **Dos piezas de integración** - Una política para `cakephp/authorization` y un componente para aplicar los permisos
 - ✅ **Multilingüe** - Incluye traducciones al español y al gallego
 
 ---
@@ -154,7 +154,7 @@ Decide el primer campo que esté presente en la identidad y se ignoran los sigui
 
 Instalar el gestor solo te da las pantallas para editar permisos. Tu aplicación decide qué hacer cumplir, y el plugin ofrece dos piezas. Ambas usan el `role_id` y el controlador/acción/plugin de la petición, y ambas **deniegan por defecto**: una acción sin permiso concedido para el rol se rechaza. Los controladores de la aplicación se guardan con plugin `'App'`.
 
-**Opción 1: política (`AclManager\Policy\AclManagerPolicy`).** Es una política de petición para `cakephp/authorization`. Lee `role_id` de los datos originales de la identidad (`$identity->getOriginalData()->role_id`), así que tu identificador debe devolver una entidad u objeto, no un array. Regístrala para `ServerRequest`:
+**Opción 1: política (`AclManager\Policy\AclManagerPolicy`).** Es una política de petición para `cakephp/authorization`. Lee `role_id` de los datos originales de la identidad (`$identity->getOriginalData()['role_id']`); los datos originales pueden ser una entidad o un array. Regístrala para `ServerRequest`:
 
 ```php
 use AclManager\Policy\AclManagerPolicy;
@@ -578,6 +578,8 @@ $this->loadComponent('AclManager.AuthorizationManager');
 7. 🎉 Abre un Pull Request
 
 Antes de abrirlo, ejecuta `composer check` (phpcs, phpstan y phpunit). El workflow de CI ejecuta las mismas comprobaciones en PHP 8.1 a 8.4, más una ejecución con las dependencias mínimas admitidas.
+
+La suite debe mantener una cobertura mínima de líneas, que CI exige en un job aparte. Para comprobarla en local necesitas un driver de cobertura (Xdebug con `XDEBUG_MODE=coverage`, o PCOV) y ejecutar `composer coverage`; falla por debajo del mínimo, que actualmente es el 100 % (se define en el script `coverage` de `composer.json`). Súbelo cuando la cobertura mejore; nunca lo bajes para que pase un cambio.
 
 ---
 

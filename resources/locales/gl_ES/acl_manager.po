@@ -232,12 +232,6 @@ msgstr "Non tes permiso para acceder ao Xestor de Autorizacións."
 msgid "ID"
 msgstr "ID"
 
-msgid "Controller"
-msgstr "Controlador"
-
-msgid "Plugin"
-msgstr "Plugin"
-
 msgid "Select All"
 msgstr "Seleccionar Todo"
 

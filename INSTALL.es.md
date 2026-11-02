@@ -84,7 +84,7 @@ Decide el primer campo que esté presente en la identidad y se ignoran los sigui
 
 Instalar el gestor solo te da las pantallas para editar permisos. Tu aplicación decide qué hacer cumplir, y el plugin ofrece dos piezas. Ambas usan el `role_id` y el controlador/acción/plugin de la petición, y ambas **deniegan por defecto**: una acción sin permiso concedido para el rol se rechaza. Los controladores de la aplicación se guardan con plugin `'App'`.
 
-**Opción 1: política (`AclManager\Policy\AclManagerPolicy`).** Es una política de petición para `cakephp/authorization`. Lee `role_id` de los datos originales de la identidad (`$identity->getOriginalData()->role_id`), así que tu identificador debe devolver una entidad u objeto, no un array. Regístrala para `ServerRequest`:
+**Opción 1: política (`AclManager\Policy\AclManagerPolicy`).** Es una política de petición para `cakephp/authorization`. Lee `role_id` de los datos originales de la identidad (`$identity->getOriginalData()['role_id']`); los datos originales pueden ser una entidad o un array. Regístrala para `ServerRequest`:
 
 ```php
 use AclManager\Policy\AclManagerPolicy;

@@ -232,12 +232,6 @@ msgstr "You do not have permission to access the Authorization Manager."
 msgid "ID"
 msgstr "ID"
 
-msgid "Controller"
-msgstr "Controller"
-
-msgid "Plugin"
-msgstr "Plugin"
-
 msgid "Select All"
 msgstr "Select All"
 

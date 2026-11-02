@@ -100,3 +100,38 @@ jobs:
 
       - name: Static analysis (phpstan)
         run: composer stan
+
+  coverage:
+    name: Test coverage (PHP 8.3)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo_sqlite, sqlite3, dom, xml
+          coverage: xdebug
+          tools: composer:v2
+
+      - name: Locate the Composer cache
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer downloads
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-coverage-${{ hashFiles('composer.json') }}
+          restore-keys: composer-${{ runner.os }}-coverage-
+
+      - name: Install dependencies
+        run: composer update --no-interaction --no-progress --prefer-dist
+
+      - name: Run the tests and enforce the minimum line coverage
+        env:
+          XDEBUG_MODE: coverage
+        run: composer coverage

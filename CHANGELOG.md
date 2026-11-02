@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `AclManager.mountPath` (default `'/authorization-manager'`): URL path where the manager is mounted, normalized defensively with a fallback to the default.
 - Optimistic concurrency on the permissions form: it carries a version token (`PermissionService::getPermissionsVersion()`, a hash of the role's allowed permissions) and `replaceRolePermissions()` accepts an optional `$expectedVersion`. A stale token throws `StalePermissionsException` before anything is changed and the UI shows a translated conflict message; a missing token is rejected as an incomplete form. Known limitation: the check and the write share a transaction but no row lock (portable across SQLite/MySQL/Postgres), so two saves landing within milliseconds can still race.
 - Single-field submit: with JavaScript the form posts the granted ids as one comma-separated `resource_ids_csv` field (a constant handful of POST variables, so `max_input_vars` no longer limits saving). Without JavaScript the `resource_ids[]` checkboxes keep working; if both are sent, the CSV wins.
+- Test coverage: behavior tests for the authorization component (role resolution, permission cache), plugin controller scanning (through a test-only plugin), ignore rules, grouped resources, role and permission failure branches and the remaining admin-check branches, taking line coverage from 91.56% to 100%.
+- `TranslationCatalogTest`: every `__d('acl_manager', ...)` message exists in the en_US, es_ES and gl_ES catalogs, no catalog entry is unused, the three catalogs hold the same messages, es_ES and gl_ES have no empty translation and placeholders (`{0}`) are preserved.
+- `composer coverage` runs the suite with a Clover report and `tests/bin/check-coverage.php` fails below a minimum line coverage (100%); a `coverage` CI job (PHP 8.3, Xdebug) enforces it.
 
 ### Security
 - Access control is now enforced: `beforeFilter` stops the request with the login/unauthorized redirect, so the action no longer runs for anonymous or non-admin users.
@@ -30,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unreferenced `webroot/` assets, the tracked `README.cp3.md` and the unused `Resource::_getFullIdentifier()`.
 
 ### Fixed
+- The `Controller` and `Plugin` messages were left in the en_US, es_ES and gl_ES catalogs without being used by any template; removed.
 - `isUserAdmin()` tolerates a `customCheck` returning a non-boolean (it is cast to bool instead of raising a `TypeError`), role names that are not strings, and compares role ids as strings with strict comparison (`"1"` still matches `1`). The precedence (`customCheck`, `role_name`, `role_id`, `is_admin`, `email`; the first present field decides) is unchanged and now documented.
 - A failure while loading the optional Authorization/Authentication components is logged as a warning (component name and message) instead of being swallowed silently; access stays fail-closed.
 - Texts in `AuthorizationManagerComponent::handleUnauthorized()` use the `acl_manager` translation domain (`__d`) and the msgid was added to the `en_US`, `es_ES` and `gl_ES` catalogs; the stale `Modified` msgid was removed.
