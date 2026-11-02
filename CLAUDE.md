@@ -33,13 +33,12 @@ The plugin relies heavily on CakePHP's Configure class for settings:
 
 - **AclManager.version**: Plugin version (3.2.0)
 - **AclManager.ignoreActions**: Array of actions/controllers to ignore during resource synchronization
-- **AclManager.permissionMode**: 'strict' or 'permissive' permission checking
-- **AclManager.cachePermissions**: Enable/disable permission caching
+- **AclManager.locale**: Optional locale applied to plugin pages for the request (null = follow the host app)
 - **AclManager.adminAccess**: Admin access control configuration
 - **AclManager.redirects**: Login and unauthorized redirect URLs
 
 ### Internationalization
-- **Default Locale**: Spanish (es_ES) set in config/bootstrap.php
+- **Locale**: follows the host application; set `AclManager.locale` to force one on plugin pages
 - **Translation Domain**: 'acl_manager' for all plugin strings
 - **Available Locales**:
   - Spanish (es_ES) - resources/locales/es_ES/acl_manager.po

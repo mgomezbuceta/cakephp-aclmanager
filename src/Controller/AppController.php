@@ -26,7 +26,7 @@ use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Response;
-use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\I18n\I18n;
 
 /**
  * AppController
@@ -35,7 +35,6 @@ use Cake\ORM\Locator\LocatorAwareTrait;
  */
 class AppController extends Controller
 {
-    use LocatorAwareTrait;
     /**
      * Initialization hook method.
      *
@@ -71,6 +70,12 @@ class AppController extends Controller
     public function beforeFilter(EventInterface $event): void
     {
         parent::beforeFilter($event);
+
+        // Optional per-request locale; set before the admin check so denied-access flashes are translated.
+        $locale = Configure::read('AclManager.locale');
+        if (is_string($locale) && $locale !== '') {
+            I18n::setLocale($locale);
+        }
 
         // Skip authorization checks if Authorization component is loaded
         if ($this->components()->has('Authorization')) {

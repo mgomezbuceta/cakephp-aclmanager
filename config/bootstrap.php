@@ -15,7 +15,6 @@ declare(strict_types=1);
  */
 
 use Cake\Core\Configure;
-use Cake\I18n\I18n;
 
 /**
  * Plugin version
@@ -23,17 +22,15 @@ use Cake\I18n\I18n;
 Configure::write('AclManager.version', '3.2.0');
 
 /**
- * Load plugin translations
- * Default language: Spanish (es_ES)
- */
-I18n::setLocale('es_ES');
-
-/**
  * Default configuration values
  */
 $defaultConfig = [
     // Enable admin prefix routing
     'admin' => false,
+
+    // When set (e.g. 'es_ES'), the plugin pages use this locale for the request.
+    // null = follow the host application's locale.
+    'locale' => null,
 
     // Actions to ignore during resource synchronization
     'ignoreActions' => [
@@ -60,24 +57,6 @@ $defaultConfig = [
     // Migrations never alter pre-existing roles/permissions/resources tables unless this is true
     'migrations' => ['adoptExistingTables' => false],
 
-    // Default role for new users (optional)
-    'defaultRoleId' => null,
-
-    // Cache permissions for better performance
-    'cachePermissions' => true,
-    'cacheDuration' => '+1 hour',
-
-    // Permission checking mode: 'strict' or 'permissive'
-    // strict: deny if permission not found
-    // permissive: allow if permission not found
-    'permissionMode' => 'strict',
-
-    // Default pagination limits
-    'paginationLimits' => [
-        'roles' => 20,
-        'permissions' => 50,
-        'resources' => 100
-    ]
 ];
 
 // Apply default configuration if not already set
@@ -91,13 +70,4 @@ foreach ($defaultConfig as $key => $value) {
 $ignoreActions = Configure::read('AclManager.ignoreActions');
 if (!is_array($ignoreActions)) {
     Configure::write('AclManager.ignoreActions', [$ignoreActions]);
-}
-
-// Set individual pagination limits
-$defaultLimits = Configure::read('AclManager.paginationLimits', []);
-foreach (['roles', 'permissions', 'resources'] as $entity) {
-    if (!Configure::check("AclManager.{$entity}.limit")) {
-        $limit = $defaultLimits[$entity] ?? 20;
-        Configure::write("AclManager.{$entity}.limit", $limit);
-    }
 }

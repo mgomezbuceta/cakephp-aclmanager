@@ -17,7 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Roles listed in `AclManager.adminAccess.adminRoleIds` can no longer be deleted or deactivated (enforced server-side, not only hidden in the UI).
 - **BREAKING:** the plugin now fails closed when the Authentication component is not available (403) instead of granting access to everyone. Apps without `cakephp/authentication` must set `AclManager.adminAccess.allowWithoutAuthentication` to `true` (new key, default `false`) or provide a `customCheck` callback.
 
+### Removed
+- `AclManagerHelper` (imported the uninstalled `cakephp/acl`, fatal on use) and the `AppView` that only loaded it.
+- Dead configuration defaults that no code read: `defaultRoleId`, `cachePermissions`, `cacheDuration`, `permissionMode`, `paginationLimits` and `{roles,permissions,resources}.limit`; the unused `userModel`, `cacheConfig` and `cacheDuration` options of `AuthorizationManagerComponent`; the "Planned / not implemented" notes in the guides.
+- The legacy `/acl-manager` fallback mount and the no-op `routes()`, `middleware()` and `bootstrap()` overrides in `AclManagerPlugin`. The manager is served only under `/authorization-manager` (or the `Admin` prefix when `AclManager.admin` is `true`).
+- Unreferenced `webroot/` assets, the tracked `README.cp3.md` and the unused `Resource::_getFullIdentifier()`.
+
 ### Fixed
+- Texts in `AuthorizationManagerComponent::handleUnauthorized()` use the `acl_manager` translation domain (`__d`) and the msgid was added to the `en_US`, `es_ES` and `gl_ES` catalogs; the stale `Modified` msgid was removed.
 - Saving permissions no longer depends on PHP `max_input_vars`: the form posts one `resource_ids[]` value per granted action instead of ~5 fields per action.
 - A truncated POST is detected through a trailing sentinel field and aborts without touching existing permissions.
 - Permissions are replaced in a single transaction with a bulk save; app-level permissions keep the `'App'` plugin value expected by the policy.
@@ -28,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Migrations: `0001` skips tables that already exist and `0003` is a no-op when the roles table is missing or already complete.
 
 ### Changed
+- **Locale is no longer forced.** The plugin's `config/bootstrap.php` stopped calling `I18n::setLocale('es_ES')`, which changed the locale of the whole host application. Plugin pages follow the host locale (English texts when none is set). New optional `AclManager.locale` (default `null`): when set, the plugin's controllers apply it for the request.
+- `config/routes.php` builds the admin-prefix and standard mounts from one shared closure; URLs are unchanged.
 - `scanAndSync()` preloads resources once and saves in bulk inside a single transaction (same statistics array).
 - **Run the new migration**: `bin/cake migrations migrate -p AclManager` (`20250101000004_NormalizeAppPlugin`). It converts NULL plugins to `'App'` in `resources` and `permissions` and **never deletes data**: if the conversion would collide with an existing row it aborts before changing anything, reports the counts per table and points to `docs/sql/cleanup-duplicates.sql` (back up, review, run, retry). Rolling it back sets `resources.plugin` to NULL again; permissions stay `'App'`.
 - **Migrations now extend `Migrations\BaseMigration`** and require `cakephp/migrations` ^4.5 or ^5.0. This fixes failures on migrations 5.x, which rejects the legacy `AbstractMigration`. Migration 0004 no longer touches the connection directly: it uses the migration's own `fetchAll()` and `execute()`. Verified by running the four migrations against SQLite with migrations 4.6.6 and 5.x.
@@ -39,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Migrations `0001`-`0003` no longer alter pre-existing `roles`/`permissions`/`resources` tables by default. If a table lacks required columns they throw naming the table, the missing columns, the config flag and `docs/sql/`. Set `AclManager.migrations.adoptExistingTables` to `true` to restore the old behavior of adding the missing columns.
 
 ### Added
+- `.gitattributes` with `export-ignore` for tests and development files so Composer dist archives stay lean (`docs/sql` is kept because the guides reference it).
 - PHPUnit test suite (SQLite in-memory) covering permission saving.
 - `AclManager.migrations.adoptExistingTables` config flag (default `false`).
 - `docs/sql/`: full schema for MySQL, PostgreSQL and SQLite, duplicate detection and cleanup SQL, and ALTER statements to adopt an existing `roles` table. The SQLite script and the cleanup are run by the test suite; the MySQL and PostgreSQL scripts are not executed in CI.

@@ -22,12 +22,9 @@ class AuthorizationManagerComponent extends Component
      * @var array<string, mixed>
      */
     protected array $_defaultConfig = [
-        'userModel' => 'Users',
         'roleField' => 'role_id',
         'unauthorizedRedirect' => ['controller' => 'Users', 'action' => 'login'],
         'cachePermissions' => true,
-        'cacheConfig' => 'default',
-        'cacheDuration' => '+1 hour',
     ];
 
     protected array $components = ['Flash'];
@@ -157,7 +154,7 @@ class AuthorizationManagerComponent extends Component
      */
     public function handleUnauthorized(?string $message = null): \Cake\Http\Response
     {
-        $message = $message ?? __('You are not authorized to access that location.');
+        $message = $message ?? __d('acl_manager', 'You are not authorized to access that location.');
 
         $this->Flash->error($message);
 

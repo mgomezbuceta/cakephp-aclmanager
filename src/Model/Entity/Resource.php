@@ -33,21 +33,4 @@ class Resource extends Entity
         'created' => true,
         'modified' => true,
     ];
-
-    /**
-     * Get the full resource identifier
-     *
-     * @return string
-     */
-    protected function _getFullIdentifier(): string
-    {
-        $parts = [];
-        if ($this->plugin) {
-            $parts[] = $this->plugin;
-        }
-        $parts[] = $this->controller;
-        $parts[] = $this->action;
-
-        return implode('.', $parts);
-    }
 }

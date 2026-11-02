@@ -45,9 +45,6 @@ msgstr "Inactive"
 msgid "Created"
 msgstr "Created"
 
-msgid "Modified"
-msgstr "Modified"
-
 # Dashboard
 msgid "Manage Roles & Permissions"
 msgstr "Manage Roles & Permissions"
@@ -280,3 +277,6 @@ msgstr "Administrator roles cannot be deactivated."
 
 msgid "The Authentication component is not available. Configure cakephp/authentication or set AclManager.adminAccess.allowWithoutAuthentication."
 msgstr "The Authentication component is not available. Configure cakephp/authentication or set AclManager.adminAccess.allowWithoutAuthentication."
+
+msgid "You are not authorized to access that location."
+msgstr "You are not authorized to access that location."

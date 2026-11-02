@@ -143,7 +143,7 @@ if (!$this->AuthorizationManager->isAuthorized($user)) {
 $this->AuthorizationManager->checkPermission($roleId, 'Articles', 'edit', 'Blog');
 ```
 
-`isAuthorized(?array $user)` recibe un array y devuelve `false` si es `null` o si falta `roleField`. Opciones del componente que se leen: `roleField` (por defecto `role_id`), `unauthorizedRedirect` (por defecto `Users::login`) y `cachePermissions` (por defecto `true`; cachea resultados por instancia del componente, usa `clearCache()` para reiniciar). `userModel`, `cacheConfig` y `cacheDuration` están declaradas pero no se usan.
+`isAuthorized(?array $user)` recibe un array y devuelve `false` si es `null` o si falta `roleField`. Opciones del componente: `roleField` (por defecto `role_id`), `unauthorizedRedirect` (por defecto `Users::login`) y `cachePermissions` (por defecto `true`; cachea resultados por instancia del componente, usa `clearCache()` para reiniciar).
 
 ## Paso 4: Cargar el plugin
 
@@ -244,6 +244,7 @@ Solo se listan las claves que el código lee. Defínelas en el array `AclManager
 | `AclManager.redirects.unauthorized` | `['plugin' => false, 'controller' => 'Pages', 'action' => 'display', 'home']` | Destino de los no administradores. |
 | `AclManager.ignoreActions` | lista en `config/bootstrap.php` | Métodos, controladores y patrones `Plugin.*` que omite Sync Resources. **Definirla sustituye toda la lista por defecto**: copia los valores que sigas necesitando. |
 | `AclManager.admin` | `false` | `true` sirve el gestor bajo el prefijo `Admin` en `/admin/authorization-manager`. |
+| `AclManager.locale` | `null` | Idioma que se aplica a las páginas del propio plugin durante la petición (por ejemplo `'es_ES'`). `null` sigue el idioma de tu aplicación. |
 | `AclManager.migrations.adoptExistingTables` | `false` | `true` permite que las migraciones 0001-0003 añadan las columnas que falten a tablas `roles`/`permissions`/`resources` ya existentes. |
 | `AclManager.version` | `'3.2.0'` | Informativa (se muestra en el pie). |
 
@@ -268,19 +269,19 @@ return [
 ];
 ```
 
-**Previsto / no implementado todavía.** El bootstrap del plugin aún escribe `permissionMode`, `cachePermissions`, `cacheDuration`, `defaultRoleId`, `paginationLimits` y `{roles,permissions,resources}.limit`, y documentación anterior los describía, pero ningún código los lee, así que cambiarlos no tiene efecto. La comprobación de permisos siempre deniega por defecto.
-
 ## Idioma (i18n)
 
 Hay traducciones (dominio `acl_manager`) para `es_ES`, `gl_ES` y `en_US`.
 
-Comportamiento actual, tal como está implementado: el `config/bootstrap.php` del plugin llama a `I18n::setLocale('es_ES')` sin condiciones cuando el plugin se carga con `'bootstrap' => true`. Ese ajuste es **global para la petición**, por lo que también cambia el idioma del resto de tu aplicación, y no se puede configurar con `Configure`. Para usar otro idioma, establécelo después de que el plugin haya hecho su bootstrap, por petición. Por ejemplo, con `LocaleSelectorMiddleware` de CakePHP, añadido a la cola después de `RoutingMiddleware`:
+El plugin no establece un idioma global: sus páginas usan el idioma que tu aplicación haya definido para la petición y, si no hay ninguno, los textos aparecen en inglés (los identificadores de mensaje). Para elegir el idioma de toda la aplicación, establece el idioma del anfitrión, por ejemplo con `LocaleSelectorMiddleware` de CakePHP, añadido a la cola después de `RoutingMiddleware`:
 
 ```php
 use Cake\I18n\Middleware\LocaleSelectorMiddleware;
 
 $middlewareQueue->add(new LocaleSelectorMiddleware(['en_US', 'es_ES', 'gl_ES']));
 ```
+
+Para forzar un idioma solo en las páginas del plugin, define `AclManager.locale` (por ejemplo `'es_ES'`) en `config/app.php`. Los controladores del plugin lo aplican al inicio de cada petición que gestionan; el valor por defecto `null` deja el idioma sin tocar.
 
 Para añadir tu propia traducción, copia `resources/locales/es_ES/acl_manager.po` a `resources/locales/{locale}/acl_manager.po` y traduce los `msgstr`.
 
@@ -306,6 +307,8 @@ Para añadir tu propia traducción, copia `resources/locales/es_ES/acl_manager.p
 
 **Acceso denegado tras activar la política.** El usuario necesita un `role_id` y el rol debe tener la acción marcada en *Manage Permissions*. Todo lo no concedido se deniega.
 
+**Los textos aparecen en inglés.** El plugin sigue el idioma de tu aplicación y ya no impone uno. Establece el idioma del anfitrión (por ejemplo con `LocaleSelectorMiddleware`, consulta la sección de internacionalización) o define `AclManager.locale` con `'es_ES'`, `'gl_ES'` u otro idioma que tenga traducción.
+
 **Los prefijos de tabla no están soportados.** Las tablas del plugin se llaman siempre `roles`, `permissions` y `resources`, y el SQL de la migración no aplica prefijos de tabla del datasource (CakePHP 4+ ya no los admite).
 
 ## Actualizar desde la 3.2.0
@@ -315,3 +318,5 @@ Para añadir tu propia traducción, copia `resources/locales/es_ES/acl_manager.p
 3. Las migraciones 0001-0003 ya no modifican tablas preexistentes salvo que `AclManager.migrations.adoptExistingTables` sea `true`. Si ya tenías una tabla `roles` propia y dependías de la adición automática de columnas, activa el parámetro o añade las columnas con `docs/sql/adopt-existing-roles.sql`.
 4. **Cambio incompatible:** sin `cakephp/authentication` el gestor ahora devuelve 403 en lugar de dar acceso a todos. Instálalo, o pon `AclManager.adminAccess.allowWithoutAuthentication` a `true` (o define un `customCheck`).
 5. `clearPermissions` y `syncResources` solo aceptan POST.
+6. El plugin ya no fuerza `es_ES` de forma global: las páginas siguen el idioma de tu aplicación. Para mantener el español, establece el idioma del anfitrión o define `AclManager.locale` con `'es_ES'`.
+7. Eliminado: el `AclManagerHelper` y el `AppView` sin uso, la URL heredada `/acl-manager` (usa `/authorization-manager`) y las claves de configuración sin efecto `defaultRoleId`, `cachePermissions`, `cacheDuration`, `permissionMode`, `paginationLimits` y `{roles,permissions,resources}.limit`.

@@ -1,0 +1,5 @@
+/tests export-ignore
+/odd export-ignore
+/.snapshots export-ignore
+/phpunit.xml.dist export-ignore
+/.gitattributes export-ignore
