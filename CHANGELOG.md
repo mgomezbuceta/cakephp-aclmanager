@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- Saving permissions no longer depends on PHP `max_input_vars`: the form posts one `resource_ids[]` value per granted action instead of ~5 fields per action.
+- A truncated POST is detected through a trailing sentinel field and aborts without touching existing permissions.
+- Permissions are replaced in a single transaction with a bulk save; app-level permissions keep the `'App'` plugin value expected by the policy.
+
+### Added
+- PHPUnit test suite (SQLite in-memory) covering permission saving.
+
 ## [3.2.0] - 2025-01-10
 
 ### 🌍 Added
