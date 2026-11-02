@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace AclManager\Policy;
 
@@ -9,40 +10,42 @@ use Cake\Http\ServerRequest;
 
 class AclManagerPolicy implements RequestPolicyInterface
 {
-    private $permissionService;
+    private PermissionService $permissionService;
 
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         $this->permissionService = new PermissionService();
     }
 
     /**
-     * Define si un usuario puede acceder a cualquier acción.
-     *      
-     * @param \Authorization\IdentityInterface $identity El usuario autenticado.
-     * @param array $resource El controlador o recurso (no se usa aquí, pero es obligatorio).
+     * Whether a user may access the requested action.
+     *
+     * @param \Authorization\IdentityInterface|null $identity The authenticated user.
+     * @param \Cake\Http\ServerRequest $request The current request.
      * @return bool
      */
     public function canAccess(?IdentityInterface $identity, ServerRequest $request): bool
     {
-        // Si el usuario no está autenticado, denegar acceso a todo lo demás.
+        // Unauthenticated users are denied everything else.
         if ($identity === null) {
             return false;
         }
 
         $user = $identity->getOriginalData();
 
-        $roleId = $user->role_id;
-        if (!$roleId) {
+        $roleId = (int)($user['role_id'] ?? 0);
+        if ($roleId === 0) {
             return false;
         }
 
-        $controller = $request->getParam('controller');
-        $action = $request->getParam('action');
-        $plugin = $request->getParam('plugin') ?? 'App';
-
-        return $this->permissionService->isAuthorized($roleId, $controller, $action, $plugin);
-        
+        return $this->permissionService->isAuthorized(
+            $roleId,
+            (string)$request->getParam('controller'),
+            (string)$request->getParam('action'),
+            (string)($request->getParam('plugin') ?? 'App'),
+        );
     }
-
 }

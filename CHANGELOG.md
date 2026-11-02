@@ -8,16 +8,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- GitHub Actions CI (`.github/workflows/ci.yml`): the test suite on PHP 8.1 to 8.4 (plus a run with the lowest supported dependencies on PHP 8.1), and a job with `composer validate`, phpcs and phpstan. Actions are pinned by commit SHA.
+- `AclManager.mountPath` (default `'/authorization-manager'`): URL path where the manager is mounted, normalized defensively with a fallback to the default.
 - Optimistic concurrency on the permissions form: it carries a version token (`PermissionService::getPermissionsVersion()`, a hash of the role's allowed permissions) and `replaceRolePermissions()` accepts an optional `$expectedVersion`. A stale token throws `StalePermissionsException` before anything is changed and the UI shows a translated conflict message; a missing token is rejected as an incomplete form. Known limitation: the check and the write share a transaction but no row lock (portable across SQLite/MySQL/Postgres), so two saves landing within milliseconds can still race.
 - Single-field submit: with JavaScript the form posts the granted ids as one comma-separated `resource_ids_csv` field (a constant handful of POST variables, so `max_input_vars` no longer limits saving). Without JavaScript the `resource_ids[]` checkboxes keep working; if both are sent, the CSV wins.
+- Test coverage: behavior tests for the authorization component (role resolution, permission cache), plugin controller scanning (through a test-only plugin), ignore rules, grouped resources, role and permission failure branches and the remaining admin-check branches, taking line coverage from 91.56% to 100%.
+- `TranslationCatalogTest`: every `__d('acl_manager', ...)` message exists in the en_US, es_ES and gl_ES catalogs, no catalog entry is unused, the three catalogs hold the same messages, es_ES and gl_ES have no empty translation and placeholders (`{0}`) are preserved.
+- `composer coverage` runs the suite with a Clover report and `tests/bin/check-coverage.php` fails below a minimum line coverage (100%); a `coverage` CI job (PHP 8.3, Xdebug) enforces it.
 
 ### Security
 - Access control is now enforced: `beforeFilter` stops the request with the login/unauthorized redirect, so the action no longer runs for anonymous or non-admin users.
 - `clearPermissions` and `syncResources` only accept POST (GET returns 405); the UI uses `Form->postLink`, closing a CSRF-via-GET hole.
 - Roles listed in `AclManager.adminAccess.adminRoleIds` can no longer be deleted or deactivated (enforced server-side, not only hidden in the UI).
 - **BREAKING:** the plugin now fails closed when the Authentication component is not available (403) instead of granting access to everyone. Apps without `cakephp/authentication` must set `AclManager.adminAccess.allowWithoutAuthentication` to `true` (new key, default `false`) or provide a `customCheck` callback.
+- Mass assignment lockdown: `Role`, `Permission` and `Resource` no longer expose `id`, `created`, `modified` or the `permissions`/`role` associations to `newEntity()`/`patchEntity()`, and `addRole`/`editRole` only accept `name`, `description`, `priority` and `active`.
+- Unexpected errors in `savePermissions`, `syncResources`, `copyPermissions` and `clearPermissions` no longer flash the exception message (it could leak SQL or paths); the exception is logged with `Log::error()` and a generic translated message is shown.
+- Output escaping: the role name inside the delete confirmation of the roles and dashboard pages was rendered unescaped in an HTML attribute (stored XSS by a role name); the checkbox label `for` attribute is escaped too.
+
+### Removed
+- **Breaking:** `AclManager.admin`. It never worked: the `Admin` prefix mount had no controller (`MissingControllerException`) and produced `/admin/admin/authorization-manager`. Use `AclManager.mountPath` instead.
+- `AclManagerHelper` (imported the uninstalled `cakephp/acl`, fatal on use) and the `AppView` that only loaded it.
+- Dead configuration defaults that no code read: `defaultRoleId`, `cachePermissions`, `cacheDuration`, `permissionMode`, `paginationLimits` and `{roles,permissions,resources}.limit`; the unused `userModel`, `cacheConfig` and `cacheDuration` options of `AuthorizationManagerComponent`; the "Planned / not implemented" notes in the guides.
+- The legacy `/acl-manager` fallback mount and the no-op `routes()`, `middleware()` and `bootstrap()` overrides in `AclManagerPlugin`. The manager is served only under `/authorization-manager` by default (configurable with `AclManager.mountPath`).
+- Unreferenced `webroot/` assets, the tracked `README.cp3.md` and the unused `Resource::_getFullIdentifier()`.
 
 ### Fixed
+- The `Controller` and `Plugin` messages were left in the en_US, es_ES and gl_ES catalogs without being used by any template; removed.
+- `isUserAdmin()` tolerates a `customCheck` returning a non-boolean (it is cast to bool instead of raising a `TypeError`), role names that are not strings, and compares role ids as strings with strict comparison (`"1"` still matches `1`). The precedence (`customCheck`, `role_name`, `role_id`, `is_admin`, `email`; the first present field decides) is unchanged and now documented.
+- A failure while loading the optional Authorization/Authentication components is logged as a warning (component name and message) instead of being swallowed silently; access stays fail-closed.
+- Texts in `AuthorizationManagerComponent::handleUnauthorized()` use the `acl_manager` translation domain (`__d`) and the msgid was added to the `en_US`, `es_ES` and `gl_ES` catalogs; the stale `Modified` msgid was removed.
 - Saving permissions no longer depends on PHP `max_input_vars`: the form posts one `resource_ids[]` value per granted action instead of ~5 fields per action.
 - A truncated POST is detected through a trailing sentinel field and aborts without touching existing permissions.
 - Permissions are replaced in a single transaction with a bulk save; app-level permissions keep the `'App'` plugin value expected by the policy.
@@ -28,6 +47,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Migrations: `0001` skips tables that already exist and `0003` is a no-op when the roles table is missing or already complete.
 
 ### Changed
+- **Versioning:** the plugin's major version now follows the CakePHP major it targets, so the next release is **5.0.0** (CakePHP 5.x). `AclManager.version` is `5.0.0`. The previous line was 3.2.x.
+- **Requirements:** `cakephp/cakephp` is now `^5.1` (the code uses `SelectQuery::orderBy()`, which does not exist in 5.0) and `composer.json` requires `ext-intl` and `ext-mbstring`. The requirements table of the README and INSTALL guides (EN/ES) was updated.
+- Code quality: the code passes `phpcs` (CakePHP standard, `phpcs.xml.dist`) and `phpstan` level 8 without a baseline; run them with `composer check` (`cs-check`, `stan`, `test`). All PHP files declare `strict_types`, `AclManagerPolicy` is typed, and `PermissionService` and `ResourceScannerService` fetch their tables through `LocatorAwareTrait` and accept an optional table locator (`new PermissionService($locator)`); the public constructors stay compatible. Controller actions that return a redirect are typed `?Response`, matching `redirect()` when a `beforeRedirect` listener stops the event.
+- Templates: Bootstrap 4 badge classes (`badge-success`, `badge-secondary`, `badge-danger`) became Bootstrap 5 `text-bg-*` classes (brand colors kept), and the CDN assets of the layout (Bootstrap 5.3.0 CSS and JS, Font Awesome 6.4.0) carry Subresource Integrity hashes with `crossorigin="anonymous"`.
+- Flash messages for unexpected failures are generic: `Error saving permissions: {0}`, `Error synchronizing resources: {0}` and `Error: {0}` were replaced by four fixed messages (saved, synchronized, copied, cleared) in the `en_US`, `es_ES` and `gl_ES` catalogs. Details go to the application log (`logs/error.log`).
+- **Locale is no longer forced.** The plugin's `config/bootstrap.php` stopped calling `I18n::setLocale('es_ES')`, which changed the locale of the whole host application. Plugin pages follow the host locale (English texts when none is set). New optional `AclManager.locale` (default `null`): when set, the plugin's controllers apply it for the request.
 - `scanAndSync()` preloads resources once and saves in bulk inside a single transaction (same statistics array).
 - **Run the new migration**: `bin/cake migrations migrate -p AclManager` (`20250101000004_NormalizeAppPlugin`). It converts NULL plugins to `'App'` in `resources` and `permissions` and **never deletes data**: if the conversion would collide with an existing row it aborts before changing anything, reports the counts per table and points to `docs/sql/cleanup-duplicates.sql` (back up, review, run, retry). Rolling it back sets `resources.plugin` to NULL again; permissions stay `'App'`.
 - **Migrations now extend `Migrations\BaseMigration`** and require `cakephp/migrations` ^4.5 or ^5.0. This fixes failures on migrations 5.x, which rejects the legacy `AbstractMigration`. Migration 0004 no longer touches the connection directly: it uses the migration's own `fetchAll()` and `execute()`. Verified by running the four migrations against SQLite with migrations 4.6.6 and 5.x.
@@ -39,6 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Migrations `0001`-`0003` no longer alter pre-existing `roles`/`permissions`/`resources` tables by default. If a table lacks required columns they throw naming the table, the missing columns, the config flag and `docs/sql/`. Set `AclManager.migrations.adoptExistingTables` to `true` to restore the old behavior of adding the missing columns.
 
 ### Added
+- `.gitattributes` with `export-ignore` for tests and development files so Composer dist archives stay lean (`docs/sql` is kept because the guides reference it).
 - PHPUnit test suite (SQLite in-memory) covering permission saving.
 - `AclManager.migrations.adoptExistingTables` config flag (default `false`).
 - `docs/sql/`: full schema for MySQL, PostgreSQL and SQLite, duplicate detection and cleanup SQL, and ALTER statements to adopt an existing `roles` table. The SQLite script and the cleanup are run by the test suite; the MySQL and PostgreSQL scripts are not executed in CI.

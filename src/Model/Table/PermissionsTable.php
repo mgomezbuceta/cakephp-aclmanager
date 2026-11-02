@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace AclManager\Model\Table;
 
+use Cake\ORM\Query;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
@@ -10,21 +11,19 @@ use Cake\Validation\Validator;
  * Permissions Model
  *
  * @property \AclManager\Model\Table\RolesTable&\Cake\ORM\Association\BelongsTo $Roles
- *
  * @method \AclManager\Model\Entity\Permission newEmptyEntity()
- * @method \AclManager\Model\Entity\Permission newEntity(array $data, array $options = [])
- * @method \AclManager\Model\Entity\Permission[] newEntities(array $data, array $options = [])
- * @method \AclManager\Model\Entity\Permission get(mixed $primaryKey, array|string $finder = 'all', \Psr\SimpleCache\CacheInterface|string|null $cache = null, \Closure|string|null $cacheKey = null, mixed ...$args)
- * @method \AclManager\Model\Entity\Permission findOrCreate($search, ?callable $callback = null, array $options = [])
- * @method \AclManager\Model\Entity\Permission patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \AclManager\Model\Entity\Permission[] patchEntities(iterable $entities, array $data, array $options = [])
- * @method \AclManager\Model\Entity\Permission|false save(\Cake\Datasource\EntityInterface $entity, array $options = [])
- * @method \AclManager\Model\Entity\Permission saveOrFail(\Cake\Datasource\EntityInterface $entity, array $options = [])
- * @method iterable<\AclManager\Model\Entity\Permission>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Permission>|false saveMany(iterable $entities, array $options = [])
- * @method iterable<\AclManager\Model\Entity\Permission>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Permission> saveManyOrFail(iterable $entities, array $options = [])
- * @method iterable<\AclManager\Model\Entity\Permission>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Permission>|false deleteMany(iterable $entities, array $options = [])
- * @method iterable<\AclManager\Model\Entity\Permission>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Permission> deleteManyOrFail(iterable $entities, array $options = [])
- *
+ * @method \AclManager\Model\Entity\Permission newEntity(array<string, mixed> $data, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Permission[] newEntities(array<string, mixed> $data, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Permission get(mixed $primaryKey, array<string, mixed>|string $finder = 'all', \Psr\SimpleCache\CacheInterface|string|null $cache = null, \Closure|string|null $cacheKey = null, mixed ...$args)
+ * @method \AclManager\Model\Entity\Permission findOrCreate($search, ?callable $callback = null, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Permission patchEntity(\Cake\Datasource\EntityInterface $entity, array<string, mixed> $data, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Permission[] patchEntities(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $data, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Permission|false save(\Cake\Datasource\EntityInterface $entity, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Permission saveOrFail(\Cake\Datasource\EntityInterface $entity, array<string, mixed> $options = [])
+ * @method iterable<\AclManager\Model\Entity\Permission>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Permission>|false saveMany(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $options = [])
+ * @method iterable<\AclManager\Model\Entity\Permission>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Permission> saveManyOrFail(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $options = [])
+ * @method iterable<\AclManager\Model\Entity\Permission>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Permission>|false deleteMany(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $options = [])
+ * @method iterable<\AclManager\Model\Entity\Permission>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Permission> deleteManyOrFail(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $options = [])
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class PermissionsTable extends Table
@@ -138,9 +137,9 @@ class PermissionsTable extends Table
      * Get all permissions for a role
      *
      * @param int $roleId Role ID
-     * @return \Cake\ORM\Query
+     * @return \Cake\ORM\Query\SelectQuery<\Cake\Datasource\EntityInterface>
      */
-    public function findByRole(int $roleId): \Cake\ORM\Query
+    public function findByRole(int $roleId): Query
     {
         return $this->find()
             ->where(['role_id' => $roleId])

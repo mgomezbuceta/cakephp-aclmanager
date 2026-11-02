@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Authorization Manager Configuration Example
  *
@@ -51,7 +53,7 @@ return [
         /**
          * Other Plugin Settings
          */
-        'version' => '3.0.0',
+        'version' => '5.0.0',
 
         // Actions/Controllers to ignore during resource scanning
         'ignoreActions' => [
@@ -63,7 +65,7 @@ return [
             'Authentication.*',
             'Error/*',
             'DebugKit.*',
-            'Utilities/*'
+            'Utilities/*',
         ],
     ],
 ];

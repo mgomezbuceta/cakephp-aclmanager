@@ -187,6 +187,136 @@ class AdminAccessTest extends TestCase
         $this->assertFalse((bool)$this->roles()->get(2)->active);
     }
 
+    public function testLoginRedirectCarriesThePathAndQueryStringToComeBackTo(): void
+    {
+        $this->get('/authorization-manager/roles?page=2&sort=name');
+
+        $this->assertRedirectContains('/users/login');
+        $this->assertRedirectContains('redirect=' . urlencode('/authorization-manager/roles?page=2&sort=name'));
+    }
+
+    public function testArrayLoginUrlReceivesTheReturnUrlAsQueryParameter(): void
+    {
+        Configure::write('AclManager.redirects.login', ['plugin' => false, 'controller' => 'NoAuth', 'action' => 'index']);
+
+        $this->get('/authorization-manager/roles');
+
+        $this->assertRedirectContains('/no-auth?redirect=' . rawurlencode('/authorization-manager/roles'));
+    }
+
+    public function testIsAdminFlagGrantsAccessWhenNoRoleFieldIsPresent(): void
+    {
+        $this->loginAs(['id' => 12, 'is_admin' => 1]);
+
+        $this->get('/authorization-manager');
+
+        $this->assertResponseOk();
+    }
+
+    public function testIsAdminFlagThatIsOffDeniesAccess(): void
+    {
+        $this->loginAs(['id' => 12, 'is_admin' => 0]);
+
+        $this->get('/authorization-manager');
+
+        $this->assertRedirectContains('/unauthorized');
+    }
+
+    public function testIdentityWithoutAnyAdminFieldIsDeniedByDefault(): void
+    {
+        $this->loginAs(['id' => 12, 'name' => 'nobody']);
+
+        $this->get('/authorization-manager');
+
+        $this->assertRedirectContains('/unauthorized');
+    }
+
+    public function testFirstPresentIdentityFieldDecidesRoleIdWinsOverIsAdmin(): void
+    {
+        $this->loginAs(['id' => 11, 'role_id' => 2, 'is_admin' => 1]);
+
+        $this->get('/authorization-manager');
+
+        $this->assertRedirectContains('/unauthorized');
+    }
+
+    public function testRoleNameWinsOverRoleIdAndEmail(): void
+    {
+        Configure::write('AclManager.adminAccess.adminEmails', ['boss@example.com']);
+        $this->loginAs(['id' => 11, 'role_name' => 'editor', 'role_id' => 1, 'email' => 'boss@example.com']);
+
+        $this->get('/authorization-manager');
+
+        $this->assertRedirectContains('/unauthorized');
+    }
+
+    public function testEmailOnlyAppliesWhenNoEarlierFieldExists(): void
+    {
+        Configure::write('AclManager.adminAccess.adminEmails', ['boss@example.com']);
+        $this->loginAs(['id' => 11, 'email' => 'boss@example.com']);
+
+        $this->get('/authorization-manager');
+
+        $this->assertResponseOk();
+    }
+
+    public function testRoleIdStringMatchesConfiguredIntegerIds(): void
+    {
+        $this->loginAs(['id' => 10, 'role_id' => '1']);
+
+        $this->get('/authorization-manager');
+
+        $this->assertResponseOk();
+    }
+
+    public function testRoleIdIntegerMatchesConfiguredStringIds(): void
+    {
+        Configure::write('AclManager.adminAccess.adminRoleIds', ['7']);
+        $this->loginAs(['id' => 10, 'role_id' => 7]);
+
+        $this->get('/authorization-manager');
+
+        $this->assertResponseOk();
+    }
+
+    public function testRoleNameIsCaseInsensitive(): void
+    {
+        $this->loginAs(['id' => 10, 'role_name' => 'SuperAdmin']);
+
+        $this->get('/authorization-manager');
+
+        $this->assertResponseOk();
+    }
+
+    public function testNonStringRoleNameIsDeniedWithoutError(): void
+    {
+        $this->loginAs(['id' => 10, 'role_name' => 5]);
+
+        $this->get('/authorization-manager');
+
+        $this->assertRedirectContains('/unauthorized');
+    }
+
+    public function testCustomCheckTruthyNonBoolResultIsAllowed(): void
+    {
+        Configure::write('AclManager.adminAccess.customCheck', fn($identity) => 1);
+        $this->loginAs(self::EDITOR);
+
+        $this->get('/authorization-manager');
+
+        $this->assertResponseOk();
+    }
+
+    public function testCustomCheckFalsyNonBoolResultIsDenied(): void
+    {
+        Configure::write('AclManager.adminAccess.customCheck', fn($identity) => null);
+        $this->loginAs(self::ADMIN);
+
+        $this->get('/authorization-manager');
+
+        $this->assertRedirectContains('/unauthorized');
+    }
+
     public function testDestructiveLinksAreRenderedAsPostForms(): void
     {
         $this->loginAs(self::ADMIN);

@@ -41,4 +41,22 @@ class AclManagerPolicyTest extends TestCase
     {
         $this->assertFalse($this->can(null, 'Articles', 'edit'));
     }
+
+    public function testIdentityBackedByAPlainArrayIsSupported(): void
+    {
+        $service = new AuthorizationService(new MapResolver([ServerRequest::class => AclManagerPolicy::class]));
+        $identity = new IdentityDecorator($service, ['id' => 1, 'role_id' => 2]);
+        $request = new ServerRequest(['params' => ['controller' => 'Articles', 'action' => 'edit']]);
+
+        $this->assertTrue($service->can($identity, 'access', $request));
+    }
+
+    public function testIdentityWithoutARoleIsDenied(): void
+    {
+        $service = new AuthorizationService(new MapResolver([ServerRequest::class => AclManagerPolicy::class]));
+        $identity = new IdentityDecorator($service, new Entity(['id' => 1]));
+        $request = new ServerRequest(['params' => ['controller' => 'Articles', 'action' => 'edit']]);
+
+        $this->assertFalse($service->can($identity, 'access', $request));
+    }
 }

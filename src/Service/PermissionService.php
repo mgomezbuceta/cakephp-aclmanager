@@ -6,7 +6,8 @@ namespace AclManager\Service;
 use AclManager\Model\Table\PermissionsTable;
 use AclManager\Model\Table\RolesTable;
 use Cake\ORM\Exception\PersistenceFailedException;
-use Cake\ORM\TableRegistry;
+use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\ORM\Locator\LocatorInterface;
 
 /**
  * Permission Service
@@ -15,6 +16,8 @@ use Cake\ORM\TableRegistry;
  */
 class PermissionService
 {
+    use LocatorAwareTrait;
+
     private const RESOURCE_CHUNK_SIZE = 500;
 
     private PermissionsTable $Permissions;
@@ -22,11 +25,20 @@ class PermissionService
 
     /**
      * Constructor
+     *
+     * @param \Cake\ORM\Locator\LocatorInterface|null $locator Table locator; defaults to the global one
      */
-    public function __construct()
+    public function __construct(?LocatorInterface $locator = null)
     {
-        $this->Permissions = TableRegistry::getTableLocator()->get('AclManager.Permissions');
-        $this->Roles = TableRegistry::getTableLocator()->get('AclManager.Roles');
+        if ($locator !== null) {
+            $this->setTableLocator($locator);
+        }
+        /** @var \AclManager\Model\Table\PermissionsTable $permissions */
+        $permissions = $this->fetchTable('AclManager.Permissions');
+        /** @var \AclManager\Model\Table\RolesTable $roles */
+        $roles = $this->fetchTable('AclManager.Roles');
+        $this->Permissions = $permissions;
+        $this->Roles = $roles;
     }
 
     /**
@@ -48,7 +60,7 @@ class PermissionService
      * Get permission matrix for a role
      *
      * @param int $roleId Role ID
-     * @return array Permission matrix grouped by plugin/controller
+     * @return array<string, array<string, array<string, bool>>> Permission matrix grouped by plugin/controller
      */
     public function getPermissionMatrix(int $roleId): array
     {
@@ -125,8 +137,13 @@ class PermissionService
      * @param bool $allowed Allowed or denied
      * @return bool Success
      */
-    protected function setPermission(int $roleId, string $controller, string $action, ?string $plugin, bool $allowed): bool
-    {
+    protected function setPermission(
+        int $roleId,
+        string $controller,
+        string $action,
+        ?string $plugin,
+        bool $allowed,
+    ): bool {
         $plugin = PermissionsTable::normalizePlugin($plugin);
         $existing = $this->Permissions->find()
             ->where([
@@ -178,7 +195,7 @@ class PermissionService
      * across SQLite/MySQL/Postgres), so two requests landing within milliseconds can still race.
      *
      * @param int $roleId Role ID
-     * @param array $resourceIds Resource ids to grant
+     * @param array<mixed> $resourceIds Resource ids to grant
      * @param string|null $expectedVersion Version the editing form was loaded with; null skips the check
      * @return int Number of permissions granted
      * @throws \AclManager\Service\StalePermissionsException When the role changed since $expectedVersion
@@ -204,7 +221,7 @@ class PermissionService
 
             $this->Permissions->deleteAll(['role_id' => $roleId]);
 
-            $resourcesTable = TableRegistry::getTableLocator()->get('AclManager.Resources');
+            $resourcesTable = $this->fetchTable('AclManager.Resources');
             $entities = [];
             foreach (array_chunk($ids, self::RESOURCE_CHUNK_SIZE) as $chunk) {
                 $resources = $resourcesTable->find()
@@ -273,7 +290,7 @@ class PermissionService
     /**
      * Get all roles with their permission counts
      *
-     * @return array
+     * @return array<int, array<string, mixed>>
      */
     public function getRolesWithPermissionCount(): array
     {

@@ -100,7 +100,7 @@ final class SchemaCompatibility
     /**
      * Same as decideFor() using a migration's own table API (hasTable() and table()->getColumns())
      *
-     * @param object $migration A Migrations\BaseMigration
+     * @param \Migrations\BaseMigration $migration A migration exposing hasTable() and table()
      * @param string $table One of roles, permissions, resources
      * @return string CREATE, SKIP or ADOPT
      */

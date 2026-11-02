@@ -45,9 +45,6 @@ msgstr "Inactivo"
 msgid "Created"
 msgstr "Creado"
 
-msgid "Modified"
-msgstr "Modificado"
-
 # Dashboard
 msgid "Manage Roles & Permissions"
 msgstr "Xestionar Roles e Permisos"
@@ -186,8 +183,8 @@ msgstr "Por favor, selecciona un rol."
 msgid "Permissions saved successfully. {0} permissions granted."
 msgstr "Permisos gardados correctamente. {0} permisos concedidos."
 
-msgid "Error saving permissions: {0}"
-msgstr "Erro ao gardar permisos: {0}"
+msgid "The permissions could not be saved. Check the application log for details."
+msgstr "Non se puideron gardar os permisos. Consulta o rexistro da aplicación para ver máis detalles."
 
 msgid "No resources found. Please run \"Sync Resources\" first."
 msgstr "Non se atoparon recursos. Por favor, executa \"Sincronizar Recursos\" primeiro."
@@ -195,15 +192,15 @@ msgstr "Non se atoparon recursos. Por favor, executa \"Sincronizar Recursos\" pr
 msgid "All permissions cleared for role \"{0}\". {1} permissions removed."
 msgstr "Todos os permisos limpados para o rol \"{0}\". {1} permisos eliminados."
 
-msgid "Error: {0}"
-msgstr "Erro: {0}"
+msgid "The permissions could not be cleared. Check the application log for details."
+msgstr "Non se puideron eliminar os permisos. Consulta o rexistro da aplicación para ver máis detalles."
 
 # Sync Resources
 msgid "Resources synchronized. Found: {0}, Created: {1}, Updated: {2}, Deactivated: {3}"
 msgstr "Recursos sincronizados. Atopados: {0}, Creados: {1}, Actualizados: {2}, Desactivados: {3}"
 
-msgid "Error synchronizing resources: {0}"
-msgstr "Erro ao sincronizar recursos: {0}"
+msgid "The resources could not be synchronized. Check the application log for details."
+msgstr "Non se puideron sincronizar os recursos. Consulta o rexistro da aplicación para ver máis detalles."
 
 # Copy Permissions
 msgid "Invalid roles specified."
@@ -218,6 +215,9 @@ msgstr "Permisos copiados correctamente de \"{0}\" a \"{1}\"."
 msgid "Error copying permissions."
 msgstr "Erro ao copiar permisos."
 
+msgid "The permissions could not be copied. Check the application log for details."
+msgstr "Non se puideron copiar os permisos. Consulta o rexistro da aplicación para ver máis detalles."
+
 msgid "Invalid role specified."
 msgstr "Rol especificado non válido."
 
@@ -231,12 +231,6 @@ msgstr "Non tes permiso para acceder ao Xestor de Autorizacións."
 # Misc
 msgid "ID"
 msgstr "ID"
-
-msgid "Controller"
-msgstr "Controlador"
-
-msgid "Plugin"
-msgstr "Plugin"
 
 msgid "Select All"
 msgstr "Seleccionar Todo"
@@ -280,3 +274,6 @@ msgstr "Os roles de administrador non se poden desactivar."
 
 msgid "The Authentication component is not available. Configure cakephp/authentication or set AclManager.adminAccess.allowWithoutAuthentication."
 msgstr "O compoñente Authentication non está dispoñible. Configura cakephp/authentication ou establece AclManager.adminAccess.allowWithoutAuthentication."
+
+msgid "You are not authorized to access that location."
+msgstr "Non tes autorización para acceder a esa localización."

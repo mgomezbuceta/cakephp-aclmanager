@@ -13,7 +13,7 @@ English | [Español](README.es.md)
 
 **A powerful, modern web interface for managing role-based permissions using CakePHP's Authorization plugin.**
 
-[Features](#-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Upgrading](#-upgrading-from-320) • [Migration](#-migration-from-v2x)
+[Features](#-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Upgrading](#-upgrading-from-3x) • [Migration](#-migration-from-v2x)
 
 ---
 
@@ -26,10 +26,10 @@ English | [Español](README.es.md)
 <td width="50%">
 
 ### 🎯 **Role-Based Access Control**
-Simple yet powerful RBAC system with role priorities and hierarchical permission management.
+Role-based permissions: grant each role the controller actions it may run. A role's priority only sets the order in which roles are listed; permissions are not inherited between roles.
 
 ### 🔄 **Auto-Discovery**
-Automatically scans your application for controllers and actions—no manual configuration needed.
+Scans your application for controllers and actions when you press *Sync Resources*; no manual listing needed.
 
 ### 🎨 **Modern UI**
 Beautiful Bootstrap 5 interface with intuitive permission matrices and visual role management.
@@ -40,8 +40,8 @@ Built-in i18n support with Spanish and Galician translations ready to use.
 </td>
 <td width="50%">
 
-### ⚡ **High Performance**
-Built on CakePHP's Authorization plugin; the permission lookups use your own database.
+### ⚡ **Plain Database Lookups**
+Built on CakePHP's Authorization plugin; permissions are plain rows in your own database, and the component can cache results per instance.
 
 ### 🛡️ **Secure by Default**
 Deny by default: an action is only allowed when a permission is granted to the user's role, and only administrators can open the manager.
@@ -63,7 +63,7 @@ Traditional ACL systems (acos/aros) are **deprecated in CakePHP 5.x**. This plug
 - ✅ **Simplified Structure** - No more complex ACO/ARO trees
 - ✅ **Visual Management** - Web interface for managing permissions
 - ✅ **Role-Based** - Industry-standard RBAC pattern
-- ✅ **Easy Integration** - Drop-in authorization solution
+- ✅ **Two Building Blocks** - A policy for `cakephp/authorization` and a component to enforce the permissions
 - ✅ **Multilingual** - Spanish and Galician translations included
 
 ---
@@ -72,8 +72,8 @@ Traditional ACL systems (acos/aros) are **deprecated in CakePHP 5.x**. This plug
 
 | Requirement | Version |
 |------------|---------|
-| PHP | >= 8.1 (with `ext-intl`) |
-| CakePHP | ^5.0 (see `composer.json`) |
+| PHP | >= 8.1 (with `ext-intl` and `ext-mbstring`) |
+| CakePHP | ^5.1 (see `composer.json`) |
 | CakePHP Authentication | ^3.0 (required unless you opt out, see Step 2) |
 | CakePHP Authorization | ^3.0 |
 | CakePHP Migrations | ^4.5 or ^5.0 (only needed for database paths A and B) |
@@ -146,7 +146,7 @@ Keep your usual middleware (error handler, asset, CSRF, ...) in the queue as wel
 5. Identity has an `email` and `AclManager.adminAccess.adminEmails` is not empty: admin if the email is listed.
 6. Otherwise: denied.
 
-A matching field short-circuits the later ones (a user with a `role_id` is never checked by email). Non-admins are redirected to `AclManager.redirects.unauthorized`.
+The first field that is present on the identity decides and the later ones are ignored; the rules are not combined with OR. Example: an identity with `role_id` 2 and `is_admin` 1 is NOT an administrator, because `role_id` is present and `is_admin` is never looked at. `adminEmails` only applies when the identity has none of `role_name`, `role_id` or `is_admin`. The result of `customCheck` is converted to a boolean and role ids are compared as strings (`"1"` matches `1`). Non-admins are redirected to `AclManager.redirects.unauthorized`.
 
 **No `cakephp/authentication`?** Without the Authentication component the plugin fails closed (HTTP 403). Only if you protect the manager some other way (e.g. HTTP auth in the web server) set `AclManager.adminAccess.allowWithoutAuthentication` to `true`, or provide a `customCheck` callable (it is called with `null` in this case).
 
@@ -154,7 +154,7 @@ A matching field short-circuits the later ones (a user with a `role_id` is never
 
 Installing the manager only gives you the screens to edit permissions. Your application decides what to enforce, and the plugin offers two building blocks. Both look up `role_id` and the request's controller/action/plugin, and both are **deny by default**: an action with no granted permission for the role is refused. Application controllers are stored with plugin `'App'`.
 
-**Option 1: policy (`AclManager\Policy\AclManagerPolicy`).** A request policy for `cakephp/authorization`. It reads `role_id` from the original identity data (`$identity->getOriginalData()->role_id`), so your identifier must return an entity or object, not a plain array. Register it for `ServerRequest`:
+**Option 1: policy (`AclManager\Policy\AclManagerPolicy`).** A request policy for `cakephp/authorization`. It reads `role_id` from the original identity data (`$identity->getOriginalData()['role_id']`); the original data can be an entity or a plain array. Register it for `ServerRequest`:
 
 ```php
 use AclManager\Policy\AclManagerPolicy;
@@ -213,7 +213,7 @@ if (!$this->AuthorizationManager->isAuthorized($user)) {
 $this->AuthorizationManager->checkPermission($roleId, 'Articles', 'edit', 'Blog');
 ```
 
-`isAuthorized(?array $user)` takes an array and returns `false` for `null` or when `roleField` is missing. Component options that are read: `roleField` (default `role_id`), `unauthorizedRedirect` (default `Users::login`) and `cachePermissions` (default `true`; caches results per component instance, call `clearCache()` to reset). `userModel`, `cacheConfig` and `cacheDuration` are declared but not used.
+`isAuthorized(?array $user)` takes an array and returns `false` for `null` or when `roleField` is missing. Component options: `roleField` (default `role_id`), `unauthorizedRedirect` (default `Users::login`) and `cachePermissions` (default `true`; caches results per component instance, call `clearCache()` to reset).
 
 ### Step 4: Load the plugin
 
@@ -331,9 +331,10 @@ Only keys that the code reads are listed. Set them in the `AclManager` array of 
 | `AclManager.redirects.login` | `['plugin' => false, 'controller' => 'Users', 'action' => 'login']` | Where anonymous users are sent (a `?redirect=` query is appended). Array or string URL. |
 | `AclManager.redirects.unauthorized` | `['plugin' => false, 'controller' => 'Pages', 'action' => 'display', 'home']` | Where non-admins are sent. |
 | `AclManager.ignoreActions` | list in `config/bootstrap.php` | Methods, controllers and `Plugin.*` patterns skipped by Sync Resources. **Setting it replaces the whole default list**, so copy the defaults you still need. |
-| `AclManager.admin` | `false` | `true` serves the manager under the `Admin` prefix at `/admin/authorization-manager`. |
+| `AclManager.mountPath` | `'/authorization-manager'` | URL path where the manager is served, for example `'/admin/authorization-manager'`. Generated links follow it. Access is still limited by the plugin's own administrator check; the path does not add any protection. An invalid or empty value falls back to the default. |
+| `AclManager.locale` | `null` | Locale applied to the plugin's own pages for the request (for example `'es_ES'`). `null` follows your application's locale. |
 | `AclManager.migrations.adoptExistingTables` | `false` | `true` lets migrations 0001-0003 add missing columns to already existing `roles`/`permissions`/`resources` tables. |
-| `AclManager.version` | `'3.2.0'` | Informational (shown in the footer). |
+| `AclManager.version` | `'5.0.0'` | Informational (shown in the footer). |
 
 Example:
 
@@ -355,8 +356,6 @@ return [
     ],
 ];
 ```
-
-**Planned / not implemented yet.** The plugin's bootstrap still writes `permissionMode`, `cachePermissions`, `cacheDuration`, `defaultRoleId`, `paginationLimits` and `{roles,permissions,resources}.limit`, and older documentation described them, but no code reads them, so changing them has no effect. Permission checks are always deny-by-default.
 
 </details>
 
@@ -392,13 +391,15 @@ public function login()
 
 Translations (domain `acl_manager`) ship for `es_ES`, `gl_ES` and `en_US`.
 
-Current behavior, as implemented: the plugin's `config/bootstrap.php` calls `I18n::setLocale('es_ES')` unconditionally when the plugin is loaded with `'bootstrap' => true`. That setting is **global to the request**, so it also changes the locale of the rest of your application, and it is not configurable through `Configure`. To use another locale, set it after the plugin has bootstrapped, per request. For example with CakePHP's `LocaleSelectorMiddleware`, added to the queue after `RoutingMiddleware`:
+The plugin does not set a global locale: its pages use the locale your application has set for the request, and the texts appear in English (the message ids) when none is set. To choose the language for the whole application, set the host locale, for example with CakePHP's `LocaleSelectorMiddleware`, added to the queue after `RoutingMiddleware`:
 
 ```php
 use Cake\I18n\Middleware\LocaleSelectorMiddleware;
 
 $middlewareQueue->add(new LocaleSelectorMiddleware(['en_US', 'es_ES', 'gl_ES']));
 ```
+
+To force a language only on the plugin pages, set `AclManager.locale` (for example `'es_ES'`) in `config/app.php`. The plugin's controllers apply it at the start of each request they handle; the default `null` leaves the locale untouched.
 
 To add your own translation, copy `resources/locales/es_ES/acl_manager.po` to `resources/locales/{locale}/acl_manager.po` and translate the `msgstr` values.
 
@@ -463,9 +464,13 @@ $resources = $scannerService->getGroupedResources();
 
 **Sync Resources or Clear Permissions return 405.** They only accept POST (buttons use `postLink`); a GET link or bookmark will not work, and your layout must include the CSRF token if you use `CsrfProtectionMiddleware`.
 
+**A flash message says an operation "could not be saved", "synchronized", "copied" or "cleared".** Unexpected errors no longer show the exception text in the browser, because it can expose SQL, paths or other internals. The full exception (class, message and stack trace) is written to the application log: look in `logs/error.log`.
+
 **No resources showing.** Open `/authorization-manager` and use *Sync Resources*. Actions matching `AclManager.ignoreActions` are skipped.
 
 **Access denied after enabling the policy.** The user needs a `role_id`, and the role needs the action ticked in *Manage Permissions*. Everything not granted is denied.
+
+**Texts appear in English.** The plugin follows your application's locale and no longer forces one. Set the host locale (for example with `LocaleSelectorMiddleware`, see the internationalization section) or set `AclManager.locale` to `'es_ES'`, `'gl_ES'` or another locale that has a translation.
 
 **Table prefixes are not supported.** The plugin's tables are always named `roles`, `permissions` and `resources`, and the migration SQL does not apply datasource table prefixes (CakePHP 4+ no longer supports them).
 
@@ -473,13 +478,16 @@ $resources = $scannerService->getGroupedResources();
 
 ---
 
-## 🔼 Upgrading from 3.2.0
+## 🔼 Upgrading from 3.x
 
 1. Back up the database, then `composer update mgomezbuceta/cakephp-aclmanager`.
 2. Run `bin/cake migrations migrate -p AclManager`. The new migration `20250101000004_NormalizeAppPlugin` converts `plugin IS NULL` to `'App'`. It never deletes rows: if duplicates would collide it aborts with the counts and nothing is changed (see "Migration 0004 never deletes data").
 3. Migrations 0001-0003 no longer alter pre-existing tables unless `AclManager.migrations.adoptExistingTables` is `true`. If you already had a custom `roles` table and relied on the old automatic column additions, either set the flag or add the columns from `docs/sql/adopt-existing-roles.sql`.
 4. **Breaking:** without `cakephp/authentication` the manager now returns 403 instead of granting access to everyone. Install it, or set `AclManager.adminAccess.allowWithoutAuthentication` to `true` (or provide a `customCheck`).
 5. `clearPermissions` and `syncResources` are POST-only.
+6. The plugin no longer forces `es_ES` globally: pages follow your application's locale. To keep Spanish, set the host locale or `AclManager.locale` to `'es_ES'`.
+7. Removed: the unused `AclManagerHelper` and `AppView`, the legacy `/acl-manager` URL (use `/authorization-manager`) and the no-op configuration keys `defaultRoleId`, `cachePermissions`, `cacheDuration`, `permissionMode`, `paginationLimits` and `{roles,permissions,resources}.limit`.
+8. **Breaking:** `AclManager.admin` was removed because it never worked (the `Admin` prefix mount had no controller and produced the wrong URL). To serve the manager elsewhere, set `AclManager.mountPath`.
 
 ---
 
@@ -568,6 +576,10 @@ Contributions are welcome!
 5. 📝 Commit your changes (`git commit -m 'Add amazing feature'`)
 6. 🚀 Push to the branch (`git push origin feature/amazing-feature`)
 7. 🎉 Open a Pull Request
+
+Before opening it, run `composer check` (phpcs, phpstan and phpunit). The CI workflow runs the same checks on PHP 8.1 to 8.4, plus a run against the lowest supported dependencies.
+
+The suite is held to a minimum line coverage, enforced in CI by a separate job. To check it locally you need a coverage driver (Xdebug with `XDEBUG_MODE=coverage`, or PCOV) and run `composer coverage`; it fails below the minimum, which is currently 100% (set in the `coverage` script of `composer.json`). Raise it when coverage improves; never lower it to make a change pass.
 
 ---
 

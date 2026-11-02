@@ -32,8 +32,5 @@ class Permission extends Entity
         'action' => true,
         'plugin' => true,
         'allowed' => true,
-        'created' => true,
-        'modified' => true,
-        'role' => true,
     ];
 }

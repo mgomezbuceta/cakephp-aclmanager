@@ -30,8 +30,5 @@ class Role extends Entity
         'description' => true,
         'priority' => true,
         'active' => true,
-        'created' => true,
-        'modified' => true,
-        'permissions' => true,
     ];
 }

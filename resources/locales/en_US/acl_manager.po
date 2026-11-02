@@ -45,9 +45,6 @@ msgstr "Inactive"
 msgid "Created"
 msgstr "Created"
 
-msgid "Modified"
-msgstr "Modified"
-
 # Dashboard
 msgid "Manage Roles & Permissions"
 msgstr "Manage Roles & Permissions"
@@ -186,8 +183,8 @@ msgstr "Please select a role."
 msgid "Permissions saved successfully. {0} permissions granted."
 msgstr "Permissions saved successfully. {0} permissions granted."
 
-msgid "Error saving permissions: {0}"
-msgstr "Error saving permissions: {0}"
+msgid "The permissions could not be saved. Check the application log for details."
+msgstr "The permissions could not be saved. Check the application log for details."
 
 msgid "No resources found. Please run \"Sync Resources\" first."
 msgstr "No resources found. Please run \"Sync Resources\" first."
@@ -195,15 +192,15 @@ msgstr "No resources found. Please run \"Sync Resources\" first."
 msgid "All permissions cleared for role \"{0}\". {1} permissions removed."
 msgstr "All permissions cleared for role \"{0}\". {1} permissions removed."
 
-msgid "Error: {0}"
-msgstr "Error: {0}"
+msgid "The permissions could not be cleared. Check the application log for details."
+msgstr "The permissions could not be cleared. Check the application log for details."
 
 # Sync Resources
 msgid "Resources synchronized. Found: {0}, Created: {1}, Updated: {2}, Deactivated: {3}"
 msgstr "Resources synchronized. Found: {0}, Created: {1}, Updated: {2}, Deactivated: {3}"
 
-msgid "Error synchronizing resources: {0}"
-msgstr "Error synchronizing resources: {0}"
+msgid "The resources could not be synchronized. Check the application log for details."
+msgstr "The resources could not be synchronized. Check the application log for details."
 
 # Copy Permissions
 msgid "Invalid roles specified."
@@ -218,6 +215,9 @@ msgstr "Permissions copied successfully from \"{0}\" to \"{1}\"."
 msgid "Error copying permissions."
 msgstr "Error copying permissions."
 
+msgid "The permissions could not be copied. Check the application log for details."
+msgstr "The permissions could not be copied. Check the application log for details."
+
 msgid "Invalid role specified."
 msgstr "Invalid role specified."
 
@@ -231,12 +231,6 @@ msgstr "You do not have permission to access the Authorization Manager."
 # Misc
 msgid "ID"
 msgstr "ID"
-
-msgid "Controller"
-msgstr "Controller"
-
-msgid "Plugin"
-msgstr "Plugin"
 
 msgid "Select All"
 msgstr "Select All"
@@ -280,3 +274,6 @@ msgstr "Administrator roles cannot be deactivated."
 
 msgid "The Authentication component is not available. Configure cakephp/authentication or set AclManager.adminAccess.allowWithoutAuthentication."
 msgstr "The Authentication component is not available. Configure cakephp/authentication or set AclManager.adminAccess.allowWithoutAuthentication."
+
+msgid "You are not authorized to access that location."
+msgstr "You are not authorized to access that location."

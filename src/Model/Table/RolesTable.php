@@ -10,21 +10,19 @@ use Cake\Validation\Validator;
  * Roles Model
  *
  * @property \AclManager\Model\Table\PermissionsTable&\Cake\ORM\Association\HasMany $Permissions
- *
  * @method \AclManager\Model\Entity\Role newEmptyEntity()
- * @method \AclManager\Model\Entity\Role newEntity(array $data, array $options = [])
- * @method \AclManager\Model\Entity\Role[] newEntities(array $data, array $options = [])
- * @method \AclManager\Model\Entity\Role get(mixed $primaryKey, array|string $finder = 'all', \Psr\SimpleCache\CacheInterface|string|null $cache = null, \Closure|string|null $cacheKey = null, mixed ...$args)
- * @method \AclManager\Model\Entity\Role findOrCreate($search, ?callable $callback = null, array $options = [])
- * @method \AclManager\Model\Entity\Role patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \AclManager\Model\Entity\Role[] patchEntities(iterable $entities, array $data, array $options = [])
- * @method \AclManager\Model\Entity\Role|false save(\Cake\Datasource\EntityInterface $entity, array $options = [])
- * @method \AclManager\Model\Entity\Role saveOrFail(\Cake\Datasource\EntityInterface $entity, array $options = [])
- * @method iterable<\AclManager\Model\Entity\Role>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Role>|false saveMany(iterable $entities, array $options = [])
- * @method iterable<\AclManager\Model\Entity\Role>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Role> saveManyOrFail(iterable $entities, array $options = [])
- * @method iterable<\AclManager\Model\Entity\Role>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Role>|false deleteMany(iterable $entities, array $options = [])
- * @method iterable<\AclManager\Model\Entity\Role>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Role> deleteManyOrFail(iterable $entities, array $options = [])
- *
+ * @method \AclManager\Model\Entity\Role newEntity(array<string, mixed> $data, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Role[] newEntities(array<string, mixed> $data, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Role get(mixed $primaryKey, array<string, mixed>|string $finder = 'all', \Psr\SimpleCache\CacheInterface|string|null $cache = null, \Closure|string|null $cacheKey = null, mixed ...$args)
+ * @method \AclManager\Model\Entity\Role findOrCreate($search, ?callable $callback = null, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Role patchEntity(\Cake\Datasource\EntityInterface $entity, array<string, mixed> $data, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Role[] patchEntities(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $data, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Role|false save(\Cake\Datasource\EntityInterface $entity, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Role saveOrFail(\Cake\Datasource\EntityInterface $entity, array<string, mixed> $options = [])
+ * @method iterable<\AclManager\Model\Entity\Role>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Role>|false saveMany(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $options = [])
+ * @method iterable<\AclManager\Model\Entity\Role>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Role> saveManyOrFail(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $options = [])
+ * @method iterable<\AclManager\Model\Entity\Role>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Role>|false deleteMany(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $options = [])
+ * @method iterable<\AclManager\Model\Entity\Role>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Role> deleteManyOrFail(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $options = [])
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class RolesTable extends Table

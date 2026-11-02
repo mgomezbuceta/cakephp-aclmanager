@@ -20,7 +20,9 @@
     ],
     "require": {
         "php": ">=8.1",
-        "cakephp/cakephp": "^5.0",
+        "ext-intl": "*",
+        "ext-mbstring": "*",
+        "cakephp/cakephp": "^5.1",
         "cakephp/authorization": "^3.0"
     },
     "suggest": {
@@ -31,7 +33,24 @@
         "phpunit/phpunit": "^10.0",
         "cakephp/cakephp-codesniffer": "^5.0",
         "cakephp/authentication": "^3.0",
-        "cakephp/migrations": "^4.5 || ^5.0"
+        "cakephp/migrations": "^4.5 || ^5.0",
+        "phpstan/phpstan": "^2.3",
+        "cakedc/cakephp-phpstan": "^4.3"
+    },
+    "scripts": {
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "stan": "phpstan analyse --no-progress",
+        "test": "phpunit",
+        "coverage": [
+            "phpunit --coverage-clover tmp/coverage/clover.xml",
+            "@php tests/bin/check-coverage.php tmp/coverage/clover.xml 100"
+        ],
+        "check": [
+            "@cs-check",
+            "@stan",
+            "@test"
+        ]
     },
     "autoload": {
         "psr-4": {

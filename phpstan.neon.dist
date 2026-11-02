@@ -1,0 +1,25 @@
+includes:
+    - vendor/cakedc/cakephp-phpstan/extension.neon
+
+parameters:
+    level: 8
+    paths:
+        - src
+    bootstrapFiles:
+        - vendor/cakephp/cakephp/src/Core/functions_global.php
+        - vendor/cakephp/cakephp/src/I18n/functions_global.php
+    ignoreErrors:
+        # Cake entities expose database columns as magic properties. Tables return the generic
+        # EntityInterface, so PHPStan cannot see these columns; the list is limited to this plugin's columns.
+        -
+            message: '#^Access to an undefined property Cake\\Datasource\\EntityInterface::\$(action|active|allowed|controller|permissions|plugin)\.$#'
+            identifier: property.notFound
+            paths:
+                - src/Model/Table/*
+                - src/Service/*
+        # APP is defined by the host application's bootstrap (CakePHP application constant).
+        -
+            message: '#^Constant APP not found\.$#'
+            identifier: constant.notFound
+            path: src/Service/ResourceScannerService.php
+            count: 1

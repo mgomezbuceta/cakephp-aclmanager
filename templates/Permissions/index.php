@@ -23,12 +23,12 @@ $this->assign('title', __d('acl_manager', 'Dashboard'));
                 <?= $this->Form->postLink(
                     '<i class="fas fa-sync"></i> ' . __d('acl_manager', 'Sync Resources'),
                     ['action' => 'syncResources'],
-                    ['class' => 'btn btn-primary me-2', 'escape' => false]
+                    ['class' => 'btn btn-primary me-2', 'escape' => false],
                 ) ?>
                 <?= $this->Html->link(
                     '<i class="fas fa-users"></i> ' . __d('acl_manager', 'Manage Roles'),
                     ['action' => 'roles'],
-                    ['class' => 'btn btn-secondary', 'escape' => false]
+                    ['class' => 'btn btn-secondary', 'escape' => false],
                 ) ?>
             </div>
         </div>
@@ -68,7 +68,7 @@ $this->assign('title', __d('acl_manager', 'Dashboard'));
                     <h3 class="mb-0"><?= __d('acl_manager', 'Roles') ?></h3>
                 </div>
                 <div class="card-body">
-                    <?php if (!empty($roles)): ?>
+                    <?php if (!empty($roles)) : ?>
                         <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
@@ -80,59 +80,84 @@ $this->assign('title', __d('acl_manager', 'Dashboard'));
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($roles as $roleData): ?>
+                                <?php foreach ($roles as $roleData) : ?>
                                     <?php $role = $roleData['role']; ?>
                                     <tr>
                                         <td>
                                             <strong><?= h($role->name) ?></strong>
-                                            <?php if ($role->description): ?>
+                                            <?php if ($role->description) : ?>
                                                 <br>
                                                 <small class="text-muted"><?= h($role->description) ?></small>
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <span class="badge badge-secondary"><?= h($role->priority) ?></span>
+                                            <span class="badge text-bg-secondary"><?= h($role->priority) ?></span>
                                         </td>
                                         <td>
-                                            <span class="badge badge-success"><?= $roleData['allowed_count'] ?></span>
+                                            <span class="badge text-bg-success"><?= $roleData['allowed_count'] ?></span>
                                             <?= __d('acl_manager', 'Allow') ?>
-                                            <span class="badge badge-danger ms-2"><?= $roleData['denied_count'] ?></span>
+                                            <span class="badge text-bg-danger ms-2">
+                                                <?= $roleData['denied_count'] ?>
+                                            </span>
                                             <?= __d('acl_manager', 'Deny') ?>
                                         </td>
                                         <td>
-                                            <?php if ($role->active): ?>
-                                                <span class="badge badge-success"><?= __d('acl_manager', 'Active') ?></span>
-                                            <?php else: ?>
-                                                <span class="badge badge-secondary"><?= __d('acl_manager', 'Inactive') ?></span>
+                                            <?php if ($role->active) : ?>
+                                                <span class="badge text-bg-success">
+                                                    <?= __d('acl_manager', 'Active') ?>
+                                                </span>
+                                            <?php else : ?>
+                                                <span class="badge text-bg-secondary">
+                                                    <?= __d('acl_manager', 'Inactive') ?>
+                                                </span>
                                             <?php endif; ?>
                                         </td>
                                         <td class="actions">
                                             <?= $this->Html->link(
                                                 '<i class="fas fa-key"></i>',
                                                 ['action' => 'manage', $role->id],
-                                                ['class' => 'btn btn-sm btn-primary', 'escape' => false, 'title' => __d('acl_manager', 'Manage Permissions')]
+                                                [
+                                                    'class' => 'btn btn-sm btn-primary',
+                                                    'escape' => false,
+                                                    'title' => __d('acl_manager', 'Manage Permissions'),
+                                                ],
                                             ) ?>
                                             <?= $this->Html->link(
                                                 '<i class="fas fa-edit"></i>',
                                                 ['action' => 'editRole', $role->id],
-                                                ['class' => 'btn btn-sm btn-secondary', 'escape' => false, 'title' => __d('acl_manager', 'Edit')]
+                                                [
+                                                    'class' => 'btn btn-sm btn-secondary',
+                                                    'escape' => false,
+                                                    'title' => __d('acl_manager', 'Edit'),
+                                                ],
                                             ) ?>
-                                            <?php if(!in_array($role->id, $adminRoleIds)) : ?>
+                                            <?php if (!in_array($role->id, $adminRoleIds)) : ?>
                                                 <?= $this->Form->postLink(
                                                     '<i class="fas fa-trash"></i>',
                                                     ['action' => 'deleteRole', $role->id],
                                                     [
-                                                        'confirm' => __d('acl_manager', 'Are you sure you want to delete {0}?', $role->name),
+                                                        'confirm' => __d(
+                                                            'acl_manager',
+                                                            'Are you sure you want to delete {0}?',
+                                                            $role->name,
+                                                        ),
                                                         'class' => 'btn btn-sm btn-danger',
-                                                        'escape' => false,
-                                                        'title' => __d('acl_manager', 'Delete')
-                                                    ]
+                                                        // Only the icon title is raw HTML; attributes (the confirm text holds the role name)
+                                                        // stay escaped.
+                                                        'escapeTitle' => false,
+                                                        'title' => __d('acl_manager', 'Delete'),
+                                                    ],
                                                 ) ?>
-                                            <?php else: ?>
+                                            <?php else : ?>
                                                 <?= $this->Html->link(
                                                     '<i class="fas fa-trash"></i>',
                                                     '#',
-                                                    ['class' => 'btn btn-sm btn-danger disabled-link', 'escape' => false, 'title' => __d('acl_manager', 'Delete'), 'onclick' => 'return false;']
+                                                    [
+                                                        'class' => 'btn btn-sm btn-danger disabled-link',
+                                                        'escape' => false,
+                                                        'title' => __d('acl_manager', 'Delete'),
+                                                        'onclick' => 'return false;',
+                                                    ],
                                                 ) ?>
                                             <?php endif; ?>
                                         </td>
@@ -140,7 +165,7 @@ $this->assign('title', __d('acl_manager', 'Dashboard'));
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
-                    <?php else: ?>
+                    <?php else : ?>
                         <div class="alert alert-info text-center">
                             <i class="fas fa-info-circle fa-2x mb-2"></i>
                             <h5><?= __d('acl_manager', 'No roles found') ?></h5>
@@ -148,7 +173,7 @@ $this->assign('title', __d('acl_manager', 'Dashboard'));
                             <?= $this->Html->link(
                                 '<i class="fas fa-plus"></i> ' . __d('acl_manager', 'Create First Role'),
                                 ['action' => 'addRole'],
-                                ['class' => 'btn btn-primary', 'escape' => false]
+                                ['class' => 'btn btn-primary', 'escape' => false],
                             ) ?>
                         </div>
                     <?php endif; ?>

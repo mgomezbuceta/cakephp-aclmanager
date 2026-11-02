@@ -216,7 +216,8 @@ class PermissionsControllerTest extends TestCase
         $this->assertStringContainsString('name="resource_ids_csv"', $body);
 
         // Order of the named form fields in the HTML: the sentinel must be the last one.
-        $form = substr($body, (int)strpos($body, '<form'), (int)strpos($body, '</form>'));
+        $versionAt = (int)strpos($body, 'name="permissions_version"');
+        $form = substr($body, $versionAt, (int)strpos($body, '</form>', $versionAt) - $versionAt);
         preg_match_all('/<input[^>]*name="([^"]+)"/', $form, $m);
         $names = array_values(array_diff($m[1], ['resource_ids[]']));
         $this->assertSame('permissions_submitted', end($names));
