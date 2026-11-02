@@ -19,6 +19,7 @@ Mode: strict. Runner: `PATH=<php8.3 shim>:$PATH composer exec phpunit`.
 - [x] X1 Locale: remove setLocale from bootstrap; `AclManager.locale` applied in AppController; tests (default leaves I18n locale untouched; configured locale applied for the request only, restored/unchanged globally after the request if feasible) — delegated writer
 - [x] X2 Routing tests first, then remove `/acl-manager` mount, no-op plugin overrides, dedupe routes.php — delegated writer
 - [x] X3 Delete helper + AppView, dead config keys (+ component unused settings), docs fixes in both languages (component name, locale section, config reference, notes removal), parity test green — delegated writer
+- [x] X5 Remove the never-working `AclManager.admin` flag (user decision, option 1) and add `AclManager.mountPath` with defensive normalization; routing/dispatch tests first
 - [x] X4 Small cleanups listed above, .gitattributes, CHANGELOG (Removed/Changed/Fixed) — delegated writer
 
 ## Acceptance criteria
@@ -36,3 +37,4 @@ Mode: strict. Runner: `PATH=<php8.3 shim>:$PATH composer exec phpunit`.
 - X3: deleted AclManagerHelper, AppView; removed dead defaults and unused component options (`userModel`, `cacheConfig`, `cacheDuration`); 4 guides updated; GuidesParityTest green.
 - X4: removed redundant LocatorAwareTrait, `Resource::_getFullIdentifier` (no references), `webroot/`, `README.cp3.md`, stale msgid `Modified`; `__d` in component (+ test, RED not observed); `.gitattributes` (docs/ kept: guides reference docs/sql); CHANGELOG updated.
 - Final: `composer exec phpunit`: OK (119 tests, 388 assertions).
+- X5 decision: `AclManager.admin` removed (the Admin-prefix mount raised MissingControllerException and produced /admin/admin/...); `AclManager.mountPath` added. RED: 13 new tests failed (custom mount, messy values, dispatch 200 as admin). GREEN: `composer exec phpunit`: OK (127 tests, 413 assertions); phpcs clean on routes.php and RoutesTest.

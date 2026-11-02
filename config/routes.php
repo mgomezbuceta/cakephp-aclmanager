@@ -60,13 +60,13 @@ return function (RouteBuilder $routes): void {
         $builder->fallbacks();
     };
 
-    if (Configure::read('AclManager.admin', false)) {
-        // Admin prefix routes
-        $routes->prefix('Admin', function (RouteBuilder $builder) use ($connectRoutes): void {
-            $builder->plugin('AclManager', ['path' => '/admin/authorization-manager'], $connectRoutes);
-        });
-    } else {
-        // Standard routes (no admin prefix)
-        $routes->plugin('AclManager', ['path' => '/authorization-manager'], $connectRoutes);
+    // Normalize defensively: trim, single leading slash, no trailing slash; fall back to the default.
+    $mountPath = Configure::read('AclManager.mountPath');
+    $mountPath = is_string($mountPath) ? '/' . trim(trim($mountPath), '/') : '/';
+    $mountPath = preg_replace('#/{2,}#', '/', $mountPath);
+    if ($mountPath === '/') {
+        $mountPath = '/authorization-manager';
     }
+
+    $routes->plugin('AclManager', ['path' => $mountPath], $connectRoutes);
 };

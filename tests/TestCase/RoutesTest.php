@@ -13,15 +13,21 @@ use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 
 /**
- * Pins the plugin URLs for both mounts and the removal of the legacy /acl-manager mount.
+ * Pins the plugin URLs, the configurable mount path and the removal of the legacy /acl-manager mount.
  */
 class RoutesTest extends TestCase
 {
     use IntegrationTestTrait;
 
+    protected array $fixtures = [
+        'plugin.AclManager.Roles',
+        'plugin.AclManager.Resources',
+        'plugin.AclManager.Permissions',
+    ];
+
     protected function tearDown(): void
     {
-        Configure::delete('AclManager.admin');
+        Configure::delete('AclManager.mountPath');
         Configure::delete('AclManager.adminAccess');
         Router::reload();
         Cache::clear('_cake_routes_');
@@ -29,11 +35,10 @@ class RoutesTest extends TestCase
     }
 
     /**
-     * Boots the host app with the requested mount so the plugin routes are loaded.
+     * Boots the host app so the plugin routes are loaded with the current AclManager.mountPath.
      */
-    private function bootRoutes(bool $admin): void
+    private function bootRoutes(): void
     {
-        Configure::write('AclManager.admin', $admin);
         Cache::clear('_cake_routes_');
         Router::reload();
         $this->configApplication(Application::class, []);
@@ -67,7 +72,7 @@ class RoutesTest extends TestCase
      */
     public function testStandardMountRoutes(string $path, array $expected): void
     {
-        $this->bootRoutes(false);
+        $this->bootRoutes();
 
         $params = Router::parseRequest($this->request('/authorization-manager' . rtrim($path, '/')));
 
@@ -82,24 +87,73 @@ class RoutesTest extends TestCase
      * @dataProvider mountedRoutes
      * @param array<string, mixed> $expected
      */
-    public function testAdminMountRoutes(string $path, array $expected): void
+    public function testCustomMountPathRoutesEveryUrlAndDropsTheDefault(string $path, array $expected): void
     {
-        $this->bootRoutes(true);
+        Configure::write('AclManager.mountPath', '/admin/authorization-manager');
+        $this->bootRoutes();
 
-        // The prefix scope already adds /admin, so the plugin path nests as /admin/admin/authorization-manager.
-        // Characterization of the current behavior; the refactor must not change it.
-        $params = Router::parseRequest($this->request('/admin/admin/authorization-manager' . rtrim($path, '/')));
+        $params = Router::parseRequest($this->request('/admin/authorization-manager' . rtrim($path, '/')));
 
         $this->assertSame('AclManager', $params['plugin']);
-        $this->assertSame('Admin', $params['prefix']);
         $this->assertSame('Permissions', $params['controller']);
+        $this->assertArrayNotHasKey('prefix', $params);
         $this->assertSame($expected['action'], $params['action']);
         $this->assertSame($expected['pass'], $params['pass']);
+
+        $this->expectException(MissingRouteException::class);
+        Router::parseRequest($this->request('/authorization-manager' . rtrim($path, '/')));
+    }
+
+    /**
+     * @return array<string, array{0: mixed, 1: string}>
+     */
+    public static function mountPathValues(): array
+    {
+        return [
+            'messy' => ['  admin/tools/ ', '/admin/tools'],
+            'trailing slash' => ['/x/', '/x'],
+            'multiple slashes' => ['//x//y//', '/x/y'],
+            'empty' => ['', '/authorization-manager'],
+            'null' => [null, '/authorization-manager'],
+            'root' => ['/', '/authorization-manager'],
+            'blank' => ['   ', '/authorization-manager'],
+            'array' => [['/x'], '/authorization-manager'],
+        ];
+    }
+
+    /**
+     * @dataProvider mountPathValues
+     */
+    public function testMountPathIsNormalizedOrFallsBack(mixed $value, string $expectedMount): void
+    {
+        Configure::write('AclManager.mountPath', $value);
+        $this->bootRoutes();
+
+        $params = Router::parseRequest($this->request($expectedMount . '/roles'));
+
+        $this->assertSame('roles', $params['action']);
+        $this->assertSame($expectedMount . '/roles', Router::url([
+            'plugin' => 'AclManager',
+            'controller' => 'Permissions',
+            'action' => 'roles',
+        ]));
+    }
+
+    public function testAuthenticatedAdminReachesTheManagerAtACustomMountPath(): void
+    {
+        Configure::write('AclManager.mountPath', '/admin/authorization-manager');
+        $this->bootRoutes();
+        Configure::delete('AclManager.adminAccess');
+        $this->session(['Auth' => ['id' => 10, 'role_id' => 1]]);
+
+        $this->get('/admin/authorization-manager/roles');
+
+        $this->assertResponseOk();
     }
 
     public function testNonNumericIdsDoNotMatchTheNamedRoutes(): void
     {
-        $this->bootRoutes(false);
+        $this->bootRoutes();
 
         $params = Router::parseRequest($this->request('/authorization-manager/manage/abc'));
 
@@ -107,17 +161,9 @@ class RoutesTest extends TestCase
         $this->assertNotSame('Permissions', $params['controller']);
     }
 
-    public function testStandardMountDoesNotExposeTheAdminMount(): void
-    {
-        $this->bootRoutes(false);
-
-        $this->expectException(MissingRouteException::class);
-        Router::parseRequest($this->request('/admin/admin/authorization-manager/roles'));
-    }
-
     public function testLegacyAclManagerMountNoLongerRoutes(): void
     {
-        $this->bootRoutes(false);
+        $this->bootRoutes();
 
         $this->expectException(MissingRouteException::class);
         Router::parseRequest($this->request('/acl-manager/permissions/index'));
@@ -125,7 +171,7 @@ class RoutesTest extends TestCase
 
     public function testReverseRoutingKeepsUrls(): void
     {
-        $this->bootRoutes(false);
+        $this->bootRoutes();
 
         $this->assertSame(
             '/authorization-manager/copy-permissions/1/2',

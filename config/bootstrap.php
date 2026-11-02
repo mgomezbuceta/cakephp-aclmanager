@@ -25,8 +25,8 @@ Configure::write('AclManager.version', '3.2.0');
  * Default configuration values
  */
 $defaultConfig = [
-    // Enable admin prefix routing
-    'admin' => false,
+    // URL path where the manager is mounted (e.g. '/admin/authorization-manager')
+    'mountPath' => '/authorization-manager',
 
     // When set (e.g. 'es_ES'), the plugin pages use this locale for the request.
     // null = follow the host application's locale.

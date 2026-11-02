@@ -331,7 +331,7 @@ Solo se listan las claves que el código lee. Defínelas en el array `AclManager
 | `AclManager.redirects.login` | `['plugin' => false, 'controller' => 'Users', 'action' => 'login']` | Destino de los usuarios anónimos (se añade `?redirect=`). URL como array o cadena. |
 | `AclManager.redirects.unauthorized` | `['plugin' => false, 'controller' => 'Pages', 'action' => 'display', 'home']` | Destino de los no administradores. |
 | `AclManager.ignoreActions` | lista en `config/bootstrap.php` | Métodos, controladores y patrones `Plugin.*` que omite Sync Resources. **Definirla sustituye toda la lista por defecto**: copia los valores que sigas necesitando. |
-| `AclManager.admin` | `false` | `true` sirve el gestor bajo el prefijo `Admin` en `/admin/authorization-manager`. |
+| `AclManager.mountPath` | `'/authorization-manager'` | Ruta URL donde se sirve el gestor, por ejemplo `'/admin/authorization-manager'`. Los enlaces generados la siguen. El acceso sigue limitado por la comprobación de administrador del propio plugin; la ruta no añade ninguna protección. Un valor no válido o vacío vuelve al valor por defecto. |
 | `AclManager.locale` | `null` | Idioma que se aplica a las páginas del propio plugin durante la petición (por ejemplo `'es_ES'`). `null` sigue el idioma de tu aplicación. |
 | `AclManager.migrations.adoptExistingTables` | `false` | `true` permite que las migraciones 0001-0003 añadan las columnas que falten a tablas `roles`/`permissions`/`resources` ya existentes. |
 | `AclManager.version` | `'3.2.0'` | Informativa (se muestra en el pie). |
@@ -485,6 +485,7 @@ $resources = $scannerService->getGroupedResources();
 5. `clearPermissions` y `syncResources` solo aceptan POST.
 6. El plugin ya no fuerza `es_ES` de forma global: las páginas siguen el idioma de tu aplicación. Para mantener el español, establece el idioma del anfitrión o define `AclManager.locale` con `'es_ES'`.
 7. Eliminado: el `AclManagerHelper` y el `AppView` sin uso, la URL heredada `/acl-manager` (usa `/authorization-manager`) y las claves de configuración sin efecto `defaultRoleId`, `cachePermissions`, `cacheDuration`, `permissionMode`, `paginationLimits` y `{roles,permissions,resources}.limit`.
+8. **Cambio incompatible:** se eliminó `AclManager.admin` porque nunca funcionó (el montaje con prefijo `Admin` no tenía controlador y generaba una URL incorrecta). Para servir el gestor en otra ruta, define `AclManager.mountPath`.
 
 ---
 

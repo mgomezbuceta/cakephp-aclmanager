@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `AclManager.mountPath` (default `'/authorization-manager'`): URL path where the manager is mounted, normalized defensively with a fallback to the default.
 - Optimistic concurrency on the permissions form: it carries a version token (`PermissionService::getPermissionsVersion()`, a hash of the role's allowed permissions) and `replaceRolePermissions()` accepts an optional `$expectedVersion`. A stale token throws `StalePermissionsException` before anything is changed and the UI shows a translated conflict message; a missing token is rejected as an incomplete form. Known limitation: the check and the write share a transaction but no row lock (portable across SQLite/MySQL/Postgres), so two saves landing within milliseconds can still race.
 - Single-field submit: with JavaScript the form posts the granted ids as one comma-separated `resource_ids_csv` field (a constant handful of POST variables, so `max_input_vars` no longer limits saving). Without JavaScript the `resource_ids[]` checkboxes keep working; if both are sent, the CSV wins.
 
@@ -18,9 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **BREAKING:** the plugin now fails closed when the Authentication component is not available (403) instead of granting access to everyone. Apps without `cakephp/authentication` must set `AclManager.adminAccess.allowWithoutAuthentication` to `true` (new key, default `false`) or provide a `customCheck` callback.
 
 ### Removed
+- **Breaking:** `AclManager.admin`. It never worked: the `Admin` prefix mount had no controller (`MissingControllerException`) and produced `/admin/admin/authorization-manager`. Use `AclManager.mountPath` instead.
 - `AclManagerHelper` (imported the uninstalled `cakephp/acl`, fatal on use) and the `AppView` that only loaded it.
 - Dead configuration defaults that no code read: `defaultRoleId`, `cachePermissions`, `cacheDuration`, `permissionMode`, `paginationLimits` and `{roles,permissions,resources}.limit`; the unused `userModel`, `cacheConfig` and `cacheDuration` options of `AuthorizationManagerComponent`; the "Planned / not implemented" notes in the guides.
-- The legacy `/acl-manager` fallback mount and the no-op `routes()`, `middleware()` and `bootstrap()` overrides in `AclManagerPlugin`. The manager is served only under `/authorization-manager` (or the `Admin` prefix when `AclManager.admin` is `true`).
+- The legacy `/acl-manager` fallback mount and the no-op `routes()`, `middleware()` and `bootstrap()` overrides in `AclManagerPlugin`. The manager is served only under `/authorization-manager` by default (configurable with `AclManager.mountPath`).
 - Unreferenced `webroot/` assets, the tracked `README.cp3.md` and the unused `Resource::_getFullIdentifier()`.
 
 ### Fixed
@@ -36,7 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Locale is no longer forced.** The plugin's `config/bootstrap.php` stopped calling `I18n::setLocale('es_ES')`, which changed the locale of the whole host application. Plugin pages follow the host locale (English texts when none is set). New optional `AclManager.locale` (default `null`): when set, the plugin's controllers apply it for the request.
-- `config/routes.php` builds the admin-prefix and standard mounts from one shared closure; URLs are unchanged.
 - `scanAndSync()` preloads resources once and saves in bulk inside a single transaction (same statistics array).
 - **Run the new migration**: `bin/cake migrations migrate -p AclManager` (`20250101000004_NormalizeAppPlugin`). It converts NULL plugins to `'App'` in `resources` and `permissions` and **never deletes data**: if the conversion would collide with an existing row it aborts before changing anything, reports the counts per table and points to `docs/sql/cleanup-duplicates.sql` (back up, review, run, retry). Rolling it back sets `resources.plugin` to NULL again; permissions stay `'App'`.
 - **Migrations now extend `Migrations\BaseMigration`** and require `cakephp/migrations` ^4.5 or ^5.0. This fixes failures on migrations 5.x, which rejects the legacy `AbstractMigration`. Migration 0004 no longer touches the connection directly: it uses the migration's own `fetchAll()` and `execute()`. Verified by running the four migrations against SQLite with migrations 4.6.6 and 5.x.

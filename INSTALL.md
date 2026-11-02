@@ -243,7 +243,7 @@ Only keys that the code reads are listed. Set them in the `AclManager` array of 
 | `AclManager.redirects.login` | `['plugin' => false, 'controller' => 'Users', 'action' => 'login']` | Where anonymous users are sent (a `?redirect=` query is appended). Array or string URL. |
 | `AclManager.redirects.unauthorized` | `['plugin' => false, 'controller' => 'Pages', 'action' => 'display', 'home']` | Where non-admins are sent. |
 | `AclManager.ignoreActions` | list in `config/bootstrap.php` | Methods, controllers and `Plugin.*` patterns skipped by Sync Resources. **Setting it replaces the whole default list**, so copy the defaults you still need. |
-| `AclManager.admin` | `false` | `true` serves the manager under the `Admin` prefix at `/admin/authorization-manager`. |
+| `AclManager.mountPath` | `'/authorization-manager'` | URL path where the manager is served, for example `'/admin/authorization-manager'`. Generated links follow it. Access is still limited by the plugin's own administrator check; the path does not add any protection. An invalid or empty value falls back to the default. |
 | `AclManager.locale` | `null` | Locale applied to the plugin's own pages for the request (for example `'es_ES'`). `null` follows your application's locale. |
 | `AclManager.migrations.adoptExistingTables` | `false` | `true` lets migrations 0001-0003 add missing columns to already existing `roles`/`permissions`/`resources` tables. |
 | `AclManager.version` | `'3.2.0'` | Informational (shown in the footer). |
@@ -320,3 +320,4 @@ To add your own translation, copy `resources/locales/es_ES/acl_manager.po` to `r
 5. `clearPermissions` and `syncResources` are POST-only.
 6. The plugin no longer forces `es_ES` globally: pages follow your application's locale. To keep Spanish, set the host locale or `AclManager.locale` to `'es_ES'`.
 7. Removed: the unused `AclManagerHelper` and `AppView`, the legacy `/acl-manager` URL (use `/authorization-manager`) and the no-op configuration keys `defaultRoleId`, `cachePermissions`, `cacheDuration`, `permissionMode`, `paginationLimits` and `{roles,permissions,resources}.limit`.
+8. **Breaking:** `AclManager.admin` was removed because it never worked (the `Admin` prefix mount had no controller and produced the wrong URL). To serve the manager elsewhere, set `AclManager.mountPath`.
