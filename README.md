@@ -1,3 +1,5 @@
+English | [Español](README.es.md)
+
 <div align="center">
 
 # 🔐 CakePHP Authorization Manager
@@ -11,7 +13,7 @@
 
 **A powerful, modern web interface for managing role-based permissions using CakePHP's Authorization plugin.**
 
-[Features](#-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Upgrading](#️-upgrading-from-320) • [Migration](#-migration-from-v2x)
+[Features](#-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Upgrading](#-upgrading-from-320) • [Migration](#-migration-from-v2x)
 
 ---
 
@@ -81,7 +83,7 @@ Traditional ACL systems (acos/aros) are **deprecated in CakePHP 5.x**. This plug
 
 ## 🚀 Installation
 
-A step-by-step guide starting from an empty CakePHP 5 application. The Spanish version is in [INSTALL.md](INSTALL.md).
+A step-by-step guide starting from an empty CakePHP 5 application. The same guide is also available as a standalone file: [INSTALL.md](INSTALL.md) (Spanish: [INSTALL.es.md](INSTALL.es.md)).
 
 > **Back up your database before running any migration or SQL from this guide.** Nothing runs automatically: the plugin never changes your schema until you run a migration or script yourself.
 
@@ -467,15 +469,13 @@ $resources = $scannerService->getGroupedResources();
 
 ---
 
-## ⬆️ Upgrading from 3.2.0
+## 🔼 Upgrading from 3.2.0
 
 1. Back up the database, then `composer update mgomezbuceta/cakephp-aclmanager`.
 2. Run `bin/cake migrations migrate -p AclManager`. The new migration `20250101000004_NormalizeAppPlugin` converts `plugin IS NULL` to `'App'`. It never deletes rows: if duplicates would collide it aborts with the counts and nothing is changed (see "Migration 0004 never deletes data").
 3. Migrations 0001-0003 no longer alter pre-existing tables unless `AclManager.migrations.adoptExistingTables` is `true`. If you already had a custom `roles` table and relied on the old automatic column additions, either set the flag or add the columns from `docs/sql/adopt-existing-roles.sql`.
 4. **Breaking:** without `cakephp/authentication` the manager now returns 403 instead of granting access to everyone. Install it, or set `AclManager.adminAccess.allowWithoutAuthentication` to `true` (or provide a `customCheck`).
 5. `clearPermissions` and `syncResources` are POST-only.
-
----
 
 ---
 

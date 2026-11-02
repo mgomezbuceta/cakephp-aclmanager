@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `composer.json` `suggest`: `cakephp/migrations` (^4.5 || ^5.0) and `cakephp/authentication`.
 
 ### Documentation
+- Installation and configuration guides are available in English (README.md, INSTALL.md) and Spanish (README.es.md, INSTALL.es.md); a test (`GuidesParityTest`) keeps their structure identical.
 - README.md and INSTALL.md rewritten as an ordered, step-by-step installation guide (authentication, authorization, plugin load, database paths A/B/C, `role_id`, first run, troubleshooting, upgrade notes).
 - The configuration reference lists only keys the code reads. `permissionMode`, `cachePermissions`, `cacheDuration`, `defaultRoleId`, `paginationLimits` and `{roles,permissions,resources}.limit` are documented as not implemented (their bootstrap defaults remain but nothing reads them).
 - Documented the real `isUserAdmin()` rules and that the plugin bootstrap forces the `es_ES` locale.
