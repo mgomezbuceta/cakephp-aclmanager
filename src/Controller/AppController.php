@@ -22,7 +22,10 @@ declare(strict_types=1);
 namespace AclManager\Controller;
 
 use Cake\Controller\Controller;
+use Cake\Core\Configure;
 use Cake\Event\EventInterface;
+use Cake\Http\Exception\ForbiddenException;
+use Cake\Http\Response;
 use Cake\ORM\Locator\LocatorAwareTrait;
 
 /**
@@ -74,21 +77,39 @@ class AppController extends Controller
             $this->Authorization->skipAuthorization();
         }
 
-        // Restrict access to administrators only
-        $this->checkAdminAccess();
+        // Restrict access to administrators only. Setting a response as the event result
+        // stops the request here, so the action never runs for denied users.
+        $response = $this->checkAdminAccess();
+        if ($response !== null) {
+            $event->setResult($response);
+            $event->stopPropagation();
+        }
     }
 
     /**
      * Check if current user has admin access
      *
-     * @return void
-     * @throws \Cake\Http\Exception\ForbiddenException
+     * @return \Cake\Http\Response|null Redirect response when access is denied, null when allowed
+     * @throws \Cake\Http\Exception\ForbiddenException When there is no Authentication and no opt-in
      */
-    protected function checkAdminAccess(): void
+    protected function checkAdminAccess(): ?Response
     {
-        // If Authentication component is not loaded, allow access (backward compatibility)
+        // Fail closed: without the Authentication component nobody is identified, so access
+        // requires an explicit opt-in or a customCheck callback that grants it.
         if (!$this->components()->has('Authentication')) {
-            return;
+            $customCheck = Configure::read('AclManager.adminAccess.customCheck');
+            if (
+                Configure::read('AclManager.adminAccess.allowWithoutAuthentication', false) === true
+                || (is_callable($customCheck) && $customCheck(null))
+            ) {
+                return null;
+            }
+
+            throw new ForbiddenException(__d(
+                'acl_manager',
+                'The Authentication component is not available. '
+                . 'Configure cakephp/authentication or set AclManager.adminAccess.allowWithoutAuthentication.',
+            ));
         }
 
         // Get the current authenticated user
@@ -112,8 +133,8 @@ class AppController extends Controller
             }
 
             $this->Flash->error(__d('acl_manager', 'You must be logged in to access the Authorization Manager.'));
-            $this->redirect($loginUrl);
-            return;
+
+            return $this->redirect($loginUrl);
         }
 
         // Check if user is admin
@@ -122,9 +143,11 @@ class AppController extends Controller
         if (!$isAdmin) {
             $unauthorizedUrl = \Cake\Core\Configure::read('AclManager.redirects.unauthorized', ['plugin' => false, 'controller' => 'Pages', 'action' => 'display', 'home']);
             $this->Flash->error(__d('acl_manager', 'You do not have permission to access the Authorization Manager.'));
-            $this->redirect($unauthorizedUrl);
-            return;
+
+            return $this->redirect($unauthorizedUrl);
         }
+
+        return null;
     }
 
     /**

@@ -34,10 +34,11 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
             <button type="submit" class="btn btn-primary btn-lg">
                 <i class="fas fa-save"></i> <?= __d('acl_manager', 'Save Permissions') ?>
             </button>
-            <?= $this->Html->link(
+            <?= $this->Form->postLink(
                '<i class="fas fa-times-circle"></i> ' . __d('acl_manager', 'Clear All'),
                 ['action' => 'clearPermissions', $role->id],
                 [
+                    'block' => true,
                     'confirm' => __d('acl_manager', 'Are you sure you want to clear all permissions for this role?'),
                     'class' => 'btn btn-danger btn-lg',
                     'escape' => false
@@ -128,6 +129,7 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
     </div>
 
     <?= $this->Form->end() ?>
+    <?= $this->fetch('postLink') ?>
 </div>
 
 <style>

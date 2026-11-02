@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- Access control is now enforced: `beforeFilter` stops the request with the login/unauthorized redirect, so the action no longer runs for anonymous or non-admin users.
+- `clearPermissions` and `syncResources` only accept POST (GET returns 405); the UI uses `Form->postLink`, closing a CSRF-via-GET hole.
+- Roles listed in `AclManager.adminAccess.adminRoleIds` can no longer be deleted or deactivated (enforced server-side, not only hidden in the UI).
+- **BREAKING:** the plugin now fails closed when the Authentication component is not available (403) instead of granting access to everyone. Apps without `cakephp/authentication` must set `AclManager.adminAccess.allowWithoutAuthentication` to `true` (new key, default `false`) or provide a `customCheck` callback.
+
 ### Fixed
 - Saving permissions no longer depends on PHP `max_input_vars`: the form posts one `resource_ids[]` value per granted action instead of ~5 fields per action.
 - A truncated POST is detected through a trailing sentinel field and aborts without touching existing permissions.

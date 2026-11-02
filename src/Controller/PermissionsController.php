@@ -5,6 +5,7 @@ namespace AclManager\Controller;
 
 use AclManager\Service\PermissionService;
 use AclManager\Service\ResourceScannerService;
+use Cake\Core\Configure;
 
 /**
  * Permissions Controller
@@ -110,6 +111,8 @@ class PermissionsController extends AppController
      */
     public function syncResources(): \Cake\Http\Response
     {
+        $this->request->allowMethod(['post']);
+
         try {
             $stats = $this->scannerService->scanAndSync();
 
@@ -187,6 +190,12 @@ class PermissionsController extends AppController
         $role = $rolesTable->get($id);
 
         if ($this->request->is(['patch', 'post', 'put'])) {
+            if ($this->isProtectedRole((int)$role->id) && !$this->request->getData('active', true)) {
+                $this->Flash->error(__d('acl_manager', 'Administrator roles cannot be deactivated.'));
+
+                return $this->redirect(['action' => 'roles']);
+            }
+
             $role = $rolesTable->patchEntity($role, $this->request->getData());
 
             if ($rolesTable->save($role)) {
@@ -215,6 +224,12 @@ class PermissionsController extends AppController
 
         $rolesTable = $this->fetchTable('AclManager.Roles');
         $role = $rolesTable->get($id);
+
+        if ($this->isProtectedRole((int)$role->id)) {
+            $this->Flash->error(__d('acl_manager', 'Administrator roles cannot be deleted.'));
+
+            return $this->redirect(['action' => 'roles']);
+        }
 
         if ($rolesTable->delete($role)) {
             $this->Flash->success(__d('acl_manager', 'Role deleted successfully.'));
@@ -271,7 +286,7 @@ class PermissionsController extends AppController
      */
     public function clearPermissions(?int $roleId = null): \Cake\Http\Response
     {
-        $this->request->allowMethod(['post', 'get']);
+        $this->request->allowMethod(['post']);
 
         if (!$roleId) {
             $this->Flash->error(__d('acl_manager', 'Invalid role specified.'));
@@ -293,5 +308,16 @@ class PermissionsController extends AppController
         }
 
         return $this->redirect(['action' => 'manage', $roleId]);
+    }
+
+    /**
+     * Whether the role is one of the configured administrator roles.
+     *
+     * @param int $roleId Role ID
+     * @return bool
+     */
+    private function isProtectedRole(int $roleId): bool
+    {
+        return in_array($roleId, (array)Configure::read('AclManager.adminAccess.adminRoleIds', [1]));
     }
 }

@@ -190,6 +190,10 @@ return [
             'adminEmails' => [
                 'admin@example.com',
             ],
+
+            // Only for apps without cakephp/authentication: allow access to everyone.
+            // Default false (access is denied with a 403 when the Authentication component is missing).
+            'allowWithoutAuthentication' => false,
         ],
         'redirects' => [
             'login' => ['controller' => 'Users', 'action' => 'login'],

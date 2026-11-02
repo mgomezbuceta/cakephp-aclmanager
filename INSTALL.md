@@ -156,6 +156,23 @@ bin/cake migrations mark_migrated -p AclManager
 # Ir a: http://tu-app/authorization-manager
 ```
 
+## Control de acceso (importante)
+
+El plugin solo es accesible para administradores y requiere el plugin `cakephp/authentication`.
+Si el componente `Authentication` no está disponible, el acceso se deniega (403). Para permitirlo
+explícitamente (no recomendado en producción), añade a `config/app.php`:
+
+```php
+'AclManager' => [
+    'adminAccess' => [
+        'allowWithoutAuthentication' => true,
+    ],
+],
+```
+
+Las acciones destructivas (`clearPermissions`, `syncResources`, `deleteRole`) solo aceptan POST.
+Los roles listados en `adminAccess.adminRoleIds` (por defecto `[1]`) no se pueden eliminar ni desactivar.
+
 ## ¿Necesitas ayuda?
 
 Envíame la salida de estos comandos:

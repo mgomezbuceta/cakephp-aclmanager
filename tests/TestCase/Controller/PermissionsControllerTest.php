@@ -24,6 +24,7 @@ class PermissionsControllerTest extends TestCase
         parent::setUp();
         $this->configApplication(Application::class, []);
         $this->disableErrorHandlerMiddleware();
+        $this->session(['Auth' => ['id' => 10, 'role_id' => 1]]);
     }
 
     /**

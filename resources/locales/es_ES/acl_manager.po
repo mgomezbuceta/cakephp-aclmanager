@@ -261,3 +261,12 @@ msgstr "Denegar"
 
 msgid "The form data was incomplete (check the PHP max_input_vars setting). No permissions were changed."
 msgstr "Los datos del formulario estaban incompletos (revisa la configuración max_input_vars de PHP). No se modificó ningún permiso."
+
+msgid "Administrator roles cannot be deleted."
+msgstr "Los roles de administrador no se pueden eliminar."
+
+msgid "Administrator roles cannot be deactivated."
+msgstr "Los roles de administrador no se pueden desactivar."
+
+msgid "The Authentication component is not available. Configure cakephp/authentication or set AclManager.adminAccess.allowWithoutAuthentication."
+msgstr "El componente Authentication no está disponible. Configura cakephp/authentication o establece AclManager.adminAccess.allowWithoutAuthentication."
