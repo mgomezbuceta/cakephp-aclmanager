@@ -32,7 +32,7 @@ class CreatePermissionsTables extends BaseMigration
                 ->addColumn('priority', 'integer', [
                     'default' => 0,
                     'null' => false,
-                    'comment' => 'Higher priority = more permissions'
+                    'comment' => 'Higher priority = more permissions',
                 ])
                 ->addColumn('active', 'boolean', [
                     'default' => true,
@@ -46,7 +46,7 @@ class CreatePermissionsTables extends BaseMigration
                 ])
                 ->addIndex(['name'], [
                     'unique' => true,
-                    'name' => 'idx_roles_name_unique'
+                    'name' => 'idx_roles_name_unique',
                 ])
                 ->create();
         }
@@ -81,18 +81,18 @@ class CreatePermissionsTables extends BaseMigration
                     'null' => false,
                 ])
                 ->addIndex(['role_id'], [
-                    'name' => 'idx_permissions_role_id'
+                    'name' => 'idx_permissions_role_id',
                 ])
                 ->addIndex(['controller', 'action'], [
-                    'name' => 'idx_permissions_controller_action'
+                    'name' => 'idx_permissions_controller_action',
                 ])
                 ->addIndex(['role_id', 'controller', 'action', 'plugin'], [
                     'unique' => true,
-                    'name' => 'idx_permissions_unique'
+                    'name' => 'idx_permissions_unique',
                 ])
                 ->addForeignKey('role_id', 'roles', 'id', [
                     'delete' => 'CASCADE',
-                    'update' => 'NO_ACTION'
+                    'update' => 'NO_ACTION',
                 ])
                 ->create();
         }
@@ -128,7 +128,7 @@ class CreatePermissionsTables extends BaseMigration
                 ])
                 ->addIndex(['controller', 'action', 'plugin'], [
                     'unique' => true,
-                    'name' => 'idx_resources_unique'
+                    'name' => 'idx_resources_unique',
                 ])
                 ->create();
         }

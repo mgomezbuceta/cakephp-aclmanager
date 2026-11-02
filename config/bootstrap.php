@@ -46,7 +46,7 @@ $defaultConfig = [
         'DebugKit.*',
         'Bake.*',
         'Migrations.*',
-        'Utilities/*'
+        'Utilities/*',
     ],
 
     // Admin access: set 'allowWithoutAuthentication' => true to allow access when the Authentication component is missing

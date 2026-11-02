@@ -10,7 +10,6 @@ declare(strict_types=1);
  * Redistributions of files must retain the above copyright notice.
  *
  * @package AclManager\Controller
- *
  * @author Marcos Gómez Buceta <mgomezbuceta@gmail.com>
  * @author Ivan Amat <dev@ivanamat.es>
  * @copyright Copyright 2025, Marcos Gómez Buceta
@@ -21,6 +20,7 @@ declare(strict_types=1);
 
 namespace AclManager\Controller;
 
+use Authentication\IdentityInterface;
 use Cake\Controller\Controller;
 use Cake\Core\Configure;
 use Cake\Event\EventInterface;
@@ -28,11 +28,15 @@ use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Response;
 use Cake\I18n\I18n;
 use Cake\Log\Log;
+use Exception;
 
 /**
  * AppController
  *
  * Base controller for all Authorization Manager controllers
+ *
+ * @property \Authorization\Controller\Component\AuthorizationComponent $Authorization
+ * @property \Authentication\Controller\Component\AuthenticationComponent $Authentication
  */
 class AppController extends Controller
 {
@@ -63,7 +67,7 @@ class AppController extends Controller
     {
         try {
             $this->loadComponent($name);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::warning(sprintf(
                 'AclManager could not load the %s component and continues without it: %s: %s',
                 $name,
@@ -76,8 +80,8 @@ class AppController extends Controller
     /**
      * Before filter callback
      *
-     * @param \Cake\Event\EventInterface $event The event object
-     * @return void|\Cake\Http\Response
+     * @param \Cake\Event\EventInterface<\Cake\Controller\Controller> $event The event object
+     * @return void
      */
     public function beforeFilter(EventInterface $event): void
     {
@@ -134,7 +138,10 @@ class AppController extends Controller
 
         if (!$identity) {
             // No authenticated user - redirect to login with return URL
-            $loginUrl = \Cake\Core\Configure::read('AclManager.redirects.login', ['plugin' => false, 'controller' => 'Users', 'action' => 'login']);
+            $loginUrl = Configure::read(
+                'AclManager.redirects.login',
+                ['plugin' => false, 'controller' => 'Users', 'action' => 'login'],
+            );
 
             // Store current URL to redirect back after login
             $currentUrl = $this->request->getUri()->getPath();
@@ -158,7 +165,10 @@ class AppController extends Controller
         $isAdmin = $this->isUserAdmin($identity);
 
         if (!$isAdmin) {
-            $unauthorizedUrl = \Cake\Core\Configure::read('AclManager.redirects.unauthorized', ['plugin' => false, 'controller' => 'Pages', 'action' => 'display', 'home']);
+            $unauthorizedUrl = Configure::read(
+                'AclManager.redirects.unauthorized',
+                ['plugin' => false, 'controller' => 'Pages', 'action' => 'display', 'home'],
+            );
             $this->Flash->error(__d('acl_manager', 'You do not have permission to access the Authorization Manager.'));
 
             return $this->redirect($unauthorizedUrl);
@@ -186,13 +196,16 @@ class AppController extends Controller
      * @param \Authentication\IdentityInterface $identity User identity
      * @return bool
      */
-    protected function isUserAdmin($identity): bool
+    protected function isUserAdmin(IdentityInterface $identity): bool
     {
         // Load configuration from config/app.php
-        $adminRoleIds = \Cake\Core\Configure::read('AclManager.adminAccess.adminRoleIds', [1]);
-        $adminRoleNames = \Cake\Core\Configure::read('AclManager.adminAccess.adminRoleNames', ['admin', 'administrator', 'superadmin']);
-        $adminEmails = \Cake\Core\Configure::read('AclManager.adminAccess.adminEmails', []);
-        $customCheck = \Cake\Core\Configure::read('AclManager.adminAccess.customCheck');
+        $adminRoleIds = Configure::read('AclManager.adminAccess.adminRoleIds', [1]);
+        $adminRoleNames = Configure::read(
+            'AclManager.adminAccess.adminRoleNames',
+            ['admin', 'administrator', 'superadmin'],
+        );
+        $adminEmails = Configure::read('AclManager.adminAccess.adminEmails', []);
+        $customCheck = Configure::read('AclManager.adminAccess.customCheck');
 
         // Custom callback function (highest priority)
         if (is_callable($customCheck)) {

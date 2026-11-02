@@ -3,7 +3,12 @@ declare(strict_types=1);
 
 namespace AclManager\Test\TestCase\Service;
 
+use AclManager\Service\ResourceScannerService;
+use AclManager\Test\TestApp\Model\Table\ThrowingResourcesTable;
+use Cake\Datasource\ConnectionManager;
+use Cake\ORM\Locator\TableLocator;
 use Cake\TestSuite\TestCase;
+use RuntimeException;
 
 class ResourceScannerServiceTest extends TestCase
 {
@@ -37,6 +42,20 @@ class ResourceScannerServiceTest extends TestCase
         ksort($rows);
 
         return $rows;
+    }
+
+    public function testScannerUsesTheInjectedTableLocator(): void
+    {
+        $locator = new TableLocator();
+        $locator->set('AclManager.Resources', new ThrowingResourcesTable([
+            'alias' => 'Resources',
+            'connection' => ConnectionManager::get('test'),
+        ]));
+        $scanner = new ResourceScannerService($locator);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(ThrowingResourcesTable::SECRET);
+        $scanner->getGroupedResources();
     }
 
     public function testRealScanTagsApplicationControllersWithAppPlugin(): void

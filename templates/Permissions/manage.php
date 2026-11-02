@@ -21,7 +21,7 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
                     <?= $this->Html->link(
                         '<i class="fas fa-arrow-left"></i> ' . __d('acl_manager', 'Back'),
                         ['action' => 'index'],
-                        ['class' => 'btn btn-secondary', 'escape' => false]
+                        ['class' => 'btn btn-secondary', 'escape' => false],
                     ) ?>
                 </div>
             </div>
@@ -36,19 +36,19 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
                 <i class="fas fa-save"></i> <?= __d('acl_manager', 'Save Permissions') ?>
             </button>
             <?= $this->Form->postLink(
-               '<i class="fas fa-times-circle"></i> ' . __d('acl_manager', 'Clear All'),
+                '<i class="fas fa-times-circle"></i> ' . __d('acl_manager', 'Clear All'),
                 ['action' => 'clearPermissions', $role->id],
                 [
                     'block' => true,
                     'confirm' => __d('acl_manager', 'Are you sure you want to clear all permissions for this role?'),
                     'class' => 'btn btn-danger btn-lg',
-                    'escape' => false
-                ]
+                    'escape' => false,
+                ],
             ) ?>
         </div>
     </div>
 
-    <?php foreach ($resources as $plugin => $controllers): ?>
+    <?php foreach ($resources as $plugin => $controllers) : ?>
         <div class="card mb-4">
             <div class="card-header">
                 <h3 class="mb-0">
@@ -56,7 +56,7 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
                 </h3>
             </div>
             <div class="card-body">
-                <?php foreach ($controllers as $controller => $actions): ?>
+                <?php foreach ($controllers as $controller => $actions) : ?>
                     <div class="controller-section mb-4">
                         <h4 class="controller-title">
                             <i class="fas fa-folder"></i> <?= h($controller) ?>
@@ -70,7 +70,7 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($actions as $action): ?>
+                                    <?php foreach ($actions as $action) : ?>
                                         <?php
                                         $actionName = is_object($action) ? $action->action : $action;
                                         $isAllowed = isset($permissions[$plugin][$controller][$actionName]) &&
@@ -90,7 +90,10 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
                                                         'class' => 'form-check-input',
                                                         'id' => "permission-{$fieldIndex}",
                                                     ]) ?>
-                                                    <label class="form-check-label" for="permission-<?= h($fieldIndex) ?>">
+                                                    <label
+                                                        class="form-check-label"
+                                                        for="permission-<?= h($fieldIndex) ?>"
+                                                    >
                                                         <?= __d('acl_manager', 'Allow') ?>
                                                     </label>
                                                 </div>
@@ -106,7 +109,7 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
         </div>
     <?php endforeach; ?>
 
-    <?php if (empty($resources)): ?>
+    <?php if (empty($resources)) : ?>
         <div class="alert alert-warning">
             <i class="fas fa-exclamation-triangle"></i>
             <?= __d('acl_manager', 'No resources found. Please run "Sync Resources" first.') ?>
@@ -127,7 +130,7 @@ $this->assign('title', __d('acl_manager', 'Manage Permissions for {0}', $role->n
             <?= $this->Html->link(
                 __d('acl_manager', 'Cancel'),
                 ['action' => 'index'],
-                ['class' => 'btn btn-secondary btn-lg']
+                ['class' => 'btn btn-secondary btn-lg'],
             ) ?>
         </div>
     </div>

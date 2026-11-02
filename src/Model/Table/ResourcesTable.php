@@ -10,19 +10,18 @@ use Cake\Validation\Validator;
  * Resources Model
  *
  * @method \AclManager\Model\Entity\Resource newEmptyEntity()
- * @method \AclManager\Model\Entity\Resource newEntity(array $data, array $options = [])
- * @method \AclManager\Model\Entity\Resource[] newEntities(array $data, array $options = [])
- * @method \AclManager\Model\Entity\Resource get(mixed $primaryKey, array|string $finder = 'all', \Psr\SimpleCache\CacheInterface|string|null $cache = null, \Closure|string|null $cacheKey = null, mixed ...$args)
- * @method \AclManager\Model\Entity\Resource findOrCreate($search, ?callable $callback = null, array $options = [])
- * @method \AclManager\Model\Entity\Resource patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \AclManager\Model\Entity\Resource[] patchEntities(iterable $entities, array $data, array $options = [])
- * @method \AclManager\Model\Entity\Resource|false save(\Cake\Datasource\EntityInterface $entity, array $options = [])
- * @method \AclManager\Model\Entity\Resource saveOrFail(\Cake\Datasource\EntityInterface $entity, array $options = [])
- * @method iterable<\AclManager\Model\Entity\Resource>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Resource>|false saveMany(iterable $entities, array $options = [])
- * @method iterable<\AclManager\Model\Entity\Resource>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Resource> saveManyOrFail(iterable $entities, array $options = [])
- * @method iterable<\AclManager\Model\Entity\Resource>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Resource>|false deleteMany(iterable $entities, array $options = [])
- * @method iterable<\AclManager\Model\Entity\Resource>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Resource> deleteManyOrFail(iterable $entities, array $options = [])
- *
+ * @method \AclManager\Model\Entity\Resource newEntity(array<string, mixed> $data, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Resource[] newEntities(array<string, mixed> $data, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Resource get(mixed $primaryKey, array<string, mixed>|string $finder = 'all', \Psr\SimpleCache\CacheInterface|string|null $cache = null, \Closure|string|null $cacheKey = null, mixed ...$args)
+ * @method \AclManager\Model\Entity\Resource findOrCreate($search, ?callable $callback = null, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Resource patchEntity(\Cake\Datasource\EntityInterface $entity, array<string, mixed> $data, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Resource[] patchEntities(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $data, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Resource|false save(\Cake\Datasource\EntityInterface $entity, array<string, mixed> $options = [])
+ * @method \AclManager\Model\Entity\Resource saveOrFail(\Cake\Datasource\EntityInterface $entity, array<string, mixed> $options = [])
+ * @method iterable<\AclManager\Model\Entity\Resource>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Resource>|false saveMany(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $options = [])
+ * @method iterable<\AclManager\Model\Entity\Resource>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Resource> saveManyOrFail(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $options = [])
+ * @method iterable<\AclManager\Model\Entity\Resource>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Resource>|false deleteMany(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $options = [])
+ * @method iterable<\AclManager\Model\Entity\Resource>|\Cake\Datasource\ResultSetInterface<\AclManager\Model\Entity\Resource> deleteManyOrFail(iterable<\Cake\Datasource\EntityInterface> $entities, array<string, mixed> $options = [])
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class ResourcesTable extends Table
@@ -40,7 +39,7 @@ class ResourcesTable extends Table
         $this->setTable('resources');
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
-        
+
         $this->getSchema()->setColumnType('active', 'boolean');
 
         $this->addBehavior('Timestamp');
@@ -89,7 +88,7 @@ class ResourcesTable extends Table
     /**
      * Get all active resources grouped by plugin and controller
      *
-     * @return array
+     * @return array<string, array<string, array<int, \Cake\Datasource\EntityInterface>>>
      */
     public function getGroupedResources(): array
     {

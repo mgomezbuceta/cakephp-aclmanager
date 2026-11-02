@@ -5,7 +5,11 @@ namespace AclManager\Test\TestCase\Service;
 
 use AclManager\Service\PermissionService;
 use AclManager\Service\StalePermissionsException;
+use AclManager\Test\TestApp\Model\Table\ThrowingPermissionsTable;
+use Cake\Datasource\ConnectionManager;
+use Cake\ORM\Locator\TableLocator;
 use Cake\TestSuite\TestCase;
+use RuntimeException;
 
 class PermissionServiceTest extends TestCase
 {
@@ -175,6 +179,20 @@ class PermissionServiceTest extends TestCase
 
         $this->assertSame(1, $this->service->replaceRolePermissions(1, [2], $version));
         $this->assertSame(['App:Articles:edit:1'], $this->rows(1));
+    }
+
+    public function testServiceUsesTheInjectedTableLocator(): void
+    {
+        $locator = new TableLocator();
+        $locator->set('AclManager.Permissions', new ThrowingPermissionsTable([
+            'alias' => 'Permissions',
+            'connection' => ConnectionManager::get('test'),
+        ]));
+        $service = new PermissionService($locator);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(ThrowingPermissionsTable::SECRET);
+        $service->revokeAll(1);
     }
 
     public function testMatrixKeysAppPermissionsUnderApp(): void

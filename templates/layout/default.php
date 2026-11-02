@@ -4,8 +4,11 @@
  *
  * @var \Cake\View\View $this
  */
+use Cake\Core\Configure;
 
 $title = $this->fetch('title');
+$dashboardUrl = ['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' => 'index'];
+$rolesUrl = ['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' => 'roles'];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -16,9 +19,17 @@ $title = $this->fetch('title');
     <?= $this->Html->meta('icon') ?>
 
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+        crossorigin="anonymous">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0"
+        crossorigin="anonymous">
 
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
@@ -236,13 +247,13 @@ $title = $this->fetch('title');
         }
 
         /* Badge Colors */
-        .badge-success {
-            background-color: var(--primary-color);
+        .badge.text-bg-success {
+            background-color: var(--primary-color) !important;
         }
 
-        .badge-secondary {
-            background-color: #e2e8f0;
-            color: var(--text-dark);
+        .badge.text-bg-secondary {
+            background-color: #e2e8f0 !important;
+            color: var(--text-dark) !important;
         }
 
         .disabled-link {
@@ -267,7 +278,7 @@ $title = $this->fetch('title');
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="<?= $this->Url->build(['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' => 'index']) ?>">
+            <a class="navbar-brand" href="<?= $this->Url->build($dashboardUrl) ?>">
                 <i class="fas fa-shield-alt"></i> <?= __d('acl_manager', 'Authorization Manager') ?>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -276,12 +287,12 @@ $title = $this->fetch('title');
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' => 'index']) ?>">
+                        <a class="nav-link" href="<?= $this->Url->build($dashboardUrl) ?>">
                             <i class="fas fa-home"></i> <?= __d('acl_manager', 'Dashboard') ?>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' => 'roles']) ?>">
+                        <a class="nav-link" href="<?= $this->Url->build($rolesUrl) ?>">
                             <i class="fas fa-users"></i> <?= __d('acl_manager', 'Roles') ?>
                         </a>
                     </li>
@@ -289,7 +300,7 @@ $title = $this->fetch('title');
                         <?= $this->Form->postLink(
                             '<i class="fas fa-sync"></i> ' . __d('acl_manager', 'Sync Resources'),
                             ['plugin' => 'AclManager', 'controller' => 'Permissions', 'action' => 'syncResources'],
-                            ['class' => 'nav-link', 'escape' => false]
+                            ['class' => 'nav-link', 'escape' => false],
                         ) ?>
                     </li>
                     <li class="nav-item">
@@ -318,14 +329,18 @@ $title = $this->fetch('title');
     <footer>
         <div class="container text-center">
             <p class="mb-0">
-                <?= __d('acl_manager', 'Authorization Manager') ?> v<?= \Cake\Core\Configure::read('AclManager.version', '3.2.0') ?> |
+                <?= __d('acl_manager', 'Authorization Manager') ?>
+                v<?= Configure::read('AclManager.version', '3.2.0') ?> |
                 <a href="https://github.com/mgomezbuceta/cakephp-aclmanager" target="_blank">GitHub</a>
             </p>
         </div>
     </footer>
 
     <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
     <?= $this->fetch('script') ?>
 </body>
 </html>

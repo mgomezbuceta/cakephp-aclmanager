@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Authorization Manager Configuration Example
  *
@@ -63,7 +65,7 @@ return [
             'Authentication.*',
             'Error/*',
             'DebugKit.*',
-            'Utilities/*'
+            'Utilities/*',
         ],
     ],
 ];

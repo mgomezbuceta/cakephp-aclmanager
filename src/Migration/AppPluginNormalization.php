@@ -28,7 +28,8 @@ final class AppPluginNormalization
             $same = implode(' AND ', array_map(fn(string $k): string => "x.$k = r.$k", $keys));
             $sql = "SELECT COUNT(*) AS n FROM $table r WHERE (r.plugin IS NULL OR r.plugin = '') AND ("
                 . "EXISTS (SELECT 1 FROM $table x WHERE x.plugin = 'App' AND $same)"
-                . " OR EXISTS (SELECT 1 FROM $table x WHERE (x.plugin IS NULL OR x.plugin = '') AND x.id < r.id AND $same))";
+                . " OR EXISTS (SELECT 1 FROM $table x"
+                . " WHERE (x.plugin IS NULL OR x.plugin = '') AND x.id < r.id AND $same))";
 
             $row = $fetchAll($sql)[0] ?? [];
 

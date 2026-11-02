@@ -72,8 +72,8 @@ Traditional ACL systems (acos/aros) are **deprecated in CakePHP 5.x**. This plug
 
 | Requirement | Version |
 |------------|---------|
-| PHP | >= 8.1 (with `ext-intl`) |
-| CakePHP | ^5.0 (see `composer.json`) |
+| PHP | >= 8.1 (with `ext-intl` and `ext-mbstring`) |
+| CakePHP | ^5.1 (see `composer.json`) |
 | CakePHP Authentication | ^3.0 (required unless you opt out, see Step 2) |
 | CakePHP Authorization | ^3.0 |
 | CakePHP Migrations | ^4.5 or ^5.0 (only needed for database paths A and B) |

@@ -5,12 +5,13 @@ namespace AclManager\Service;
 
 use AclManager\Model\Table\PermissionsTable;
 use AclManager\Model\Table\ResourcesTable;
-use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Core\Plugin;
-use Cake\ORM\TableRegistry;
+use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\ORM\Locator\LocatorInterface;
 use Cake\Utility\Inflector;
 use DirectoryIterator;
+use Exception;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -21,28 +22,42 @@ use ReflectionMethod;
  */
 class ResourceScannerService
 {
+    use LocatorAwareTrait;
+
     private ResourcesTable $Resources;
+    /**
+     * @var array<int, string>
+     */
     private array $ignoredActions;
 
     /**
      * Constructor
+     *
+     * @param \Cake\ORM\Locator\LocatorInterface|null $locator Table locator; defaults to the global one
      */
-    public function __construct()
+    public function __construct(?LocatorInterface $locator = null)
     {
-        $this->Resources = TableRegistry::getTableLocator()->get('AclManager.Resources');
-        $this->ignoredActions = Configure::read('AclManager.ignoreActions', [
+        if ($locator !== null) {
+            $this->setTableLocator($locator);
+        }
+        /** @var \AclManager\Model\Table\ResourcesTable $resources */
+        $resources = $this->fetchTable('AclManager.Resources');
+        $this->Resources = $resources;
+        /** @var array<int, string> $ignoredActions */
+        $ignoredActions = Configure::read('AclManager.ignoreActions', [
             'isAuthorized',
             'beforeFilter',
             'afterFilter',
             'initialize',
             'beforeRender',
         ]);
+        $this->ignoredActions = $ignoredActions;
     }
 
     /**
      * Scan all controllers and update resources table
      *
-     * @return array Statistics about the scan
+     * @return array<string, int> Statistics about the scan
      */
     public function scanAndSync(): array
     {
@@ -109,7 +124,7 @@ class ResourceScannerService
     /**
      * Scan all controllers in the application and plugins
      *
-     * @return array List of resources
+     * @return array<int, array<string, mixed>> List of resources
      */
     protected function scanAllControllers(): array
     {
@@ -138,7 +153,7 @@ class ResourceScannerService
      *
      * @param string $path Path to scan
      * @param string|null $plugin Plugin name
-     * @return array List of resources
+     * @return array<int, array<string, mixed>> List of resources
      */
     protected function scanControllersInPath(string $path, ?string $plugin = null): array
     {
@@ -185,7 +200,7 @@ class ResourceScannerService
      * Find all controller files in a directory
      *
      * @param string $path Directory path
-     * @return array List of controller filenames
+     * @return array<int, string> List of controller filenames
      */
     protected function findControllerFiles(string $path): array
     {
@@ -203,7 +218,7 @@ class ResourceScannerService
                     $files[] = $filename;
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Directory not readable or doesn't exist
             return [];
         }
@@ -230,8 +245,8 @@ class ResourceScannerService
     /**
      * Get all public actions from a controller
      *
-     * @param string $className Controller class name
-     * @return array List of action names
+     * @param class-string $className Controller class name
+     * @return array<int, string> List of action names
      */
     protected function getControllerActions(string $className): array
     {
@@ -347,38 +362,37 @@ class ResourceScannerService
     /**
      * Get all resources grouped by plugin and controller
      *
-     * @return array
+     * @return array<string, array<string, array<int, \Cake\Datasource\EntityInterface>>>
      */
     public function getGroupedResources(): array
-    {        
+    {
         $resources = $this->Resources->getGroupedResources();
 
-        foreach($resources as $pluginName => $controllers){
-            if(!$this->shouldIgnorePlugin($pluginName)){
-                foreach($controllers as $controllerName => $actions){
+        foreach ($resources as $pluginName => $controllers) {
+            if (!$this->shouldIgnorePlugin($pluginName)) {
+                foreach ($controllers as $controllerName => $actions) {
                     if (!$this->shouldIgnoreController($controllerName, $pluginName)) {
                         $deleteAction = false;
-                        foreach($actions as $keyAction => $action){
-                            if ($this->shouldIgnoreAction($action->action, $controllerName, $pluginName)) {                                                            
+                        foreach ($actions as $keyAction => $action) {
+                            if ($this->shouldIgnoreAction($action->action, $controllerName, $pluginName)) {
                                 unset($resources[$pluginName][$controllerName][$keyAction]);
                                 $deleteAction = true;
                             }
                         }
-                        if($deleteAction) {
-                            $resources[$pluginName][$controllerName] = array_values($resources[$pluginName][$controllerName]);
+                        if ($deleteAction) {
+                            $resources[$pluginName][$controllerName] = array_values(
+                                $resources[$pluginName][$controllerName],
+                            );
                         }
-                    }
-                    else{
+                    } else {
                         unset($resources[$pluginName][$controllerName]);
                     }
                 }
-            }
-            else{
+            } else {
                 unset($resources[$pluginName]);
             }
         }
 
         return $resources;
-
     }
 }

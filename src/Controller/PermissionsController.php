@@ -7,7 +7,9 @@ use AclManager\Service\PermissionService;
 use AclManager\Service\ResourceScannerService;
 use AclManager\Service\StalePermissionsException;
 use Cake\Core\Configure;
+use Cake\Http\Response;
 use Cake\Log\Log;
+use Exception;
 use Throwable;
 
 /**
@@ -41,13 +43,13 @@ class PermissionsController extends AppController
      *
      * @return \Cake\Http\Response|null
      */
-    public function index(): \Cake\Http\Response|null
+    public function index(): ?Response
     {
         $roles = $this->permissionService->getRolesWithPermissionCount();
         $resourceCount = $this->fetchTable('AclManager.Resources')->find()->where(['active' => true])->count();
 
         // Load configuration from config/app.php
-        $adminRoleIds = \Cake\Core\Configure::read('AclManager.adminAccess.adminRoleIds', [1]);
+        $adminRoleIds = Configure::read('AclManager.adminAccess.adminRoleIds', [1]);
 
         $this->set(compact('roles', 'resourceCount', 'adminRoleIds'));
 
@@ -60,10 +62,11 @@ class PermissionsController extends AppController
      * @param int|null $roleId Role ID
      * @return \Cake\Http\Response|null
      */
-    public function manage(?int $roleId = null): \Cake\Http\Response|null
+    public function manage(?int $roleId = null): ?Response
     {
         if (!$roleId) {
             $this->Flash->error(__d('acl_manager', 'Please select a role.'));
+
             return $this->redirect(['action' => 'index']);
         }
 
@@ -86,9 +89,9 @@ class PermissionsController extends AppController
      * Save permissions for a role
      *
      * @param int $roleId Role ID
-     * @return \Cake\Http\Response
+     * @return \Cake\Http\Response|null
      */
-    protected function savePermissions(int $roleId): \Cake\Http\Response
+    protected function savePermissions(int $roleId): ?Response
     {
         // The sentinel is the last form field; if PHP truncated the POST (max_input_vars) it is missing.
         if (!$this->request->getData('permissions_submitted')) {
@@ -113,14 +116,16 @@ class PermissionsController extends AppController
         try {
             $saved = $this->permissionService->replaceRolePermissions($roleId, $this->submittedResourceIds(), $version);
 
-            $this->Flash->success(__d('acl_manager', 'Permissions saved successfully. {0} permissions granted.', $saved));
+            $this->Flash->success(
+                __d('acl_manager', 'Permissions saved successfully. {0} permissions granted.', $saved),
+            );
         } catch (StalePermissionsException) {
             $this->Flash->error(__d(
                 'acl_manager',
                 'Another administrator changed the permissions of this role while you were editing. '
                 . 'The page has been reloaded with the current data; apply your changes again.',
             ));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logFailure('savePermissions', $e);
             $this->Flash->error(__d(
                 'acl_manager',
@@ -151,9 +156,9 @@ class PermissionsController extends AppController
     /**
      * Scan and synchronize resources
      *
-     * @return \Cake\Http\Response
+     * @return \Cake\Http\Response|null
      */
-    public function syncResources(): \Cake\Http\Response
+    public function syncResources(): ?Response
     {
         $this->request->allowMethod(['post']);
 
@@ -166,11 +171,11 @@ class PermissionsController extends AppController
                 $stats['found'],
                 $stats['created'],
                 $stats['updated'],
-                $stats['deactivated']
+                $stats['deactivated'],
             );
 
             $this->Flash->success($message);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logFailure('syncResources', $e);
             $this->Flash->error(__d(
                 'acl_manager',
@@ -186,14 +191,14 @@ class PermissionsController extends AppController
      *
      * @return \Cake\Http\Response|null
      */
-    public function roles(): \Cake\Http\Response|null
+    public function roles(): ?Response
     {
         $roles = $this->fetchTable('AclManager.Roles')->find()
             ->orderBy(['priority' => 'DESC'])
             ->all();
 
         // Load configuration from config/app.php
-        $adminRoleIds = \Cake\Core\Configure::read('AclManager.adminAccess.adminRoleIds', [1]);
+        $adminRoleIds = Configure::read('AclManager.adminAccess.adminRoleIds', [1]);
 
         $this->set(compact('roles', 'adminRoleIds'));
 
@@ -205,7 +210,7 @@ class PermissionsController extends AppController
      *
      * @return \Cake\Http\Response|null
      */
-    public function addRole(): \Cake\Http\Response|null
+    public function addRole(): ?Response
     {
         $rolesTable = $this->fetchTable('AclManager.Roles');
         $role = $rolesTable->newEmptyEntity();
@@ -215,6 +220,7 @@ class PermissionsController extends AppController
 
             if ($rolesTable->save($role)) {
                 $this->Flash->success(__d('acl_manager', 'Role created successfully.'));
+
                 return $this->redirect(['action' => 'roles']);
             }
 
@@ -232,7 +238,7 @@ class PermissionsController extends AppController
      * @param int|null $id Role ID
      * @return \Cake\Http\Response|null
      */
-    public function editRole(?int $id = null): \Cake\Http\Response|null
+    public function editRole(?int $id = null): ?Response
     {
         $rolesTable = $this->fetchTable('AclManager.Roles');
         $role = $rolesTable->get($id);
@@ -248,6 +254,7 @@ class PermissionsController extends AppController
 
             if ($rolesTable->save($role)) {
                 $this->Flash->success(__d('acl_manager', 'Role updated successfully.'));
+
                 return $this->redirect(['action' => 'roles']);
             }
 
@@ -255,18 +262,17 @@ class PermissionsController extends AppController
         }
 
         $this->set(compact('role'));
-        $this->render('add_role');
 
-        return null;
+        return $this->render('add_role');
     }
 
     /**
      * Delete a role
      *
      * @param int|null $id Role ID
-     * @return \Cake\Http\Response
+     * @return \Cake\Http\Response|null
      */
-    public function deleteRole(?int $id = null): \Cake\Http\Response
+    public function deleteRole(?int $id = null): ?Response
     {
         $this->request->allowMethod(['post', 'delete']);
 
@@ -293,19 +299,21 @@ class PermissionsController extends AppController
      *
      * @param int|null $sourceId Source role ID
      * @param int|null $targetId Target role ID
-     * @return \Cake\Http\Response
+     * @return \Cake\Http\Response|null
      */
-    public function copyPermissions(?int $sourceId = null, ?int $targetId = null): \Cake\Http\Response
+    public function copyPermissions(?int $sourceId = null, ?int $targetId = null): ?Response
     {
         $this->request->allowMethod(['post']);
 
         if (!$sourceId || !$targetId) {
             $this->Flash->error(__d('acl_manager', 'Invalid roles specified.'));
+
             return $this->redirect(['action' => 'index']);
         }
 
         if ($sourceId === $targetId) {
             $this->Flash->error(__d('acl_manager', 'Source and target roles must be different.'));
+
             return $this->redirect(['action' => 'index']);
         }
 
@@ -319,12 +327,12 @@ class PermissionsController extends AppController
                     'acl_manager',
                     'Permissions copied successfully from "{0}" to "{1}".',
                     $sourceRole->name,
-                    $targetRole->name
+                    $targetRole->name,
                 ));
             } else {
                 $this->Flash->error(__d('acl_manager', 'Error copying permissions.'));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logFailure('copyPermissions', $e);
             $this->Flash->error(__d(
                 'acl_manager',
@@ -339,14 +347,15 @@ class PermissionsController extends AppController
      * Clear all permissions for a role
      *
      * @param int|null $roleId Role ID
-     * @return \Cake\Http\Response
+     * @return \Cake\Http\Response|null
      */
-    public function clearPermissions(?int $roleId = null): \Cake\Http\Response
+    public function clearPermissions(?int $roleId = null): ?Response
     {
         $this->request->allowMethod(['post']);
 
         if (!$roleId) {
             $this->Flash->error(__d('acl_manager', 'Invalid role specified.'));
+
             return $this->redirect(['action' => 'index']);
         }
 
@@ -358,9 +367,9 @@ class PermissionsController extends AppController
                 'acl_manager',
                 'All permissions cleared for role "{0}". {1} permissions removed.',
                 $role->name,
-                $count
+                $count,
             ));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logFailure('clearPermissions', $e);
             $this->Flash->error(__d(
                 'acl_manager',
